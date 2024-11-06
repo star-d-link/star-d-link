@@ -5,12 +5,12 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.header.writers.frameoptions.XFrameOptionsHeaderWriter;
 import org.springframework.security.web.header.writers.frameoptions.XFrameOptionsHeaderWriter.XFrameOptionsMode;
-import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 
 @Configuration
 @EnableWebSecurity
@@ -19,12 +19,22 @@ public class SecurityConfig {
 
     @Bean
     SecurityFilterChain filterChain(HttpSecurity httpSecurity) throws Exception {
-        httpSecurity.authorizeHttpRequests(
-                (auth) -> auth.requestMatchers(new AntPathRequestMatcher("/**")).permitAll())
-            .csrf((csrf) -> csrf.ignoringRequestMatchers(
-                new AntPathRequestMatcher("/h2-console/**")))
+        httpSecurity
+            // 폼 로그인 비활성화
+            .formLogin(AbstractHttpConfigurer::disable)
+            // 로그아웃 비활성화
+            .logout(AbstractHttpConfigurer::disable)
+            // csrf 토큰 세션 비활성화
+            .csrf(AbstractHttpConfigurer::disable)
+            // Http session 생성 비활성화
+            .sessionManagement(AbstractHttpConfigurer::disable)
+            // 모든 url 접근허용
+//            .authorizeHttpRequests(
+//                (auth) -> auth.requestMatchers(new AntPathRequestMatcher("/**")).permitAll())
+            // iframe 허용 (h2 console)
             .headers((headers) -> headers.addHeaderWriter(new XFrameOptionsHeaderWriter(
-                XFrameOptionsMode.SAMEORIGIN)));
+                XFrameOptionsMode.SAMEORIGIN)))
+        ;
 
         return httpSecurity.build();
     }
