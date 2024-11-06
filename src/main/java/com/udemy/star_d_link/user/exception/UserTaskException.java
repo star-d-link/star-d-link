@@ -4,6 +4,7 @@ import lombok.Getter;
 
 @Getter
 public class UserTaskException extends RuntimeException {
+public class UserTaskException {
 
     private final String msg;
     private final int code;
