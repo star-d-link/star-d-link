@@ -44,13 +44,13 @@ public class UserEntity {
     private String email;
 
     @Column(length = 250)
-    private String profile_url;
+    private String profileUrl;
 
     @Column(nullable = false, length = 20)
-    private String phone_number;
+    private String phoneNumber;
 
     @Column(nullable = false, length = 20)
-    private String birth_date;
+    private String birthDate;
 
     @Column(nullable = false, length = 100)
     private String region;
@@ -59,9 +59,9 @@ public class UserEntity {
     private String role;
 
     @CreatedDate
-    private LocalDateTime created_at;
+    private LocalDateTime createdAt;
 
     @LastModifiedDate
-    private LocalDateTime updated_at;
+    private LocalDateTime updatedAt;
 
 }
