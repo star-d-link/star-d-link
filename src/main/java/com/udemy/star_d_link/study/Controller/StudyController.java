@@ -2,15 +2,18 @@ package com.udemy.star_d_link.study.Controller;
 
 import com.udemy.star_d_link.study.Dto.Response.ApiResponse;
 import com.udemy.star_d_link.study.Dto.StudyCreateRequestDto;
+import com.udemy.star_d_link.study.Dto.StudyResponseDto;
 import com.udemy.star_d_link.study.Entity.Study;
 import com.udemy.star_d_link.study.Service.StudyService;
 import jakarta.validation.Valid;
+import java.util.NoSuchElementException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -62,6 +65,29 @@ public class StudyController {
                 null
             );
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
+        }
+    }
+
+    @GetMapping("/{study_id}")
+    public ResponseEntity<ApiResponse<StudyResponseDto>> getStudy(
+        @PathVariable Long study_id) {
+        try {
+
+            StudyResponseDto studyDto = studyService.findByStudyId(study_id);
+
+            ApiResponse<StudyResponseDto> response = new ApiResponse<>(
+                "success",
+                "스터디 모집 글 조회 완료.",
+                studyDto
+            );
+            return ResponseEntity.status(HttpStatus.OK).body(response);
+        } catch (NoSuchElementException e) {
+            ApiResponse<StudyResponseDto> response = new ApiResponse<>(
+                "error",
+                "글이 존재하지 않습니다.",
+                null
+            );
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(response);
         }
     }
 }
