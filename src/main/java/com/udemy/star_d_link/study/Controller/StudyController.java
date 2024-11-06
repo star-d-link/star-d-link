@@ -33,8 +33,7 @@ public class StudyController {
 
     @PostMapping(value = "/create")
     public ResponseEntity<ApiResponse<Study>> createStudy(
-        @Valid
-        @RequestBody StudyCreateRequestDto requestDto,
+        @Valid @RequestBody StudyCreateRequestDto requestDto,
         @AuthenticationPrincipal UserDetails currentUser) {
 
         if (currentUser == null) {
@@ -47,7 +46,7 @@ public class StudyController {
         }
 
         try {
-            Study newStudy = studyService.createStudy(requestDto);
+            Study newStudy = studyService.createStudy(requestDto, currentUser.getUsername());
 
             ApiResponse<Study> response = new ApiResponse<>(
                 "success",
@@ -56,13 +55,13 @@ public class StudyController {
             );
 
             return ResponseEntity.status(HttpStatus.CREATED).body(response);
-        } catch (RuntimeException e) {
+        } catch (IllegalArgumentException e) {
             ApiResponse<Study> response = new ApiResponse<>(
                 "error",
                 "작성 형식이 올바르지 않습니다.",
                 null
             );
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(response);
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
         }
     }
 }

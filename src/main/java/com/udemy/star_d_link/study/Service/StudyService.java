@@ -13,9 +13,15 @@ public class StudyService {
         this.studyRepository = studyRepository;
     }
 
-    public Study createStudy(StudyCreateRequestDto studyCreateRequestDto){
+    public Study createStudy(StudyCreateRequestDto studyCreateRequestDto, String username){
+
+        // 임시로 유저 아이디 적용함. 실제 적용할 때는
+        // User user = userRepository.findByUsername(username) 같이 받아온 username으로 userId를 찾기
+        Long id = 1L;
+
+
         Study newStudy = Study.builder()
-            .userId(studyCreateRequestDto.getUserId())
+            .userId(id)
             .title(studyCreateRequestDto.getTitle())
             .content(studyCreateRequestDto.getContent())
             .hashtag(studyCreateRequestDto.getHashtag())
