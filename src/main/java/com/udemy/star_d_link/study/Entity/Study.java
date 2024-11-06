@@ -45,5 +45,5 @@ public class Study {
     private boolean isOnline;
 
     @Column(nullable = false)
-    private int headcount;
+    private int headCount;
 }
