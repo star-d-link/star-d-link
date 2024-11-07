@@ -22,7 +22,7 @@ public class UserServiceImpl implements UserService {
     @Override
     public UserDTO read(String username, String password) {
         UserEntity userEntity = userRepository.findByUsername(username)
-            .orElseThrow(UserExceptions.NOT_FOUND::get);
+            .orElseThrow(UserExceptions.BAD_CREDENTIALS::get);
 
         if (!passwordEncoder.matches(password, userEntity.getPassword())) {
             throw UserExceptions.BAD_CREDENTIALS.get();
