@@ -1,5 +1,6 @@
 package com.udemy.star_d_link.user.controller;
 
+import com.udemy.star_d_link.security.util.JWTUtil;
 import com.udemy.star_d_link.user.dto.UserDTO;
 import com.udemy.star_d_link.user.service.UserService;
 import java.util.Map;
@@ -18,6 +19,7 @@ import org.springframework.web.bind.annotation.RestController;
 public class TokenController {
 
     private final UserService userService;
+    private final JWTUtil jwtUtil;
 
     @PostMapping("/make")
     public ResponseEntity<Map<String, String>> makeToken(@RequestBody UserDTO userDTO) {
@@ -27,7 +29,20 @@ public class TokenController {
         UserDTO userDTOResult = userService.read(userDTO.getUsername(), userDTO.getPassword());
 
         log.info(userDTOResult);
-        // TODO: 토큰 생성해야함
-        return null;
+
+        String username = userDTOResult.getUsername();
+        Map<String, Object> dataMap = userDTOResult.getDataMap();
+
+        // TODO: 개발 진행 중 액세스 10분, 리프레쉬 7일로 설정 나중에 1일, 30일로 변경해야함
+        String accessToken = jwtUtil.createToken(dataMap, 10);
+        String refreshToken = jwtUtil.createToken(Map.of("username", username)
+            , 60 * 24 * 7);
+
+        log.info("accessToken: " + accessToken);
+        log.info("refreshToken: " + refreshToken);
+
+        return ResponseEntity.ok(
+            Map.of("accessToken", accessToken, "refreshToken", refreshToken)
+        );
     }
 }

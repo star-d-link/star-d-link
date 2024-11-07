@@ -43,7 +43,6 @@ public class UserDTO {
             "password", password,
             "nickname", nickname,
             "email", email,
-            "profileUrl", profileUrl,
             "phoneNumber", phoneNumber,
             "birthDate", birthDate,
             "region", region,
