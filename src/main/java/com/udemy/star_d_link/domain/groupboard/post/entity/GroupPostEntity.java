@@ -7,12 +7,15 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
+import java.time.LocalDate;
 import java.util.List;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.UpdateTimestamp;
 
 @Entity
 @Getter
@@ -34,6 +37,14 @@ public class GroupPostEntity {
 
     @Column(nullable = false)
     private int numberOfComments;
+
+    @CreationTimestamp
+    @Column(nullable = false, updatable = false)
+    private LocalDate createdAt;
+
+    @UpdateTimestamp
+    @Column(insertable = false)
+    private LocalDate updatedAt;
 
     @OneToMany(mappedBy = "groupPost")
     private List<GroupPostFileEntity> groupPostFile;
