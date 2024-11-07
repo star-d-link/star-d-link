@@ -4,7 +4,10 @@ import com.udemy.star_d_link.study.Dto.Response.ApiResponse;
 import com.udemy.star_d_link.study.Dto.StudyCreateRequestDto;
 import com.udemy.star_d_link.study.Dto.StudyListDto;
 import com.udemy.star_d_link.study.Dto.StudyResponseDto;
+import com.udemy.star_d_link.study.Dto.StudyUpdateRequestDto;
 import com.udemy.star_d_link.study.Entity.Study;
+import com.udemy.star_d_link.study.Exception.UnauthorizedException;
+import com.udemy.star_d_link.study.Mapper.StudyMapper;
 import com.udemy.star_d_link.study.Service.StudyService;
 import jakarta.validation.Valid;
 import java.util.NoSuchElementException;
@@ -17,6 +20,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -43,55 +47,89 @@ public class StudyController {
         @AuthenticationPrincipal UserDetails currentUser) {
 
         if (currentUser == null) {
-            ApiResponse<Study> response = new ApiResponse<>(
-                "error",
-                "작성 권한이 없습니다.",
-                null
-            );
-            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(response);
+            throw new UnauthorizedException("작성 권한이 없습니다.");
         }
+        Study newStudy = studyService.createStudy(requestDto, currentUser.getUsername());
 
-        try {
-            Study newStudy = studyService.createStudy(requestDto, currentUser.getUsername());
+        ApiResponse<Study> response = new ApiResponse<>(
+            "success",
+            "작성이 완료되었습니다.",
+            newStudy
+        );
 
-            ApiResponse<Study> response = new ApiResponse<>(
-                "success",
-                "작성이 완료되었습니다.",
-                newStudy
-            );
-
-            return ResponseEntity.status(HttpStatus.CREATED).body(response);
-        } catch (IllegalArgumentException e) {
-            ApiResponse<Study> response = new ApiResponse<>(
-                "error",
-                "작성 형식이 올바르지 않습니다.",
-                null
-            );
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
-        }
+        return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
     @GetMapping("/{study_id}")
     public ResponseEntity<ApiResponse<StudyResponseDto>> getStudy(
         @PathVariable Long study_id) {
-        try {
+        StudyResponseDto studyDto = studyService.findByStudyId(study_id);
 
-            StudyResponseDto studyDto = studyService.findByStudyId(study_id);
+        ApiResponse<StudyResponseDto> response = new ApiResponse<>(
+            "success",
+            "스터디 모집 글 조회 완료.",
+            studyDto
+        );
+        return ResponseEntity.status(HttpStatus.OK).body(response);
+    }
 
-            ApiResponse<StudyResponseDto> response = new ApiResponse<>(
-                "success",
-                "스터디 모집 글 조회 완료.",
-                studyDto
-            );
-            return ResponseEntity.status(HttpStatus.OK).body(response);
-        } catch (NoSuchElementException e) {
-            ApiResponse<StudyResponseDto> response = new ApiResponse<>(
-                "error",
-                "글이 존재하지 않습니다.",
-                null
-            );
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(response);
+
+    @GetMapping("/{study_id}/edit")
+    public ResponseEntity<ApiResponse<StudyUpdateRequestDto>> getStudyEditForm(
+        @PathVariable Long study_id,
+        @AuthenticationPrincipal UserDetails currentUser) {
+
+        if (currentUser == null) {
+            throw new UnauthorizedException("인증이 필요합니다.");
         }
+
+        StudyResponseDto studyResponseDto = studyService.findByStudyId(study_id);
+
+        // studyResponseDto의 getUserId로 user의 닉네임을 받아와야 함
+        // 임시로 nickname 설정
+        String tempName = "test";
+
+        if(!tempName.equals(currentUser.getUsername())) {
+            throw new UnauthorizedException("접근 권한이 없습니다.");
+        }
+
+        StudyUpdateRequestDto responseDto = StudyMapper.toUpdateRequestDto(studyResponseDto);
+
+        ApiResponse<StudyUpdateRequestDto> response = new ApiResponse<>(
+            "success",
+            "수정할 내용을 표시합니다.",
+            responseDto
+        );
+
+        return ResponseEntity.status(HttpStatus.OK).body(response);
+    }
+
+    @PutMapping("/{study_id}/edit")
+    public ResponseEntity<ApiResponse<StudyResponseDto>> putStudyEditForm(
+        @PathVariable Long study_id,
+        @RequestBody StudyUpdateRequestDto requestDto,
+        @AuthenticationPrincipal UserDetails currentUser) {
+
+        if (currentUser == null /*|| !currentUser.getUsername().equals(nickname)*/) {
+            throw new UnauthorizedException("수정 권한이 없습니다.");
+        }
+
+        Study editStudy = studyService.editStudyByUserId(study_id, requestDto);
+
+        // 실제로 적용할 때는 getUserId로 유저 정보를 찾아서 나온 nickname이나 다른 유저 정보로 수정
+        if (!currentUser.getUsername().equals(editStudy.getUserId())) {
+            throw new UnauthorizedException("수정 권한이 없습니다.");
+        }
+
+        StudyResponseDto studyResponseDto = new StudyResponseDto(editStudy, true);
+
+
+        ApiResponse<StudyResponseDto> response = new ApiResponse<>(
+            "success",
+            "사용자 정보가 성공적으로 수정되었습니다.",
+            studyResponseDto
+        );
+        return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 
     @GetMapping("/list")

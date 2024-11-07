@@ -16,6 +16,6 @@ public class StudyCreateRequestDto {
     private Boolean isRecruit;
     private String region;
     private Boolean isOnline;
-    private Integer heedCount;
+    private Integer headCount;
     private Date createDate;
 }
