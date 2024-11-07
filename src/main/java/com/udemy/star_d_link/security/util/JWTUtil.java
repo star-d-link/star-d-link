@@ -3,6 +3,7 @@ package com.udemy.star_d_link.security.util;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;
+import java.nio.charset.StandardCharsets;
 import java.time.ZonedDateTime;
 import java.util.Date;
 import java.util.Map;
@@ -12,16 +13,16 @@ import org.springframework.stereotype.Component;
 
 @Component
 @Log4j2
-public class JWTUtill {
+public class JWTUtil {
 
-    private static String key = "1348342572893738473540958238572893342346";
+    private static final String key = "1348342572893738473540958238572893342346";
 
     public String createToken(Map<String, Object> valueMap, int min) {
 
         SecretKey key = null;
 
         try {
-            key = Keys.hmacShaKeyFor(JWTUtill.key.getBytes("UTF-8"));
+            key = Keys.hmacShaKeyFor(JWTUtil.key.getBytes(StandardCharsets.UTF_8));
         } catch (Exception e) {
             throw new RuntimeException(e.getMessage());
         }
@@ -43,7 +44,7 @@ public class JWTUtill {
         SecretKey key = null;
 
         try {
-            key = Keys.hmacShaKeyFor(JWTUtill.key.getBytes("UTF-8"))
+            key = Keys.hmacShaKeyFor(JWTUtil.key.getBytes(StandardCharsets.UTF_8));
         } catch (Exception e) {
             throw new RuntimeException(e.getMessage());
         }
