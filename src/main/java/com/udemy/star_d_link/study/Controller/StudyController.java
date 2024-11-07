@@ -42,19 +42,26 @@ public class StudyController {
     }
 
     @PostMapping(value = "/create")
-    public ResponseEntity<ApiResponse<Study>> createStudy(
+    public ResponseEntity<ApiResponse<StudyResponseDto>> createStudy(
         @Valid @RequestBody StudyCreateRequestDto requestDto,
         @AuthenticationPrincipal UserDetails currentUser) {
 
         if (currentUser == null) {
             throw new UnauthorizedException("작성 권한이 없습니다.");
         }
-        Study newStudy = studyService.createStudy(requestDto, currentUser.getUsername());
+        // 요청 DTO를 Study 엔티티로 변환
+        Study study = StudyMapper.toEntity(requestDto);
 
-        ApiResponse<Study> response = new ApiResponse<>(
+        // 엔티티 저장
+        Study savedStudy = studyService.createStudy(study);
+
+        // 저장된 엔티티를 응답 DTO로 변환
+        StudyResponseDto responseDto = StudyMapper.toResponseDto(savedStudy);
+
+        ApiResponse<StudyResponseDto> response = new ApiResponse<>(
             "success",
             "작성이 완료되었습니다.",
-            newStudy
+            responseDto
         );
 
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
@@ -121,7 +128,8 @@ public class StudyController {
             throw new UnauthorizedException("수정 권한이 없습니다.");
         }
 
-        StudyResponseDto studyResponseDto = new StudyResponseDto(editStudy, true);
+        StudyResponseDto studyResponseDto = StudyMapper.toResponseDto(editStudy);
+
 
 
         ApiResponse<StudyResponseDto> response = new ApiResponse<>(

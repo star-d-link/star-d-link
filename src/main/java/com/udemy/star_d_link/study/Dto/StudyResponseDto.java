@@ -1,5 +1,6 @@
 package com.udemy.star_d_link.study.Dto;
 
+import com.udemy.star_d_link.study.Entity.Study;
 import java.util.Date;
 import lombok.AllArgsConstructor;
 import lombok.Getter;

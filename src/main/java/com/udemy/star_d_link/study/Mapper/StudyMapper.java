@@ -64,4 +64,17 @@ public class StudyMapper {
             responseDto.getHeadCount()
         );
     }
+
+    // StudyUpdateRequestDto를 이용해 기존 Study 엔티티를 업데이트하는 메소드
+    public static Study updateStudyFromDto(Study study, StudyUpdateRequestDto requestDto) {
+        return study.toBuilder()
+            .title(requestDto.getTitle())
+            .content(requestDto.getContent())
+            .hashtag(requestDto.getHashtag())
+            .isRecruit(requestDto.getIsRecruit())
+            .region(requestDto.getRegion())
+            .isOnline(requestDto.getIsOnline())
+            .headCount(requestDto.getHeadCount())
+            .build();
+    }
 }

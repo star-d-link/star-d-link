@@ -23,13 +23,15 @@ public class StudyService {
         this.studyRepository = studyRepository;
     }
 
-    public Study createStudy(StudyCreateRequestDto requestDto, String username){
+    public Study createStudy(Study study){
 
         // 임시로 유저 아이디 적용함. 실제 적용할 때는
         // User user = userRepository.findByUsername(username) 같이 받아온 username으로 userId를 찾기
         Long id = 1L;
+        Study updatedStudy = study.toBuilder()
+            .userId(id)  // userId를 설정
+            .build();
 
-        Study study = StudyMapper.toEntity(requestDto);
         return studyRepository.save(study);
     }
 
@@ -38,23 +40,10 @@ public class StudyService {
         // 임시로 유저 아이디 적용함. 실제 적용할 때는
         // User user = userRepository.findByUsername(username) 같이 받아온 username으로 userId를 찾기
         Long id = 1L;
-        Optional<Study> optionalStudy = studyRepository.findByUserId(id);
-
-        if (optionalStudy.isEmpty()) {
-            throw new RuntimeException("해당 글을 찾을 수 없습니다.");
-        }
         Study study = studyRepository.findById(studyId)
             .orElseThrow(() -> new RuntimeException("해당 글을 찾을 수 없습니다."));
 
-        Study editStudy = study.toBuilder()
-            .title(requestDto.getTitle())
-            .content(requestDto.getContent())
-            .hashtag(requestDto.getHashtag())
-            .isRecruit(requestDto.getIsRecruit())
-            .region(requestDto.getRegion())
-            .isOnline(requestDto.getIsOnline())
-            .headCount(requestDto.getHeadCount())
-            .build();
+        Study editStudy = StudyMapper.updateStudyFromDto(study, requestDto);
 
         return studyRepository.save(editStudy);
     }
