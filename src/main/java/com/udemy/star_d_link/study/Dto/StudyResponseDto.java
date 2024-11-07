@@ -14,9 +14,9 @@ public class StudyResponseDto {
     private String title;
     private String content;
     private String hashtag;
-    private boolean isRecruit;
+    private Boolean isRecruit;
     private String region;
-    private boolean isOnline;
-    private int heedCount;
+    private Boolean isOnline;
+    private Integer heedCount;
     private Date createDate;
 }

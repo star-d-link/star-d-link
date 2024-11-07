@@ -2,12 +2,14 @@ package com.udemy.star_d_link.study.Controller;
 
 import com.udemy.star_d_link.study.Dto.Response.ApiResponse;
 import com.udemy.star_d_link.study.Dto.StudyCreateRequestDto;
+import com.udemy.star_d_link.study.Dto.StudyListDto;
 import com.udemy.star_d_link.study.Dto.StudyResponseDto;
 import com.udemy.star_d_link.study.Entity.Study;
 import com.udemy.star_d_link.study.Service.StudyService;
 import jakarta.validation.Valid;
 import java.util.NoSuchElementException;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -17,6 +19,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
@@ -89,5 +92,29 @@ public class StudyController {
             );
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(response);
         }
+    }
+
+    @GetMapping("/list")
+    public ResponseEntity<ApiResponse<Page<StudyListDto>>> listStudy(
+        @RequestParam(defaultValue = "0") int page,
+        @RequestParam(defaultValue = "10") int size) {
+
+        Page<Study> studyPage = studyService.getStudyList(page, size);
+        Page<StudyListDto> dtoPage = studyPage.map(study -> new StudyListDto(
+            study.getStudyId(),
+            study.getTitle(),
+            study.getIsRecruit(),
+            study.getRegion(),
+            study.getIsOnline(),
+            study.getCreateDate()
+        ));
+
+        ApiResponse<Page<StudyListDto>> response = new ApiResponse<>(
+            "success",
+            "스터디 목록 조회 완료",
+            dtoPage
+        );
+
+        return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 }

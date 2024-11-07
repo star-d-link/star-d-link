@@ -5,6 +5,10 @@ import com.udemy.star_d_link.study.Dto.StudyResponseDto;
 import com.udemy.star_d_link.study.Entity.Study;
 import com.udemy.star_d_link.study.Repository.StudyRepository;
 import java.util.NoSuchElementException;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -52,4 +56,11 @@ public class StudyService {
             study.getCreateDate()
         );
     }
+
+    public Page<Study> getStudyList(int page, int size) {
+        Pageable pageable = PageRequest.of(page, size, Sort.by("createDate").descending());
+        return studyRepository.findAll(pageable);
+    }
+
+
 }
