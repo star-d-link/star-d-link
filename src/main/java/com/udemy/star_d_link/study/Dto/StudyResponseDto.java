@@ -8,14 +8,15 @@ import lombok.NoArgsConstructor;
 @Getter
 @NoArgsConstructor
 @AllArgsConstructor
-public class StudyCreateRequestDto {
+public class StudyResponseDto {
+    private Long StudyId;
     private Long userId;
     private String title;
     private String content;
     private String hashtag;
-    private Boolean isRecruit;
+    private boolean isRecruit;
     private String region;
-    private Boolean isOnline;
-    private Integer heedCount;
+    private boolean isOnline;
+    private int heedCount;
     private Date createDate;
 }

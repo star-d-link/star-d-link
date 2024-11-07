@@ -6,11 +6,16 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
+import jakarta.persistence.Temporal;
+import jakarta.persistence.TemporalType;
+import java.util.Date;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.CreationTimestamp;
+import org.springframework.data.annotation.CreatedDate;
 
 @Entity
 @Builder(toBuilder = true)
@@ -36,14 +41,19 @@ public class Study {
     private String hashtag;
 
     @Column(nullable = false)
-    private boolean isRecruit;
+    private Boolean isRecruit;
 
     @Column(length = 100)
     private String region;
 
     @Column(nullable = false)
-    private boolean isOnline;
+    private Boolean isOnline;
 
     @Column(nullable = false)
-    private int headCount;
+    private Integer headCount;
+
+    @Temporal(TemporalType.TIMESTAMP)
+    @Column(nullable = false, updatable = false)
+    @CreationTimestamp
+    private Date createDate;
 }

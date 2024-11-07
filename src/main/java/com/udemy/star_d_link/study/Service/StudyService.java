@@ -5,7 +5,6 @@ import com.udemy.star_d_link.study.Dto.StudyResponseDto;
 import com.udemy.star_d_link.study.Entity.Study;
 import com.udemy.star_d_link.study.Repository.StudyRepository;
 import java.util.NoSuchElementException;
-import java.util.Optional;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -16,7 +15,7 @@ public class StudyService {
         this.studyRepository = studyRepository;
     }
 
-    public Study createStudy(StudyCreateRequestDto studyCreateRequestDto, String username){
+    public Study createStudy(StudyCreateRequestDto requestDto, String username){
 
         // 임시로 유저 아이디 적용함. 실제 적용할 때는
         // User user = userRepository.findByUsername(username) 같이 받아온 username으로 userId를 찾기
@@ -24,13 +23,13 @@ public class StudyService {
 
         Study newStudy = Study.builder()
             .userId(id)
-            .title(studyCreateRequestDto.getTitle())
-            .content(studyCreateRequestDto.getContent())
-            .hashtag(studyCreateRequestDto.getHashtag())
+            .title(requestDto.getTitle())
+            .content(requestDto.getContent())
+            .hashtag(requestDto.getHashtag())
             .isRecruit(false)
-            .region(studyCreateRequestDto.getRegion())
-            .isOnline(studyCreateRequestDto.isOnline())
-            .headCount(studyCreateRequestDto.getHeedCount())
+            .region(requestDto.getRegion())
+            .isOnline(requestDto.getIsOnline())
+            .headCount(requestDto.getHeedCount())
             .build();
 
         return studyRepository.save(newStudy);
@@ -46,10 +45,11 @@ public class StudyService {
             study.getTitle(),
             study.getContent(),
             study.getHashtag(),
-            study.isRecruit(),
+            study.getIsRecruit(),
             study.getRegion(),
-            study.isOnline(),
-            study.getHeadCount()
+            study.getIsOnline(),
+            study.getHeadCount(),
+            study.getCreateDate()
         );
     }
 }
