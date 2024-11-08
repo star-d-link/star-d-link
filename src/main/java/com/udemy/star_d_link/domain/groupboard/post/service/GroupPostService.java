@@ -30,6 +30,7 @@ public class GroupPostService {
         StudyMember studyMember = StudyMemberRepository.find();
         GroupPostEntity groupPost = GroupPostEntity.of(createRequestDto, studyMembers);
         groupPostRepository.save(groupPost);
+        return GroupPostCreateResponseDto.from(groupPost);
     }
 
     @Transactional
