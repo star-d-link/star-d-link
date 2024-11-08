@@ -6,6 +6,7 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.util.Map;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.stereotype.Component;
@@ -61,11 +62,25 @@ public class JWTCheckFilter extends OncePerRequestFilter {
             handleException(response, new Exception("ACCESS TOKEN NOT FOUND"));
             return;
         }
+
+        String accessToken = headerStr.substring(7);
+
+        try {
+            Map<String, Object> tokenMap = jwtUtil.validateToken(accessToken);
+            // 토큰 검증 결과에 문제가 없으면 다음 필터로 넘어간다.
+            log.info("tokenMap: " + tokenMap);
+            filterChain.doFilter(request, response);
+        } catch (Exception e) {
+            // 문제가 발생하면
+            handleException(response, e);
+        }
+
+
     }
 
     /**
-     * Access Toekn이 없거나 Beaarer로 시작하지 않는 경우라 JwtException이 발생하면
-     * 403 Forbidden 에러를 발생시키게 한다.
+     * Access Toekn이 없거나 Beaarer로 시작하지 않는 경우 또는 토큰에
+     * 문제가 있을경우에 JwtException이 발생하면 403 Forbidden 에러를 발생시키게 한다.
      * @param response
      * @param e
      * @throws IOException
