@@ -1,5 +1,7 @@
 package com.udemy.star_d_link.domain.groupboard.post.service;
 
+import com.udemy.star_d_link.domain.groupboard.post.dto.request.GroupPostCreateRequestDto;
+import com.udemy.star_d_link.domain.groupboard.post.dto.response.GroupPostCreateResponseDto;
 import com.udemy.star_d_link.domain.groupboard.post.dto.response.GroupPostInquiryResponseDto;
 import com.udemy.star_d_link.domain.groupboard.post.entity.GroupPostEntity;
 import com.udemy.star_d_link.domain.groupboard.post.repository.GroupPostRepository;
@@ -16,7 +18,13 @@ public class GroupPostService {
     public List<GroupPostInquiryResponseDto> getSome(Long groupId, Long lastPostId) {
         List<GroupPostEntity> groupPostEntities = groupPostRepository.findSomeByGroupIdAndLastPostId(
             groupId, lastPostId);
-        // 댓글 개수 가져오기
         return groupPostEntities.stream().map(GroupPostInquiryResponseDto::from).toList();
+    }
+
+    public GroupPostCreateResponseDto save(Long groupId,
+        GroupPostCreateRequestDto createRequestDto) {
+        StudyMember studyMember = StudyMemberRepository.find();
+        GroupPostEntity groupPost = GroupPostEntity.of(createRequestDto, studyMembers);
+        groupPostRepository.save(groupPost);
     }
 }
