@@ -29,6 +29,7 @@ public class Study {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long studyId;
 
+    @Column
     private Long userId;
 
     @Column(length = 255, nullable = false)
