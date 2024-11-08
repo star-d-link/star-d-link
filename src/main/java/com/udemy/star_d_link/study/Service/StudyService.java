@@ -1,6 +1,7 @@
 package com.udemy.star_d_link.study.Service;
 
 import com.udemy.star_d_link.study.Dto.StudyCreateRequestDto;
+import com.udemy.star_d_link.study.Dto.StudyListDto;
 import com.udemy.star_d_link.study.Dto.StudyResponseDto;
 import com.udemy.star_d_link.study.Dto.StudyUpdateRequestDto;
 import com.udemy.star_d_link.study.Entity.Study;
@@ -13,6 +14,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 public class StudyService {
@@ -23,16 +25,17 @@ public class StudyService {
         this.studyRepository = studyRepository;
     }
 
-    public Study createStudy(Study study){
+    @Transactional
+    public StudyResponseDto  createStudy(StudyCreateRequestDto requestDto){
 
-        // 임시로 유저 아이디 적용함. 실제 적용할 때는
-        // User user = userRepository.findByUsername(username) 같이 받아온 username으로 userId를 찾기
-        Long id = 1L;
-        Study updatedStudy = study.toBuilder()
-            .userId(id)  // userId를 설정
-            .build();
+        // DTO를 엔티티로 변환
+        Study study = StudyMapper.toEntity(requestDto);
 
-        return studyRepository.save(study);
+        // 엔티티 저장
+        Study savedStudy = studyRepository.save(study);
+
+        // 저장된 엔티티를 응답 DTO로 변환
+        return StudyMapper.toResponseDto(savedStudy);
     }
 
     public Study editStudyByUserId(Long studyId, StudyUpdateRequestDto requestDto) {
@@ -48,16 +51,16 @@ public class StudyService {
         return studyRepository.save(editStudy);
     }
 
-    public StudyResponseDto findByStudyId(Long studyId){
-        Study study =  studyRepository.findByStudyId(studyId)
+    public Study findByStudyId(Long studyId) {
+        return studyRepository.findByStudyId(studyId)
             .orElseThrow(() -> new NoSuchElementException("스터디 모집글 내용을 찾을 수 없습니다: " + studyId));
-
-        return StudyMapper.toResponseDto(study);
     }
 
-    public Page<Study> getStudyList(int page, int size) {
+    public Page<StudyListDto> getStudyList(int page, int size) {
         Pageable pageable = PageRequest.of(page, size, Sort.by("createDate").descending());
-        return studyRepository.findAll(pageable);
+        Page<Study> studyPage = studyRepository.findAll(pageable);
+
+        return studyPage.map(StudyMapper::toListDto);
     }
 
 

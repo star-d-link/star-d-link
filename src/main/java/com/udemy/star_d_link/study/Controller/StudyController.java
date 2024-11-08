@@ -49,14 +49,8 @@ public class StudyController {
         if (currentUser == null) {
             throw new UnauthorizedException("작성 권한이 없습니다.");
         }
-        // 요청 DTO를 Study 엔티티로 변환
-        Study study = StudyMapper.toEntity(requestDto);
 
-        // 엔티티 저장
-        Study savedStudy = studyService.createStudy(study);
-
-        // 저장된 엔티티를 응답 DTO로 변환
-        StudyResponseDto responseDto = StudyMapper.toResponseDto(savedStudy);
+        StudyResponseDto responseDto = studyService.createStudy(requestDto);
 
         ApiResponse<StudyResponseDto> response = new ApiResponse<>(
             "success",
@@ -70,12 +64,16 @@ public class StudyController {
     @GetMapping("/{study_id}")
     public ResponseEntity<ApiResponse<StudyResponseDto>> getStudy(
         @PathVariable Long study_id) {
-        StudyResponseDto studyDto = studyService.findByStudyId(study_id);
+        // 서비스 계층에서 Study 엔티티 조회
+        Study study = studyService.findByStudyId(study_id);
+
+        // Study 엔티티를 StudyResponseDto로 변환
+        StudyResponseDto responseDto = StudyMapper.toResponseDto(study);
 
         ApiResponse<StudyResponseDto> response = new ApiResponse<>(
             "success",
             "스터디 모집 글 조회 완료.",
-            studyDto
+            responseDto
         );
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }
@@ -90,7 +88,7 @@ public class StudyController {
             throw new UnauthorizedException("인증이 필요합니다.");
         }
 
-        StudyResponseDto studyResponseDto = studyService.findByStudyId(study_id);
+        Study study = studyService.findByStudyId(study_id);
 
         // studyResponseDto의 getUserId로 user의 닉네임을 받아와야 함
         // 임시로 nickname 설정
@@ -100,7 +98,7 @@ public class StudyController {
             throw new UnauthorizedException("접근 권한이 없습니다.");
         }
 
-        StudyUpdateRequestDto responseDto = StudyMapper.toUpdateRequestDto(studyResponseDto);
+        StudyUpdateRequestDto responseDto = StudyMapper.toUpdateRequestDto(study);
 
         ApiResponse<StudyUpdateRequestDto> response = new ApiResponse<>(
             "success",
@@ -145,15 +143,7 @@ public class StudyController {
         @RequestParam(defaultValue = "0") int page,
         @RequestParam(defaultValue = "10") int size) {
 
-        Page<Study> studyPage = studyService.getStudyList(page, size);
-        Page<StudyListDto> dtoPage = studyPage.map(study -> new StudyListDto(
-            study.getStudyId(),
-            study.getTitle(),
-            study.getIsRecruit(),
-            study.getRegion(),
-            study.getIsOnline(),
-            study.getCreateDate()
-        ));
+        Page<StudyListDto> dtoPage = studyService.getStudyList(page, size);
 
         ApiResponse<Page<StudyListDto>> response = new ApiResponse<>(
             "success",
