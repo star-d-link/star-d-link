@@ -39,9 +39,14 @@ public class JWTCheckFilter extends OncePerRequestFilter {
         if (request.getServletPath().startsWith("/api/v1/token/")) {
             return true;
         }
+        // h2 console
+        if (request.getServletPath().startsWith("/h2-console")) {
+            return true;
+        }
 
-        // TODO: 경로 지정 필요
-        return false;
+
+        // TODO: 현재 개발편의성을 위해 모든경로를 true로 지정했지만 나중에 권한에 따라 조정해야함
+        return true;
     }
 
     /**
@@ -80,7 +85,9 @@ public class JWTCheckFilter extends OncePerRequestFilter {
 
             String username = tokenMap.get("username").toString();
             //권한이 여러 개인 경우에는 ,로 구분해서 처리한다
-            String[] roles = tokenMap.get("roles").toString().split(",");
+            log.info("test");
+            String[] roles = tokenMap.get("role").toString().split(",");
+            log.info("roles: " + roles);
 
             // 토큰 검증 결과를 이용해 Authentication 객체를 생성한다.
             // Access Token을 이용해서 이미 검사가 완료되었으므로 Credentials는 null로 지정
@@ -89,7 +96,7 @@ public class JWTCheckFilter extends OncePerRequestFilter {
                     new CustomUserPrincipal(username),
                     null,
                     Arrays.stream(roles)
-                        .map(SimpleGrantedAuthority::new)
+                        .map(role -> new SimpleGrantedAuthority("ROLE_" + role))
                         .collect(Collectors.toList())
                 );
 
