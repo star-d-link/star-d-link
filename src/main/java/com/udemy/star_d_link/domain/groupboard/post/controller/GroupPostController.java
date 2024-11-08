@@ -13,6 +13,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -46,7 +47,7 @@ public class GroupPostController {
         return ResponseEntity.ok(responseDto);
     }
 
-    @GetMapping("/{group-id}/post/{post-id}")
+    @PutMapping("/{group-id}/post/{post-id}")
     public ResponseEntity<?> updatePost(/*시큐리티 객체 받기*/@PathVariable("group-id") Long groupId,
         @RequestBody GroupPostUpdateRequestDto updateRequestDto,
         @PathVariable("post-id") Long postId) {
