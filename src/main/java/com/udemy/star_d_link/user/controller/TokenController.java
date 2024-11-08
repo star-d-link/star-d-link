@@ -36,10 +36,10 @@ public class TokenController {
         String username = userDTOResult.getUsername();
         Map<String, Object> dataMap = userDTOResult.getDataMap();
 
-        // TODO: 개발 진행 중 액세스 10분, 리프레쉬 7일로 설정 나중에 1일, 30일로 변경해야함
-        String accessToken = jwtUtil.createToken(dataMap, 10);
+        // 액세스토큰 1일, 리프레쉬토큰 30일
+        String accessToken = jwtUtil.createToken(dataMap, 60 * 24);
         String refreshToken = jwtUtil.createToken(Map.of("username", username)
-            , 60 * 24 * 7);
+            , 60 * 24 * 30);
 
         log.info("accessToken: " + accessToken);
         log.info("refreshToken: " + refreshToken);
