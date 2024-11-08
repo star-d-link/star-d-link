@@ -45,8 +45,8 @@ public class JWTCheckFilter extends OncePerRequestFilter {
         }
 
 
-        // TODO: 현재 개발편의성을 위해 모든경로를 true로 지정했지만 나중에 권한에 따라 조정해야함
-        return true;
+        // TODO: JWTCheck가 필요없는 경로들을 나중에 더 추가해야한다.
+        return false;
     }
 
     /**
