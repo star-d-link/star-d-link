@@ -18,12 +18,33 @@ public class JWTCheckFilter extends OncePerRequestFilter {
 
     private final JWTUtil jwtUtil;
 
+    /**
+     * JWTCheckFilter가 동작하지 않아야 하는 경로를 지정한다.
+     * @param request current HTTP request
+     * @return
+     * @throws ServletException
+     */
     @Override
     protected boolean shouldNotFilter(HttpServletRequest request) throws ServletException {
+
+        // 토큰의 생성, 재생성 경로
+        if (request.getServletPath().startsWith("/api/v1/token/")) {
+            return true;
+        }
+
         // TODO: 경로 지정 필요
         return false;
     }
 
+    /**
+     * Access Token을 꺼내서 검증해 문제가 없는 경우에는 컨트롤러 혹은 다음 필터들이
+     * 동작하도록 구성한다. 만일 Access Token에 문제가 있는 경우 JwtException이 발생한다.
+     * @param request
+     * @param response
+     * @param filterChain
+     * @throws ServletException
+     * @throws IOException
+     */
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response,
         FilterChain filterChain) throws ServletException, IOException {
@@ -42,6 +63,13 @@ public class JWTCheckFilter extends OncePerRequestFilter {
         }
     }
 
+    /**
+     * Access Toekn이 없거나 Beaarer로 시작하지 않는 경우라 JwtException이 발생하면
+     * 403 Forbidden 에러를 발생시키게 한다.
+     * @param response
+     * @param e
+     * @throws IOException
+     */
     private void handleException(HttpServletResponse response, Exception e) throws IOException {
         response.setStatus(HttpServletResponse.SC_FORBIDDEN);
         response.setContentType("application/json");
