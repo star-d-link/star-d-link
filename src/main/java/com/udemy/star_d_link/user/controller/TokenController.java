@@ -12,6 +12,9 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+/**
+ * 실제 사용자의 정보를 확인해서 토큰을 발행하는 컨트롤러
+ */
 @RestController
 @RequestMapping("/api/v1/token")
 @Log4j2
