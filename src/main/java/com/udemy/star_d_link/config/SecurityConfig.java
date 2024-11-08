@@ -40,6 +40,7 @@ public class SecurityConfig {
             .sessionManagement(sessionManagementConfigurer -> {
                 sessionManagementConfigurer.sessionCreationPolicy(SessionCreationPolicy.NEVER);
             })
+            // jwtCheckFilter를 먼저 실행한다
             .addFilterBefore(jwtCheckFilter, UsernamePasswordAuthenticationFilter.class)
             // 모든 url 접근허용
 //            .authorizeHttpRequests(
