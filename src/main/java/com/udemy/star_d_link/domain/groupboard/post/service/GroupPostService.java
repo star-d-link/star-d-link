@@ -34,8 +34,16 @@ public class GroupPostService {
         GroupPostUpdateRequestDto updateRequestDto, Long postId) {
         GroupPostEntity groupPost = groupPostRepository.findById(postId)
             .orElseThrow(RuntimeException::new);
+        //유저 검증
         groupPost.modify(updateRequestDto);
         groupPostRepository.save(groupPost);
         return GroupPostUpdateResponseDto.from(groupPost);
+    }
+
+    public void delete(Long groupId, Long postId) {
+        GroupPostEntity groupPost = groupPostRepository.findById(postId)
+            .orElseThrow(RuntimeException::new);
+        //유저 검증
+        groupPostRepository.delete(groupPost);
     }
 }
