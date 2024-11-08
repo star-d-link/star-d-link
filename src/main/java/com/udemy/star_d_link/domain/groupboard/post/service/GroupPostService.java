@@ -6,6 +6,8 @@ import com.udemy.star_d_link.domain.groupboard.post.dto.response.GroupPostCreate
 import com.udemy.star_d_link.domain.groupboard.post.dto.response.GroupPostInquiryResponseDto;
 import com.udemy.star_d_link.domain.groupboard.post.dto.response.GroupPostUpdateResponseDto;
 import com.udemy.star_d_link.domain.groupboard.post.entity.GroupPostEntity;
+import com.udemy.star_d_link.domain.groupboard.post.entity.GroupPostFileEntity;
+import com.udemy.star_d_link.domain.groupboard.post.repository.GroupPostFileRepository;
 import com.udemy.star_d_link.domain.groupboard.post.repository.GroupPostRepository;
 import jakarta.transaction.Transactional;
 import java.util.List;
@@ -17,6 +19,7 @@ import org.springframework.stereotype.Service;
 public class GroupPostService {
 
     private final GroupPostRepository groupPostRepository;
+    private final GroupPostFileRepository groupPostFileRepository;
 
     public List<GroupPostInquiryResponseDto> getSome(Long groupId, Long lastPostId) {
         List<GroupPostEntity> groupPostEntities = groupPostRepository.findSomeByGroupIdAndLastPostId(
@@ -29,6 +32,9 @@ public class GroupPostService {
         GroupPostCreateRequestDto createRequestDto) {
         StudyMember studyMember = StudyMemberRepository.find();
         GroupPostEntity groupPost = GroupPostEntity.of(createRequestDto, studyMembers);
+        List<GroupPostFileEntity> groupPostFiles = createRequestDto.getFileUrls().stream()
+            .map(fileUrl -> GroupPostFileEntity.of(fileUrl, groupPost)).toList();
+        groupPostFileRepository.saveAll(groupPostFiles);
         groupPostRepository.save(groupPost);
         return GroupPostCreateResponseDto.from(groupPost);
     }

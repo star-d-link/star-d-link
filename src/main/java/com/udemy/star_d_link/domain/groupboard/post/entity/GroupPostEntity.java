@@ -12,6 +12,7 @@ import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
@@ -65,11 +66,16 @@ public class GroupPostEntity {
             .content(createRequestDto.getContent())
             .user(studyMembers.getUser())
             .study(studyMembers.getStudy())
+            .groupPostFile(new ArrayList<>())
             .build();
     }
 
     public void modify(GroupPostUpdateRequestDto updateRequestDto) {
         this.title = updateRequestDto.getTitle();
         this.content = updateRequestDto.getContent();
+    }
+
+    public void addFile(GroupPostFileEntity groupPostFile) {
+        this.groupPostFile.add(groupPostFile);
     }
 }

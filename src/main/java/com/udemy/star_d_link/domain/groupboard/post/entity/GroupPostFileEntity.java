@@ -24,6 +24,7 @@ import org.hibernate.annotations.UpdateTimestamp;
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class GroupPostFileEntity {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -41,4 +42,13 @@ public class GroupPostFileEntity {
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     private GroupPostEntity groupPost;
+
+    public static GroupPostFileEntity of(String fileUrl, GroupPostEntity groupPost) {
+        GroupPostFileEntity groupPostFile = GroupPostFileEntity.builder()
+            .fileUrl(fileUrl)
+            .groupPost(groupPost)
+            .build();
+        groupPost.addFile(groupPostFile);
+        return groupPostFile;
+    }
 }
