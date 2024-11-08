@@ -7,6 +7,7 @@ import com.udemy.star_d_link.domain.groupboard.post.dto.response.GroupPostInquir
 import com.udemy.star_d_link.domain.groupboard.post.dto.response.GroupPostUpdateResponseDto;
 import com.udemy.star_d_link.domain.groupboard.post.entity.GroupPostEntity;
 import com.udemy.star_d_link.domain.groupboard.post.repository.GroupPostRepository;
+import jakarta.transaction.Transactional;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -23,6 +24,7 @@ public class GroupPostService {
         return groupPostEntities.stream().map(GroupPostInquiryResponseDto::from).toList();
     }
 
+    @Transactional
     public GroupPostCreateResponseDto save(Long groupId,
         GroupPostCreateRequestDto createRequestDto) {
         StudyMember studyMember = StudyMemberRepository.find();
@@ -30,6 +32,7 @@ public class GroupPostService {
         groupPostRepository.save(groupPost);
     }
 
+    @Transactional
     public GroupPostUpdateResponseDto update(Long groupId,
         GroupPostUpdateRequestDto updateRequestDto, Long postId) {
         GroupPostEntity groupPost = groupPostRepository.findById(postId)
@@ -40,6 +43,7 @@ public class GroupPostService {
         return GroupPostUpdateResponseDto.from(groupPost);
     }
 
+    @Transactional
     public void delete(Long groupId, Long postId) {
         GroupPostEntity groupPost = groupPostRepository.findById(postId)
             .orElseThrow(RuntimeException::new);
