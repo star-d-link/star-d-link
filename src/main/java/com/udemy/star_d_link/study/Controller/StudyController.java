@@ -17,6 +17,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -87,16 +88,9 @@ public class StudyController {
         if (currentUser == null) {
             throw new UnauthorizedException("인증이 필요합니다.");
         }
-
-        Study study = studyService.findByStudyId(study_id);
-
-        // studyResponseDto의 getUserId로 user의 닉네임을 받아와야 함
-        // 임시로 nickname 설정
-        String tempName = "test";
-
-        if(!tempName.equals(currentUser.getUsername())) {
-            throw new UnauthorizedException("접근 권한이 없습니다.");
-        }
+        // 서비스 계층으로 study_id와 currentUser 전달하여 권한 확인 및 데이터 조회
+        Long tempId = 1L;
+        Study study = studyService.getStudyForEdit(study_id, tempId);
 
         StudyUpdateRequestDto responseDto = StudyMapper.toUpdateRequestDto(study);
 
@@ -118,17 +112,14 @@ public class StudyController {
         if (currentUser == null /*|| !currentUser.getUsername().equals(nickname)*/) {
             throw new UnauthorizedException("수정 권한이 없습니다.");
         }
+        // 실제로 적용할 때는 currentUser의 정보를 바탕으로 userId 사용 후 권한 확인
+        Long tempId = 1L;
 
-        Study editStudy = studyService.editStudyByUserId(study_id, requestDto);
+        Study editStudy = studyService.editStudyByUserId(study_id, tempId, requestDto);
 
-        // 실제로 적용할 때는 getUserId로 유저 정보를 찾아서 나온 nickname이나 다른 유저 정보로 수정
-        if (!currentUser.getUsername().equals(editStudy.getUserId())) {
-            throw new UnauthorizedException("수정 권한이 없습니다.");
-        }
+
 
         StudyResponseDto studyResponseDto = StudyMapper.toResponseDto(editStudy);
-
-
 
         ApiResponse<StudyResponseDto> response = new ApiResponse<>(
             "success",
@@ -136,6 +127,29 @@ public class StudyController {
             studyResponseDto
         );
         return ResponseEntity.status(HttpStatus.OK).body(response);
+    }
+
+    @DeleteMapping("/{study_id}")
+    public ResponseEntity<ApiResponse<Void>> deleteStudy(
+        @PathVariable Long study_id,
+        @AuthenticationPrincipal UserDetails currentUser) {
+
+        if (currentUser == null) {
+            throw new UnauthorizedException("인증이 필요합니다.");
+        }
+
+        // 실제로 적용할 때는 currentUser의 정보를 바탕으로 userId 사용 후 권한 확인
+        Long tempId = 1L;
+
+        studyService.deleteStudyByUserId(study_id, tempId);
+
+        ApiResponse<Void> response = new ApiResponse<>(
+            "success",
+            "모집 글 삭제가 완료되었습니다.",
+            null
+        );
+
+        return  ResponseEntity.status(HttpStatus.NO_CONTENT).body(response);
     }
 
     @GetMapping("/list")

@@ -5,6 +5,7 @@ import com.udemy.star_d_link.study.Dto.StudyListDto;
 import com.udemy.star_d_link.study.Dto.StudyResponseDto;
 import com.udemy.star_d_link.study.Dto.StudyUpdateRequestDto;
 import com.udemy.star_d_link.study.Entity.Study;
+import com.udemy.star_d_link.study.Exception.UnauthorizedException;
 import com.udemy.star_d_link.study.Mapper.StudyMapper;
 import com.udemy.star_d_link.study.Repository.StudyRepository;
 import java.util.NoSuchElementException;
@@ -26,7 +27,7 @@ public class StudyService {
     }
 
     @Transactional
-    public StudyResponseDto  createStudy(StudyCreateRequestDto requestDto){
+    public StudyResponseDto createStudy(StudyCreateRequestDto requestDto){
 
         // DTO를 엔티티로 변환
         Study study = StudyMapper.toEntity(requestDto);
@@ -38,17 +39,42 @@ public class StudyService {
         return StudyMapper.toResponseDto(savedStudy);
     }
 
-    public Study editStudyByUserId(Long studyId, StudyUpdateRequestDto requestDto) {
+    public Study getStudyForEdit(Long studyId, Long userId) {
 
-        // 임시로 유저 아이디 적용함. 실제 적용할 때는
-        // User user = userRepository.findByUsername(username) 같이 받아온 username으로 userId를 찾기
-        Long id = 1L;
         Study study = studyRepository.findById(studyId)
             .orElseThrow(() -> new RuntimeException("해당 글을 찾을 수 없습니다."));
+
+        if (!study.getUserId().equals(userId)) {
+            throw new UnauthorizedException("수정 권한이 없습니다.");
+        }
+
+        return study;
+    }
+
+    public Study editStudyByUserId(Long studyId, Long userId, StudyUpdateRequestDto requestDto) {
+        Study study = studyRepository.findById(userId)
+            .orElseThrow(() -> new RuntimeException("해당 글을 찾을 수 없습니다."));
+
+        if (!study.getUserId().equals(userId)) {
+            throw new UnauthorizedException("수정 권한이 없습니다.");
+        }
 
         Study editStudy = StudyMapper.updateStudyFromDto(study, requestDto);
 
         return studyRepository.save(editStudy);
+    }
+
+    @Transactional
+    public void deleteStudyByUserId(Long studyId, Long userId) {
+
+        Study study = studyRepository.findById(studyId)
+            .orElseThrow(() -> new RuntimeException("해당 글을 찾을 수 없습니다."));
+
+        if (!study.getUserId().equals(userId)) {
+            throw new UnauthorizedException("해당 글을 삭제할 권한이 없습니다.");
+        }
+
+        studyRepository.delete(study);
     }
 
     public Study findByStudyId(Long studyId) {
