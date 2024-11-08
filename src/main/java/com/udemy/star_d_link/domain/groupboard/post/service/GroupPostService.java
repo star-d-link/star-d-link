@@ -9,6 +9,7 @@ import com.udemy.star_d_link.domain.groupboard.post.entity.GroupPostEntity;
 import com.udemy.star_d_link.domain.groupboard.post.entity.GroupPostFileEntity;
 import com.udemy.star_d_link.domain.groupboard.post.repository.GroupPostFileRepository;
 import com.udemy.star_d_link.domain.groupboard.post.repository.GroupPostRepository;
+import com.udemy.star_d_link.global.common.service.ImageUploadService;
 import jakarta.transaction.Transactional;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
@@ -20,6 +21,7 @@ public class GroupPostService {
 
     private final GroupPostRepository groupPostRepository;
     private final GroupPostFileRepository groupPostFileRepository;
+    private final ImageUploadService imageUploadService;
 
     public List<GroupPostInquiryResponseDto> getSome(Long groupId, Long lastPostId) {
         List<GroupPostEntity> groupPostEntities = groupPostRepository.findSomeByGroupIdAndLastPostId(
@@ -46,6 +48,10 @@ public class GroupPostService {
             .orElseThrow(RuntimeException::new);
         //유저 검증
         groupPost.modify(updateRequestDto);
+        List<GroupPostFileEntity> groupPostFiles = updateRequestDto.getAddFileUrls().stream()
+            .map(fileUrl -> GroupPostFileEntity.of(fileUrl, groupPost)).toList();
+        groupPostFileRepository.saveAll(groupPostFiles);
+        imageUploadService.deleteFiles(updateRequestDto.getDeleteFileUrls());
         groupPostRepository.save(groupPost);
         return GroupPostUpdateResponseDto.from(groupPost);
     }

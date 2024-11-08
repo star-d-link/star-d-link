@@ -4,9 +4,12 @@ import com.amazonaws.HttpMethod;
 import com.amazonaws.services.s3.AmazonS3Client;
 import com.amazonaws.services.s3.Headers;
 import com.amazonaws.services.s3.model.CannedAccessControlList;
+import com.amazonaws.services.s3.model.DeleteObjectsRequest;
+import com.amazonaws.services.s3.model.DeleteObjectsRequest.KeyVersion;
 import com.amazonaws.services.s3.model.GeneratePresignedUrlRequest;
 import com.udemy.star_d_link.global.common.dto.PreSignedUrlResponseDto;
 import java.util.Date;
+import java.util.List;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
@@ -29,6 +32,22 @@ public class ImageUploadService {
             fileName);
 
         return generatePreSignedUrl(generatePresignedUrlRequest);
+    }
+
+    public void deleteFile(String fileUrl) {
+        String key = fileUrl.substring(fileUrl.indexOf("image/"));
+        amazonS3Client.deleteObject(bucket, key);
+    }
+
+    public void deleteFiles(List<String> fileUrls) {
+        if(fileUrls !=null && !fileUrls.isEmpty()) {
+            List<KeyVersion> keyVersions = fileUrls.stream()
+                .map(url -> url.substring(url.lastIndexOf("image/")))
+                .map(KeyVersion::new).toList();
+            DeleteObjectsRequest deleteObjectsRequest = new DeleteObjectsRequest(bucket)
+                .withKeys(keyVersions);
+            amazonS3Client.deleteObjects(deleteObjectsRequest);
+        }
     }
 
     private GeneratePresignedUrlRequest getGeneratePreSignedUrlRequest(String fileName) {
