@@ -87,7 +87,7 @@ public class JWTCheckFilter extends OncePerRequestFilter {
             //권한이 여러 개인 경우에는 ,로 구분해서 처리한다
             log.info("test");
             String[] roles = tokenMap.get("role").toString().split(",");
-            log.info("roles: " + roles);
+            log.info("roles: " + Arrays.toString(roles));
 
             // 토큰 검증 결과를 이용해 Authentication 객체를 생성한다.
             // Access Token을 이용해서 이미 검사가 완료되었으므로 Credentials는 null로 지정
