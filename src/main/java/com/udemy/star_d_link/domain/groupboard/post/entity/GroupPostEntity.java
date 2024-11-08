@@ -1,6 +1,7 @@
 package com.udemy.star_d_link.domain.groupboard.post.entity;
 
 import com.udemy.star_d_link.domain.groupboard.post.dto.request.GroupPostCreateRequestDto;
+import com.udemy.star_d_link.domain.groupboard.post.dto.request.GroupPostUpdateRequestDto;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
@@ -65,5 +66,10 @@ public class GroupPostEntity {
             .user(studyMembers.getUser())
             .study(studyMembers.getStudy())
             .build();
+    }
+
+    public void modify(GroupPostUpdateRequestDto updateRequestDto) {
+        this.title = updateRequestDto.getTitle();
+        this.content = updateRequestDto.getContent();
     }
 }

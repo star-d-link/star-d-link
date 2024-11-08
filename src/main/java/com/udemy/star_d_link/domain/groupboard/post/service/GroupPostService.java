@@ -1,8 +1,10 @@
 package com.udemy.star_d_link.domain.groupboard.post.service;
 
 import com.udemy.star_d_link.domain.groupboard.post.dto.request.GroupPostCreateRequestDto;
+import com.udemy.star_d_link.domain.groupboard.post.dto.request.GroupPostUpdateRequestDto;
 import com.udemy.star_d_link.domain.groupboard.post.dto.response.GroupPostCreateResponseDto;
 import com.udemy.star_d_link.domain.groupboard.post.dto.response.GroupPostInquiryResponseDto;
+import com.udemy.star_d_link.domain.groupboard.post.dto.response.GroupPostUpdateResponseDto;
 import com.udemy.star_d_link.domain.groupboard.post.entity.GroupPostEntity;
 import com.udemy.star_d_link.domain.groupboard.post.repository.GroupPostRepository;
 import java.util.List;
@@ -26,5 +28,14 @@ public class GroupPostService {
         StudyMember studyMember = StudyMemberRepository.find();
         GroupPostEntity groupPost = GroupPostEntity.of(createRequestDto, studyMembers);
         groupPostRepository.save(groupPost);
+    }
+
+    public GroupPostUpdateResponseDto update(Long groupId,
+        GroupPostUpdateRequestDto updateRequestDto, Long postId) {
+        GroupPostEntity groupPost = groupPostRepository.findById(postId)
+            .orElseThrow(RuntimeException::new);
+        groupPost.modify(updateRequestDto);
+        groupPostRepository.save(groupPost);
+        return GroupPostUpdateResponseDto.from(groupPost);
     }
 }
