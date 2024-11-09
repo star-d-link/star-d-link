@@ -24,8 +24,12 @@ public class CourseReview {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer boardId;
+
     @ManyToOne
-    private SiteUser siteUser;
+    private Integer userId;//나중에 삭제
+    /*
+    @ManyToOne
+    private SiteUser siteUser;*/
 
     private Integer likeCount;
     @Column(length = 30, nullable = false)
