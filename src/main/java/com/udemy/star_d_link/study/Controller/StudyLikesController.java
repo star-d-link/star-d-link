@@ -7,11 +7,15 @@ import com.udemy.star_d_link.study.Dto.StudyResponseDto;
 import com.udemy.star_d_link.study.Exception.UnauthorizedException;
 import com.udemy.star_d_link.study.Service.StudyLikesService;
 import jakarta.validation.Valid;
+import java.net.URI;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -47,7 +51,38 @@ public class StudyLikesController {
             responseDto
         );
 
-        return ResponseEntity.status(HttpStatus.CREATED).body(response);
+        String redirectUrl = "/study/" + studyId;
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.setLocation(URI.create(redirectUrl));
+        return new ResponseEntity<>(headers, HttpStatus.SEE_OTHER);
+    }
+
+    @DeleteMapping("/")
+    public ResponseEntity<ApiResponse<Void>> deleteLikes(
+        @PathVariable("study_id") Long studyId,
+        @AuthenticationPrincipal UserDetails currentUser) {
+
+        if (currentUser == null) {
+            throw new UnauthorizedException("권한이 없습니다.");
+        }
+
+        // 서비스 계층으로 study_id와 currentUser 전달하여 권한 확인 및 데이터 조회
+        Long tempId = 1L;
+
+        studyLikesService.deleteLikes(studyId, tempId);
+
+        ApiResponse<Void> response = new ApiResponse<>(
+            "success",
+            "모집 글 삭제가 완료되었습니다.",
+            null
+        );
+
+        String redirectUrl = "/study/" + studyId;
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.setLocation(URI.create(redirectUrl));
+        return new ResponseEntity<>(headers, HttpStatus.SEE_OTHER);
     }
 
     private Long getUserIdFromUserDetails(UserDetails currentUser) {

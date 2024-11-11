@@ -29,10 +29,26 @@ public class StudyLikesService {
         Study study = studyRepository.findById(studyId)
             .orElseThrow(() -> new NoSuchElementException("해당 스터디를 찾을 수 없습니다: "));
 
+        boolean alreadyLike = studyLikeRepository.existsByUserIdAndStudy(userId, study);
+        if (alreadyLike) {
+            throw new IllegalArgumentException("이미 좋아요를 눌렀습니다");
+        }
         StudyLikes studyLikes = StudyLikesMapper.toEntity(null, userId, study);
 
         StudyLikes savedStudyLikes = studyLikeRepository.save(studyLikes);
 
         return StudyLikesMapper.toDto(savedStudyLikes);
+    }
+
+    @Transactional
+    public void deleteLikes(Long studyId, Long userId) {
+        // studyId를 통해 Study 엔티티를 조회
+        Study study = studyRepository.findById(studyId)
+            .orElseThrow(() -> new NoSuchElementException("해당 스터디를 찾을 수 없습니다: "));
+
+        StudyLikes studyLikes = studyLikeRepository.findByStudyIdAndUserId(userId, study.getStudyId())
+            .orElseThrow(() -> new NoSuchElementException("좋아요를 찾을 수 없습니다."));
+
+        studyLikeRepository.delete(studyLikes);
     }
 }
