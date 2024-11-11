@@ -3,11 +3,13 @@ package com.udemy.star_d_link.study.Controller;
 import com.udemy.star_d_link.study.Dto.Response.ApiResponse;
 import com.udemy.star_d_link.study.Dto.StudyCreateRequestDto;
 import com.udemy.star_d_link.study.Dto.StudyListDto;
+import com.udemy.star_d_link.study.Dto.StudyMembersDto;
 import com.udemy.star_d_link.study.Dto.StudyResponseDto;
 import com.udemy.star_d_link.study.Dto.StudyUpdateRequestDto;
 import com.udemy.star_d_link.study.Entity.Study;
 import com.udemy.star_d_link.study.Exception.UnauthorizedException;
 import com.udemy.star_d_link.study.Mapper.StudyMapper;
+import com.udemy.star_d_link.study.Service.StudyMembersService;
 import com.udemy.star_d_link.study.Service.StudyService;
 import jakarta.validation.Valid;
 import java.util.NoSuchElementException;
@@ -32,10 +34,12 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping(value = "/study")
 public class StudyController {
     private final StudyService studyService;
+    private final StudyMembersService studyMembersService;
 
     @Autowired
-    public StudyController(StudyService studyService) {
+    public StudyController(StudyService studyService, StudyMembersService studyMembersService) {
         this.studyService = studyService;
+        this.studyMembersService = studyMembersService;
     }
 
     @GetMapping(value = "create")
@@ -167,5 +171,29 @@ public class StudyController {
         );
 
         return ResponseEntity.status(HttpStatus.OK).body(response);
+    }
+
+    @PostMapping("/{study_id}apply")
+    public ResponseEntity<ApiResponse<StudyMembersDto>> applyStudy(
+        @PathVariable("study_id") Long studyId,
+        @AuthenticationPrincipal UserDetails currentUser) {
+
+        if (currentUser == null) {
+            throw new UnauthorizedException("로그인이 필요합니다.");
+        }
+
+        // 실제로 적용할 때는 currentUser의 정보를 바탕으로 userId 사용 후 권한 확인
+        Long tempId = 1L;
+
+        StudyMembersDto responseDto = studyMembersService.applyStudy(studyId, tempId);
+
+        ApiResponse<StudyMembersDto> response = new ApiResponse<>(
+            "success",
+            "스터디 모집 신청이 완료되었습니다.",
+            responseDto
+        );
+
+        return ResponseEntity.status(HttpStatus.CREATED).body(response);
+
     }
 }

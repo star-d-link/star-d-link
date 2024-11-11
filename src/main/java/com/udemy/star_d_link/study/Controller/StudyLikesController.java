@@ -1,12 +1,9 @@
 package com.udemy.star_d_link.study.Controller;
 
 import com.udemy.star_d_link.study.Dto.Response.ApiResponse;
-import com.udemy.star_d_link.study.Dto.StudyCreateRequestDto;
 import com.udemy.star_d_link.study.Dto.StudyLikesDto;
-import com.udemy.star_d_link.study.Dto.StudyResponseDto;
 import com.udemy.star_d_link.study.Exception.UnauthorizedException;
 import com.udemy.star_d_link.study.Service.StudyLikesService;
-import jakarta.validation.Valid;
 import java.net.URI;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
@@ -15,11 +12,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -86,9 +80,8 @@ public class StudyLikesController {
     }
 
     private Long getUserIdFromUserDetails(UserDetails currentUser) {
-        // userRepository나 UserService 등을 통해 userId를 조회하는 로직 필요
-        // 여기서는 임시로 하드코딩된 예시 사용
-        return 1L;  // 실제로는 currentUser.getUsername()을 통해 User 엔티티에서 조회해야 합니다.
+        // userRepository나 UserService 등을 통해 userId를 조회
+        return 1L;  // 실제로는 currentUser.getUsername()을 통해 User Entity에서 조회
     }
 
 }
