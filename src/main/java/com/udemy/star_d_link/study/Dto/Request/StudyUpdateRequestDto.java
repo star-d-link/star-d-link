@@ -1,5 +1,6 @@
-package com.udemy.star_d_link.study.Dto;
+package com.udemy.star_d_link.study.Dto.Request;
 
+import com.udemy.star_d_link.study.Dto.Response.StudyResponseDto;
 import jakarta.validation.constraints.NotEmpty;
 import lombok.AllArgsConstructor;
 import lombok.Getter;

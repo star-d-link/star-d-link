@@ -1,11 +1,11 @@
 package com.udemy.star_d_link.study.Mapper;
 
-import com.udemy.star_d_link.study.Dto.StudyMembersDto;
+import com.udemy.star_d_link.study.Dto.Response.StudyMemberResponseDto;
 import com.udemy.star_d_link.study.Entity.Study;
 import com.udemy.star_d_link.study.Entity.StudyMembers;
 
 public class StudyMembersMapper {
-    public static StudyMembers toEntity(StudyMembersDto dto, Long userId, Study study) {
+    public static StudyMembers toEntity(StudyMemberResponseDto dto, Long userId, Study study) {
         return StudyMembers.builder()
             .studyManageId(dto.getStudyManageId())
             .userId(userId)
@@ -24,8 +24,8 @@ public class StudyMembersMapper {
             .build();
     }
 
-    public static StudyMembersDto toDto(StudyMembers studyMembers) {
-        return new StudyMembersDto(
+    public static StudyMemberResponseDto toDto(StudyMembers studyMembers) {
+        return new StudyMemberResponseDto(
             studyMembers.getStudyManageId(),
             studyMembers.getUserId(),
             studyMembers.getStudy().getStudyId(),

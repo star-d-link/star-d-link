@@ -1,7 +1,7 @@
 package com.udemy.star_d_link.study.Controller;
 
 import com.udemy.star_d_link.study.Dto.Response.ApiResponse;
-import com.udemy.star_d_link.study.Dto.StudyLikesDto;
+import com.udemy.star_d_link.study.Dto.Response.StudyLikesResponseDto;
 import com.udemy.star_d_link.study.Exception.UnauthorizedException;
 import com.udemy.star_d_link.study.Service.StudyLikesService;
 import java.net.URI;
@@ -28,7 +28,7 @@ public class StudyLikesController {
     }
 
     @PostMapping("/")
-    public ResponseEntity<ApiResponse<StudyLikesDto>> addLikes(
+    public ResponseEntity<ApiResponse<StudyLikesResponseDto>> addLikes(
         @PathVariable("study_id") Long studyId,
         @AuthenticationPrincipal UserDetails currentUser) {
 
@@ -37,9 +37,9 @@ public class StudyLikesController {
         }
         // 서비스 계층으로 study_id와 currentUser 전달하여 권한 확인 및 데이터 조회
         Long tempId = 1L;
-        StudyLikesDto responseDto = studyLikesService.addLikes(studyId, tempId);
+        StudyLikesResponseDto responseDto = studyLikesService.addLikes(studyId, tempId);
 
-        ApiResponse<StudyLikesDto> response = new ApiResponse<>(
+        ApiResponse<StudyLikesResponseDto> response = new ApiResponse<>(
             "success",
             "작성이 완료되었습니다.",
             responseDto

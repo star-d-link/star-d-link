@@ -1,6 +1,6 @@
 package com.udemy.star_d_link.study.Service;
 
-import com.udemy.star_d_link.study.Dto.StudyLikesDto;
+import com.udemy.star_d_link.study.Dto.Response.StudyLikesResponseDto;
 import com.udemy.star_d_link.study.Entity.Study;
 import com.udemy.star_d_link.study.Entity.StudyLikes;
 import com.udemy.star_d_link.study.Mapper.StudyLikesMapper;
@@ -23,7 +23,7 @@ public class StudyLikesService {
     }
 
     @Transactional
-    public StudyLikesDto addLikes(Long studyId, Long userId) {
+    public StudyLikesResponseDto addLikes(Long studyId, Long userId) {
 
         // studyId를 통해 Study 엔티티를 조회
         Study study = studyRepository.findById(studyId)

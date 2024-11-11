@@ -1,7 +1,7 @@
 package com.udemy.star_d_link.study.Controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.udemy.star_d_link.study.Dto.StudyCreateRequestDto;
+import com.udemy.star_d_link.study.Dto.Request.StudyCreateRequestDto;
 import com.udemy.star_d_link.study.Service.StudyService;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;

@@ -1,4 +1,4 @@
-package com.udemy.star_d_link.study.Dto;
+package com.udemy.star_d_link.study.Dto.Response;
 
 import java.util.Date;
 import lombok.AllArgsConstructor;
@@ -8,8 +8,8 @@ import lombok.NoArgsConstructor;
 @Getter
 @NoArgsConstructor
 @AllArgsConstructor
-public class StudyListDto {
-    private Long StudyId;
+public class StudyListResponseDto {
+    private Long studyId;
     private String title;
     private Boolean isRecruit;
     private String region;

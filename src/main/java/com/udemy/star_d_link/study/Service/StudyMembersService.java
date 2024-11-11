@@ -1,6 +1,6 @@
 package com.udemy.star_d_link.study.Service;
 
-import com.udemy.star_d_link.study.Dto.StudyMembersDto;
+import com.udemy.star_d_link.study.Dto.Response.StudyMemberResponseDto;
 import com.udemy.star_d_link.study.Entity.Study;
 import com.udemy.star_d_link.study.Entity.StudyMembers;
 import com.udemy.star_d_link.study.Mapper.StudyMembersMapper;
@@ -23,7 +23,7 @@ public class StudyMembersService {
     }
 
     @Transactional
-    public StudyMembersDto applyStudy(Long studyId, Long userId) {
+    public StudyMemberResponseDto applyStudy(Long studyId, Long userId) {
         Study study = studyRepository.findById(studyId)
             .orElseThrow(() -> new NoSuchElementException("해당 스터디를 찾을 수 없습니다: " + studyId));
 

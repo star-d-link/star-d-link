@@ -1,15 +1,14 @@
 package com.udemy.star_d_link.study.Service;
 
-import com.udemy.star_d_link.study.Dto.StudyCreateRequestDto;
-import com.udemy.star_d_link.study.Dto.StudyListDto;
-import com.udemy.star_d_link.study.Dto.StudyResponseDto;
-import com.udemy.star_d_link.study.Dto.StudyUpdateRequestDto;
+import com.udemy.star_d_link.study.Dto.Request.StudyCreateRequestDto;
+import com.udemy.star_d_link.study.Dto.Response.StudyListResponseDto;
+import com.udemy.star_d_link.study.Dto.Response.StudyResponseDto;
+import com.udemy.star_d_link.study.Dto.Request.StudyUpdateRequestDto;
 import com.udemy.star_d_link.study.Entity.Study;
 import com.udemy.star_d_link.study.Exception.UnauthorizedException;
 import com.udemy.star_d_link.study.Mapper.StudyMapper;
 import com.udemy.star_d_link.study.Repository.StudyRepository;
 import java.util.NoSuchElementException;
-import java.util.Optional;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -82,7 +81,7 @@ public class StudyService {
             .orElseThrow(() -> new NoSuchElementException("스터디 모집글 내용을 찾을 수 없습니다: " + studyId));
     }
 
-    public Page<StudyListDto> getStudyList(int page, int size) {
+    public Page<StudyListResponseDto> getStudyList(int page, int size) {
         Pageable pageable = PageRequest.of(page, size, Sort.by("createDate").descending());
         Page<Study> studyPage = studyRepository.findAll(pageable);
 

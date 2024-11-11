@@ -1,9 +1,9 @@
 package com.udemy.star_d_link.study.Mapper;
 
-import com.udemy.star_d_link.study.Dto.StudyCreateRequestDto;
-import com.udemy.star_d_link.study.Dto.StudyListDto;
-import com.udemy.star_d_link.study.Dto.StudyResponseDto;
-import com.udemy.star_d_link.study.Dto.StudyUpdateRequestDto;
+import com.udemy.star_d_link.study.Dto.Request.StudyCreateRequestDto;
+import com.udemy.star_d_link.study.Dto.Response.StudyListResponseDto;
+import com.udemy.star_d_link.study.Dto.Response.StudyResponseDto;
+import com.udemy.star_d_link.study.Dto.Request.StudyUpdateRequestDto;
 import com.udemy.star_d_link.study.Entity.Study;
 
 public class StudyMapper {
@@ -66,8 +66,8 @@ public class StudyMapper {
     }
 
     // Study 엔티티를 StudyListDto로 변환하는 메소드
-    public static StudyListDto toListDto(Study study) {
-        return new StudyListDto(
+    public static StudyListResponseDto toListDto(Study study) {
+        return new StudyListResponseDto(
             study.getStudyId(),
             study.getTitle(),
             study.getIsRecruit(),
