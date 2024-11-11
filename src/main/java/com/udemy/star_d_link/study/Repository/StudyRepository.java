@@ -14,4 +14,5 @@ public interface StudyRepository extends JpaRepository<Study, Long> {
     Optional<Study> findByStudyId(Long studyId);
     Optional<Study> findByUserId(Long UserId);
     Page<Study> findAll(Pageable pageable);
+    Page<Study> findByTitleContainingIgnoreCase(String title, Pageable pageable);
 }

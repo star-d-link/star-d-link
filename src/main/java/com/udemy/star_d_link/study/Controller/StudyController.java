@@ -12,8 +12,10 @@ import com.udemy.star_d_link.study.Mapper.StudyMapper;
 import com.udemy.star_d_link.study.Service.StudyMembersService;
 import com.udemy.star_d_link.study.Service.StudyService;
 import jakarta.validation.Valid;
+import java.net.URI;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -41,7 +43,7 @@ public class StudyController {
         this.studyMembersService = studyMembersService;
     }
 
-    @GetMapping(value = "create")
+    @GetMapping(value = "/create")
     public String signForm(){
         return "signup";
     }
@@ -172,7 +174,7 @@ public class StudyController {
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 
-    @PostMapping("/{study_id}apply")
+    @PostMapping("/{study_id}/apply")
     public ResponseEntity<ApiResponse<StudyMemberResponseDto>> applyStudy(
         @PathVariable("study_id") Long studyId,
         @AuthenticationPrincipal UserDetails currentUser) {
@@ -186,13 +188,31 @@ public class StudyController {
 
         StudyMemberResponseDto responseDto = studyMembersService.applyStudy(studyId, tempId);
 
-        ApiResponse<StudyMemberResponseDto> response = new ApiResponse<>(
+        String redirectUrl = "/study/" + studyId;
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.setLocation(URI.create(redirectUrl));
+
+        return new ResponseEntity<>(headers, HttpStatus.SEE_OTHER);
+
+    }
+
+
+    // 제목만으로 검색하는 임시 검색 기능
+    @GetMapping("/search")
+    public ResponseEntity<ApiResponse<Page<StudyListResponseDto>>> searchStudy(
+        @RequestParam("title") String title,
+        @RequestParam(defaultValue = "0") int page,
+        @RequestParam(defaultValue = "10") int size) {
+
+        Page<StudyListResponseDto> studyPage = studyService.searchStudyTitle(title, page, size);
+
+        ApiResponse<Page<StudyListResponseDto>> response = new ApiResponse<>(
             "success",
-            "스터디 모집 신청이 완료되었습니다.",
-            responseDto
+            "검색 결과 조회 완료",
+            studyPage
         );
 
-        return ResponseEntity.status(HttpStatus.CREATED).body(response);
-
+        return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 }

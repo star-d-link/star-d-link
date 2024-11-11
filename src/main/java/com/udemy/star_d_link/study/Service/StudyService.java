@@ -88,5 +88,12 @@ public class StudyService {
         return studyPage.map(StudyMapper::toListDto);
     }
 
+    public Page<StudyListResponseDto> searchStudyTitle(String title, int page, int size) {
+        Pageable pageable = PageRequest.of(page, size, Sort.by("createDate").descending());
+        Page<Study> studyPage = studyRepository.findByTitleContainingIgnoreCase(title, pageable);
+
+        return studyPage.map(StudyMapper::toListDto);
+    }
+
 
 }
