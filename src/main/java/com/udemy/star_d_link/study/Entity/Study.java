@@ -64,4 +64,19 @@ public class Study {
 
     @OneToMany(mappedBy = "study", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<StudyLikes> likes = new ArrayList<>();
+
+    @Column(nullable = false)
+    private Integer likesCount = 0;
+
+    public void incrementLikes() {
+        this.likesCount++;
+    }
+
+    public void decrementLikes() {
+        if (this.likesCount > 0) {
+            this.likesCount--;
+        }  else {
+            throw new IllegalStateException("좋아요 수는 0보다 작을 수 없습니다.");
+        }
+    }
 }

@@ -34,8 +34,10 @@ public class StudyLikesService {
             throw new IllegalArgumentException("이미 좋아요를 눌렀습니다");
         }
         StudyLikes studyLikes = StudyLikesMapper.toEntity(null, userId, study);
-
         StudyLikes savedStudyLikes = studyLikeRepository.save(studyLikes);
+
+        study.incrementLikes();
+        studyRepository.save(study);
 
         return StudyLikesMapper.toDto(savedStudyLikes);
     }
@@ -50,5 +52,8 @@ public class StudyLikesService {
             .orElseThrow(() -> new NoSuchElementException("좋아요를 찾을 수 없습니다."));
 
         studyLikeRepository.delete(studyLikes);
+
+        study.decrementLikes();
+        studyRepository.save(study);
     }
 }
