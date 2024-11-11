@@ -29,7 +29,7 @@ public class StudyMembersService {
     @Transactional
     public StudyMemberResponseDto applyStudy(Long studyId, Long userId) {
         Study study = studyRepository.findById(studyId)
-            .orElseThrow(() -> new NoSuchElementException("해당 스터디를 찾을 수 없습니다: " + studyId));
+            .orElseThrow(() -> new NoSuchElementException("해당 스터디를 찾을 수 없습니다: "));
 
         boolean alreadyApplied = studyMemberRepository.existsByUserIdAndStudyId(userId, studyId);
         if (alreadyApplied) {
@@ -51,7 +51,33 @@ public class StudyMembersService {
         return studyPage.map(StudyMembersMapper::toResponseDto);
     }
 
-    public boolean hasPermission (Long studyId, Long userId) {
+    public StudyMemberResponseDto acceptMember(Long studyId, Long userId) {
+        StudyMembers member = studyMemberRepository.findById(userId)
+            .orElseThrow(() -> new NoSuchElementException("해당 멤버를 찾을 수 없습니다: "));
+
+        if(!member.getStudy().getStudyId().equals(studyId)) {
+            throw new IllegalArgumentException("해당 스터디에 속하지 않는 멤버입니다.");
+        }
+
+        StudyMembers updateMember = StudyMembersMapper.updateStatusToActive(member);
+
+        StudyMembers saveMember = studyMemberRepository.save(updateMember);
+
+        return StudyMembersMapper.toResponseDto(saveMember);
+    }
+
+    public void rejectMember(Long studyId, Long userId) {
+        StudyMembers member = studyMemberRepository.findById(userId)
+            .orElseThrow(() -> new NoSuchElementException("해당 멤버를 찾을 수 없습니다: "));
+
+        if(!member.getStudy().getStudyId().equals(studyId)) {
+            throw new IllegalArgumentException("해당 스터디에 속하지 않는 멤버입니다.");
+        }
+
+        studyMemberRepository.delete(member);
+    }
+
+    public boolean hasPermission(Long studyId, Long userId) {
 
         Study study = studyRepository.findByStudyId(studyId)
             .orElseThrow(() -> new NoSuchElementException("해당 스터디를 찾을 수 없습니다"));

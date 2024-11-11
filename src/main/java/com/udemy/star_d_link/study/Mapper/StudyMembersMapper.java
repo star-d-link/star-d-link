@@ -23,4 +23,14 @@ public class StudyMembersMapper {
             studyMembers.getStatus()
         );
     }
+
+    public static StudyMembers updateStatusToActive(StudyMembers member) {
+        return StudyMembers.builder()
+            .studyManageId(member.getStudyManageId())
+            .userId(member.getUserId())
+            .study(member.getStudy())
+            .role(member.getRole())
+            .status("참여중")
+            .build();
+    }
 }
