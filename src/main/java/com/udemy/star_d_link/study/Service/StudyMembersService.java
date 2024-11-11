@@ -8,6 +8,10 @@ import com.udemy.star_d_link.study.Repository.StudyMemberRepository;
 import com.udemy.star_d_link.study.Repository.StudyRepository;
 import java.util.NoSuchElementException;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -37,6 +41,21 @@ public class StudyMembersService {
         StudyMembers studyMember = StudyMembersMapper.toEntity(userId, study, role);
         StudyMembers saveMember = studyMemberRepository.save(studyMember);
 
-        return StudyMembersMapper.toDto(saveMember);
+        return StudyMembersMapper.toResponseDto(saveMember);
+    }
+
+    public Page<StudyMemberResponseDto> getMemberList(int page, int size) {
+        Pageable pageable = PageRequest.of(page, size, Sort.by("createDate").descending());
+        Page<StudyMembers> studyPage = studyMemberRepository.findAll(pageable);
+
+        return studyPage.map(StudyMembersMapper::toResponseDto);
+    }
+
+    public boolean hasPermission (Long studyId, Long userId) {
+
+        Study study = studyRepository.findByStudyId(studyId)
+            .orElseThrow(() -> new NoSuchElementException("해당 스터디를 찾을 수 없습니다"));
+
+        return study.getUserId().equals(userId);
     }
 }
