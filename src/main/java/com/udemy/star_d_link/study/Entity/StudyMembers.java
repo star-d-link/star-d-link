@@ -2,6 +2,8 @@ package com.udemy.star_d_link.study.Entity;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -32,8 +34,9 @@ public class StudyMembers {
     @JoinColumn(name = "study_id", nullable = false)
     private Study study;
 
+    @Enumerated(EnumType.STRING)
     @Column(nullable = false)
-    private String role;
+    private Role role;
 
     @Column(nullable = false)
     private String status;

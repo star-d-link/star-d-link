@@ -179,6 +179,7 @@ public class StudyController {
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 
+    // 참여 신청
     @PostMapping("/{study_id}/apply")
     public ResponseEntity<ApiResponse<StudyMemberResponseDto>> applyStudy(
         @PathVariable("study_id") Long studyId,

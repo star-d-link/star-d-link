@@ -1,8 +1,10 @@
 package com.udemy.star_d_link.study.Service;
 
 import com.udemy.star_d_link.study.Dto.Response.StudyMemberResponseDto;
+import com.udemy.star_d_link.study.Entity.Role;
 import com.udemy.star_d_link.study.Entity.Study;
 import com.udemy.star_d_link.study.Entity.StudyMembers;
+import com.udemy.star_d_link.study.Exception.UnauthorizedException;
 import com.udemy.star_d_link.study.Mapper.StudyMembersMapper;
 import com.udemy.star_d_link.study.Repository.StudyMemberRepository;
 import com.udemy.star_d_link.study.Repository.StudyRepository;
@@ -75,6 +77,24 @@ public class StudyMembersService {
         }
 
         studyMemberRepository.delete(member);
+    }
+
+    public StudyMembers changeMemberRole(Long studyId, Long userId, Role newRole, Long currentUserId) {
+        Study study = studyRepository.findById(studyId)
+            .orElseThrow(() -> new NoSuchElementException("해당 스터디를 찾을 수 없습니다: "));
+
+        StudyMembers currentMember = studyMemberRepository.findByUserIdAndStudy(currentUserId, study)
+            .orElseThrow(() -> new UnauthorizedException("권한이 없습니다."));
+
+        if (currentMember.getRole() != Role.LEADER && currentMember.getRole() != Role.SUB_LEADER) {
+            throw new UnauthorizedException("멤버 역할을 변경할 권한이 없습니다.");
+        }
+
+        StudyMembers targetMember = studyMemberRepository.findByUserIdAndStudy(userId, study)
+            .orElseThrow(() -> new NoSuchElementException("해당 멤버를 찾을 수 없습니다."));
+
+        targetMember.setRole(newRole);
+        return studyMemberRepository.save(targetMember);
     }
 
     public boolean hasPermission(Long studyId, Long userId) {

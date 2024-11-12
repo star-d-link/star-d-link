@@ -2,7 +2,10 @@ package com.udemy.star_d_link.study.Controller;
 
 import com.udemy.star_d_link.study.Dto.Response.ApiResponse;
 import com.udemy.star_d_link.study.Dto.Response.StudyMemberResponseDto;
+import com.udemy.star_d_link.study.Entity.Role;
+import com.udemy.star_d_link.study.Entity.StudyMembers;
 import com.udemy.star_d_link.study.Exception.UnauthorizedException;
+import com.udemy.star_d_link.study.Mapper.StudyMembersMapper;
 import com.udemy.star_d_link.study.Service.StudyMembersService;
 import java.net.URI;
 import org.springframework.data.domain.Page;
@@ -111,5 +114,32 @@ public class StudyMembersController {
         headers.setLocation(URI.create(redirectUrl));
 
         return new ResponseEntity<>(headers, HttpStatus.SEE_OTHER);
+    }
+
+    @PutMapping("/role")
+    public ResponseEntity<ApiResponse<StudyMemberResponseDto>> changeMemberRole(
+        @PathVariable("study_id") Long studyId,
+        @RequestParam("user_id") Long userId,
+        @RequestParam("role") Role newRole,
+        @AuthenticationPrincipal UserDetails currentUser) {
+
+        if (currentUser == null) {
+            throw new UnauthorizedException("로그인이 필요합니다.");
+        }
+
+        // 현재 사용자의 userId 확인
+        Long currentUserId = 1L; // 임시로 userId를 설정합니다. 실제로는 currentUser에서 가져옵니다.
+
+        StudyMembers updatedMember = studyMembersService.changeMemberRole(studyId, userId, newRole, currentUserId);
+
+        StudyMemberResponseDto responseDto = StudyMembersMapper.toResponseDto(updatedMember);
+
+        ApiResponse<StudyMemberResponseDto> response = new ApiResponse<>(
+            "success",
+            "멤버 역할 변경이 완료되었습니다.",
+            responseDto
+        );
+
+        return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 }
