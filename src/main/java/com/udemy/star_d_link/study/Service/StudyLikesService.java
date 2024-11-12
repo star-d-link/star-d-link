@@ -48,7 +48,7 @@ public class StudyLikesService {
         Study study = studyRepository.findById(studyId)
             .orElseThrow(() -> new NoSuchElementException("해당 스터디를 찾을 수 없습니다: "));
 
-        StudyLikes studyLikes = studyLikeRepository.findByStudyIdAndUserId(userId, study.getStudyId())
+        StudyLikes studyLikes = studyLikeRepository.findByStudyAndUserId(study, userId)
             .orElseThrow(() -> new NoSuchElementException("좋아요를 찾을 수 없습니다."));
 
         studyLikeRepository.delete(studyLikes);

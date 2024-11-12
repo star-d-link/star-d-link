@@ -15,6 +15,9 @@ import jakarta.validation.Valid;
 import java.net.URI;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -160,10 +163,12 @@ public class StudyController {
 
     @GetMapping("/list")
     public ResponseEntity<ApiResponse<Page<StudyListResponseDto>>> listStudy(
-        @RequestParam(defaultValue = "0") int page,
-        @RequestParam(defaultValue = "10") int size) {
+        @PageableDefault(size = 10, sort = "createDate", direction = Sort.Direction.DESC) Pageable pageable,
+        @RequestParam(value = "isOnline", required = false) Boolean isOnline,
+        @RequestParam(value = "region", required = false) String region,
+        @RequestParam(value = "isRecruit", required = false) Boolean isRecruit) {
 
-        Page<StudyListResponseDto> dtoPage = studyService.getStudyList(page, size);
+        Page<StudyListResponseDto> dtoPage = studyService.getStudyList(isOnline, region, isRecruit, pageable);
 
         ApiResponse<Page<StudyListResponseDto>> response = new ApiResponse<>(
             "success",

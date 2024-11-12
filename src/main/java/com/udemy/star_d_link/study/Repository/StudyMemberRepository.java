@@ -8,5 +8,5 @@ import java.util.Optional;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface StudyMemberRepository extends JpaRepository<StudyMembers, Long> {
-    boolean existsByUserIdAndStudyId(Long userId, Long studyId);
+    boolean existsByUserIdAndStudy(Long userId, Study study);
 }

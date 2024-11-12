@@ -31,7 +31,7 @@ public class StudyMembersService {
         Study study = studyRepository.findById(studyId)
             .orElseThrow(() -> new NoSuchElementException("해당 스터디를 찾을 수 없습니다: "));
 
-        boolean alreadyApplied = studyMemberRepository.existsByUserIdAndStudyId(userId, studyId);
+        boolean alreadyApplied = studyMemberRepository.existsByUserIdAndStudy(userId, study);
         if (alreadyApplied) {
             throw new IllegalArgumentException("이미 스터디에 신청하셨습니다.");
         }
