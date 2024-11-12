@@ -203,18 +203,36 @@ public class StudyController {
     }
 
 
-    // 제목과 내용이 같을 때 결과를 출력하는 임시 검색
+    // 제목 또는 내용이 같을 때 결과를 출력하는 일반 검색
     @GetMapping("/search")
     public ResponseEntity<ApiResponse<Page<StudyResponseDto>>> searchStudy(
         @RequestParam("keyword") String keyword,
         @PageableDefault(size = 10, sort = "createDate", direction = Sort.Direction.DESC) Pageable pageable) {
 
-        Page<StudyResponseDto> studyPage = studyService.searchStudyTitle(keyword, pageable);
+        Page<StudyResponseDto> studyPage = studyService.searchStudy(keyword, pageable);
 
         ApiResponse<Page<StudyResponseDto>> response = new ApiResponse<>(
             "success",
             "검색 결과 조회 완료",
             studyPage
+        );
+
+        return ResponseEntity.status(HttpStatus.OK).body(response);
+    }
+
+
+    // 상세 검색 (해시 태그 검색 기능만 넣었음 필요에 따라 추가 가능)
+    @GetMapping("/detailed-search")
+    public ResponseEntity<ApiResponse<Page<StudyResponseDto>>> detailedSearchStudy(
+        @RequestParam("hashtag") String hashtag,
+        @PageableDefault(size = 10, sort = "createDate", direction = Sort.Direction.DESC) Pageable pageable) {
+
+        Page<StudyResponseDto> detailedStudyPage = studyService.detailedSearchStudy(hashtag, pageable);
+
+        ApiResponse<Page<StudyResponseDto>> response = new ApiResponse<>(
+            "success",
+            "상세 검색 결과 조회 완료",
+            detailedStudyPage
         );
 
         return ResponseEntity.status(HttpStatus.OK).body(response);

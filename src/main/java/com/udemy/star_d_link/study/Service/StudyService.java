@@ -120,7 +120,7 @@ public class StudyService {
     }
 
 
-    public Page<StudyResponseDto> searchStudyTitle(String keyword, Pageable pageable) {
+    public Page<StudyResponseDto> searchStudy(String keyword, Pageable pageable) {
         QStudy study = QStudy.study;
 
         BooleanBuilder builder = new BooleanBuilder();
@@ -128,6 +128,32 @@ public class StudyService {
         if (keyword != null && !keyword.trim().isEmpty()) {
             builder.or(study.title.containsIgnoreCase(keyword));
             builder.or(study.content.containsIgnoreCase(keyword));
+        }
+
+        List<Study> studyList = queryFactory
+            .selectFrom(study)
+            .where(builder)
+            .offset(pageable.getOffset())
+            .limit(pageable.getPageSize())
+            .fetch();
+
+        long total = queryFactory
+            .select(study)
+            .from(study)
+            .where(builder)
+            .fetch().size();
+
+        return new PageImpl<>(studyList, pageable, total)
+            .map(StudyMapper::toResponseDto);
+    }
+
+    public Page<StudyResponseDto> detailedSearchStudy(String hashtag, Pageable pageable) {
+        QStudy study = QStudy.study;
+
+        BooleanBuilder builder = new BooleanBuilder();
+
+        if (hashtag != null && !hashtag.trim().isEmpty()) {
+            builder.and(study.hashtag.containsIgnoreCase(hashtag));
         }
 
         List<Study> studyList = queryFactory
