@@ -1,7 +1,6 @@
 package com.udemy.star_d_link.study.Service;
 
 import com.querydsl.core.BooleanBuilder;
-import com.querydsl.jpa.impl.JPAQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import com.udemy.star_d_link.study.Dto.Request.StudyCreateRequestDto;
 import com.udemy.star_d_link.study.Dto.Response.StudyListResponseDto;
@@ -14,7 +13,6 @@ import com.udemy.star_d_link.study.Mapper.StudyMapper;
 import com.udemy.star_d_link.study.Repository.StudyRepository;
 import java.util.List;
 import java.util.NoSuchElementException;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
@@ -111,21 +109,41 @@ public class StudyService {
             .limit(pageable.getPageSize()) // 페이지 크기(default : 10)
             .fetch();
 
-        long total = studyList.size();
-
-
+        long total = queryFactory
+            .select(study)
+            .from(study)
+            .where(builder)
+            .fetch().size();
 
         return new PageImpl<>(studyList, pageable, total)
             .map(StudyMapper::toListDto);
     }
 
 
-    public Page<StudyListResponseDto> searchStudyTitle(String title, int page, int size) {
-        Pageable pageable = PageRequest.of(page, size, Sort.by("createDate").descending());
-        Page<Study> studyPage = studyRepository.findByTitleContainingIgnoreCase(title, pageable);
+    public Page<StudyResponseDto> searchStudyTitle(String keyword, Pageable pageable) {
+        QStudy study = QStudy.study;
 
-        return studyPage.map(StudyMapper::toListDto);
+        BooleanBuilder builder = new BooleanBuilder();
+
+        if (keyword != null && !keyword.trim().isEmpty()) {
+            builder.or(study.title.containsIgnoreCase(keyword));
+            builder.or(study.content.containsIgnoreCase(keyword));
+        }
+
+        List<Study> studyList = queryFactory
+            .selectFrom(study)
+            .where(builder)
+            .offset(pageable.getOffset())
+            .limit(pageable.getPageSize())
+            .fetch();
+
+        long total = queryFactory
+            .select(study)
+            .from(study)
+            .where(builder)
+            .fetch().size();
+
+        return new PageImpl<>(studyList, pageable, total)
+            .map(StudyMapper::toResponseDto);
     }
-
-
 }

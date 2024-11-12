@@ -203,16 +203,15 @@ public class StudyController {
     }
 
 
-    // 제목만으로 검색하는 임시 검색 기능
+    // 제목과 내용이 같을 때 결과를 출력하는 임시 검색
     @GetMapping("/search")
-    public ResponseEntity<ApiResponse<Page<StudyListResponseDto>>> searchStudy(
-        @RequestParam("title") String title,
-        @RequestParam(defaultValue = "0") int page,
-        @RequestParam(defaultValue = "10") int size) {
+    public ResponseEntity<ApiResponse<Page<StudyResponseDto>>> searchStudy(
+        @RequestParam("keyword") String keyword,
+        @PageableDefault(size = 10, sort = "createDate", direction = Sort.Direction.DESC) Pageable pageable) {
 
-        Page<StudyListResponseDto> studyPage = studyService.searchStudyTitle(title, page, size);
+        Page<StudyResponseDto> studyPage = studyService.searchStudyTitle(keyword, pageable);
 
-        ApiResponse<Page<StudyListResponseDto>> response = new ApiResponse<>(
+        ApiResponse<Page<StudyResponseDto>> response = new ApiResponse<>(
             "success",
             "검색 결과 조회 완료",
             studyPage
