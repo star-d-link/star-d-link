@@ -4,6 +4,7 @@ import com.udemy.star_d_link.user.dto.UserDTO;
 import com.udemy.star_d_link.user.entity.UserEntity;
 import com.udemy.star_d_link.user.exception.UserExceptions;
 import com.udemy.star_d_link.user.repository.UserRepository;
+import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -27,6 +28,15 @@ public class UserServiceImpl implements UserService {
         if (!passwordEncoder.matches(password, userEntity.getPassword())) {
             throw UserExceptions.BAD_CREDENTIALS.get();
         }
+
+        return new UserDTO(userEntity);
+    }
+
+    @Override
+    public UserDTO getByUsername(String username) {
+        Optional<UserEntity> result = userRepository.findByUsername(username);
+
+        UserEntity userEntity = result.orElseThrow(UserExceptions.NOT_FOUND::get);
 
         return new UserDTO(userEntity);
     }

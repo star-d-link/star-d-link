@@ -6,4 +6,5 @@ public interface UserService {
 
     UserDTO read(String username, String password);
 
+    UserDTO getByUsername(String username);
 }
