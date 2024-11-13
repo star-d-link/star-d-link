@@ -1,8 +1,12 @@
 package com.udemy.star_d_link.study.Repository;
 
+import com.udemy.star_d_link.study.Dto.Response.StudyScheduleResponseDto;
+import com.udemy.star_d_link.study.Entity.Study;
 import com.udemy.star_d_link.study.Entity.StudySchedule;
+import java.util.List;
+import java.util.Optional;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface StudyScheduleRepository extends JpaRepository<StudySchedule, Long> {
-
+    List<StudySchedule> findByStudy(Study study);
 }

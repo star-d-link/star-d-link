@@ -4,6 +4,7 @@ import com.udemy.star_d_link.study.Dto.Request.StudyScheduleRequestDto;
 import com.udemy.star_d_link.study.Dto.Response.StudyScheduleResponseDto;
 import com.udemy.star_d_link.study.Entity.Study;
 import com.udemy.star_d_link.study.Entity.StudySchedule;
+import java.util.List;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.factory.Mappers;
@@ -16,4 +17,6 @@ public interface StudyScheduleMapper {
     StudySchedule toEntity(StudyScheduleRequestDto requestDto, Study study);
 
     StudyScheduleResponseDto toDto(StudySchedule studySchedule);
+
+    List<StudyScheduleResponseDto> toDtoList(List<StudySchedule> studyScheduleList);
 }

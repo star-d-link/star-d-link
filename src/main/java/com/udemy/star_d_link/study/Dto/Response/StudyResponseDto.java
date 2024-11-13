@@ -1,5 +1,6 @@
 package com.udemy.star_d_link.study.Dto.Response;
 
+import java.time.LocalDate;
 import java.util.Date;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -18,5 +19,5 @@ public class StudyResponseDto {
     private String region;
     private Boolean isOnline;
     private Integer headCount;
-    private Date createDate;
+    private LocalDate createDate;
 }

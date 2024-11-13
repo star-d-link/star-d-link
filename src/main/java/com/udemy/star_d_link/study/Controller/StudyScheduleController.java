@@ -10,12 +10,14 @@ import com.udemy.star_d_link.study.Service.StudyMembersService;
 import com.udemy.star_d_link.study.Service.StudyScheduleService;
 import jakarta.validation.Valid;
 import java.net.URI;
+import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -31,6 +33,32 @@ public class StudyScheduleController {
     public StudyScheduleController(StudyScheduleService studyScheduleService, StudyMembersService studyMembersService) {
         this.studyScheduleService = studyScheduleService;
         this.studyMembersService = studyMembersService;
+    }
+
+    @GetMapping("/")
+    public ResponseEntity<ApiResponse<List<StudyScheduleResponseDto>>> getScheduleList (
+        @PathVariable("study_id") Long studyId,
+        @AuthenticationPrincipal UserDetails currentUser) {
+
+        if (currentUser == null) {
+            throw new UnauthorizedException("로그인이 필요합니다.");
+        }
+
+        // 실제로 적용할 때는 currentUser의 정보를 바탕으로 userId 사용 후 권한 확인
+        Long tempId = 1L;
+        boolean hasPermission = studyMembersService.hasPermission(studyId, tempId);
+        if (!hasPermission) {
+            throw new UnauthorizedException("스터디 일정 조회 권한이 없습니다.");
+        }
+
+        List<StudyScheduleResponseDto> scheduleList = studyScheduleService.getScheduleList(studyId);
+        ApiResponse<List<StudyScheduleResponseDto>> response = new ApiResponse<>(
+            "success",
+            "스터디 일정 목록 조회 완료",
+            scheduleList
+        );
+
+        return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 
     @PutMapping("/add")
@@ -57,6 +85,6 @@ public class StudyScheduleController {
         HttpHeaders headers = new HttpHeaders();
         headers.setLocation(URI.create(redirectUrl));
 
-        return new ResponseEntity<>(headers, HttpStatus.SEE_OTHER);
+        return ResponseEntity.status(HttpStatus.SEE_OTHER).headers(headers).build();
     }
 }

@@ -2,7 +2,7 @@ package com.udemy.star_d_link.study.Dto.Request;
 
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
-import java.util.Date;
+import java.time.LocalDate;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -26,5 +26,5 @@ public class StudyCreateRequestDto {
     private String region;
     private Boolean isOnline;
     private Integer headCount;
-    private Date createDate;
+    private LocalDate createDate;
 }
