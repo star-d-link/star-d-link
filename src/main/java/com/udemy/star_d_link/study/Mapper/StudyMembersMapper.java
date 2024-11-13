@@ -1,36 +1,26 @@
 package com.udemy.star_d_link.study.Mapper;
 
 import com.udemy.star_d_link.study.Dto.Response.StudyMemberResponseDto;
+import com.udemy.star_d_link.study.Entity.Role;
 import com.udemy.star_d_link.study.Entity.Study;
 import com.udemy.star_d_link.study.Entity.StudyMembers;
+import org.mapstruct.Mapper;
+import org.mapstruct.Mapping;
+import org.mapstruct.MappingTarget;
+import org.mapstruct.factory.Mappers;
+import org.springframework.stereotype.Component;
 
-public class StudyMembersMapper {
-    public static StudyMembers toEntity(Long userId, Study study, String role) {
-        return StudyMembers.builder()
-            .userId(userId)
-            .study(study)
-            .role(role)
-            .status("대기중") // 기본 상태 설정
-            .build();
-    }
+@Mapper(componentModel = "spring")
+public interface StudyMembersMapper {
 
-    public static StudyMemberResponseDto toResponseDto(StudyMembers studyMembers) {
-        return new StudyMemberResponseDto(
-            studyMembers.getStudyManageId(),
-            studyMembers.getUserId(),
-            studyMembers.getStudy().getStudyId(),
-            studyMembers.getRole(),
-            studyMembers.getStatus()
-        );
-    }
+    StudyMembersMapper INSTANCE = Mappers.getMapper(StudyMembersMapper.class);
 
-    public static StudyMembers updateStatusToActive(StudyMembers member) {
-        return StudyMembers.builder()
-            .studyManageId(member.getStudyManageId())
-            .userId(member.getUserId())
-            .study(member.getStudy())
-            .role(member.getRole())
-            .status("참여중")
-            .build();
-    }
+    StudyMembers toEntity(Long userId, Study study, Role role);
+
+    @Mapping(target = "studyManageId", ignore = true) // 새로운 엔티티 생성 시 studyManageId는 무시
+    StudyMemberResponseDto toDto(StudyMembers studyMembers);
+
+    @Mapping(target = "status", constant = "참여중")
+    void updateStatusToActive(@MappingTarget StudyMembers member);
+
 }

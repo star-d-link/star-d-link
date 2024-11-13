@@ -26,9 +26,10 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/study/{study_id}/manage")
 public class StudyMembersController {
     private final StudyMembersService studyMembersService;
-
-    public StudyMembersController(StudyMembersService studyMembersService) {
+    private final StudyMembersMapper studymembersmapper;
+    public StudyMembersController(StudyMembersService studyMembersService, StudyMembersMapper studymembersmapper) {
         this.studyMembersService = studyMembersService;
+        this.studymembersmapper = studymembersmapper;
     }
 
     @GetMapping("/")
@@ -132,7 +133,7 @@ public class StudyMembersController {
 
         StudyMembers updatedMember = studyMembersService.changeMemberRole(studyId, userId, newRole, currentUserId);
 
-        StudyMemberResponseDto responseDto = StudyMembersMapper.toResponseDto(updatedMember);
+        StudyMemberResponseDto responseDto = studymembersmapper.toDto(updatedMember);
 
         ApiResponse<StudyMemberResponseDto> response = new ApiResponse<>(
             "success",

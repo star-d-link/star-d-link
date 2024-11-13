@@ -39,11 +39,13 @@ import org.springframework.web.bind.annotation.RestController;
 public class StudyController {
     private final StudyService studyService;
     private final StudyMembersService studyMembersService;
+    private final StudyMapper studyMapper;
 
     @Autowired
-    public StudyController(StudyService studyService, StudyMembersService studyMembersService) {
+    public StudyController(StudyService studyService, StudyMembersService studyMembersService, StudyMapper studyMapper) {
         this.studyService = studyService;
         this.studyMembersService = studyMembersService;
+        this.studyMapper = studyMapper;
     }
 
     @GetMapping(value = "/create")
@@ -78,7 +80,7 @@ public class StudyController {
         Study study = studyService.findByStudyId(study_id);
 
         // Study 엔티티를 StudyResponseDto로 변환
-        StudyResponseDto responseDto = StudyMapper.toResponseDto(study);
+        StudyResponseDto responseDto = studyMapper.toResponseDto(study);
 
         ApiResponse<StudyResponseDto> response = new ApiResponse<>(
             "success",
@@ -101,7 +103,7 @@ public class StudyController {
         Long tempId = 1L;
         Study study = studyService.getStudyForEdit(study_id, tempId);
 
-        StudyUpdateRequestDto responseDto = StudyMapper.toUpdateRequestDto(study);
+        StudyUpdateRequestDto responseDto = studyMapper.toUpdateRequestDto(study);
 
         ApiResponse<StudyUpdateRequestDto> response = new ApiResponse<>(
             "success",
@@ -128,7 +130,7 @@ public class StudyController {
 
 
 
-        StudyResponseDto studyResponseDto = StudyMapper.toResponseDto(editStudy);
+        StudyResponseDto studyResponseDto = studyMapper.toResponseDto(editStudy);
 
         ApiResponse<StudyResponseDto> response = new ApiResponse<>(
             "success",

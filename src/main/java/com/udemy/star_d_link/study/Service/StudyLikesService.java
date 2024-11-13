@@ -17,9 +17,12 @@ public class StudyLikesService {
     private StudyRepository studyRepository;
 
     private final StudyLikeRepository studyLikeRepository;
+    private final StudyLikesMapper studyLikesMapper;
 
-    public StudyLikesService(StudyLikeRepository studyLikeRepository) {
+    public StudyLikesService(StudyLikeRepository studyLikeRepository, StudyLikesMapper studyLikesMapper) {
         this.studyLikeRepository = studyLikeRepository;
+        this.studyLikesMapper = studyLikesMapper;
+
     }
 
     @Transactional
@@ -33,13 +36,13 @@ public class StudyLikesService {
         if (alreadyLike) {
             throw new IllegalArgumentException("이미 좋아요를 눌렀습니다");
         }
-        StudyLikes studyLikes = StudyLikesMapper.toEntity(null, userId, study);
+        StudyLikes studyLikes = studyLikesMapper.toEntity(null, userId, study);
         StudyLikes savedStudyLikes = studyLikeRepository.save(studyLikes);
 
         study.incrementLikes();
         studyRepository.save(study);
 
-        return StudyLikesMapper.toDto(savedStudyLikes);
+        return studyLikesMapper.toDto(savedStudyLikes);
     }
 
     @Transactional

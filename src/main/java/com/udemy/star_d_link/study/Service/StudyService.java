@@ -26,20 +26,21 @@ public class StudyService {
 
     private final StudyRepository studyRepository;
     private final JPAQueryFactory queryFactory;
-
-    public StudyService(StudyRepository studyRepository, JPAQueryFactory queryFactory) {
+    private final StudyMapper studyMapper;
+    public StudyService(StudyRepository studyRepository, JPAQueryFactory queryFactory, StudyMapper studyMapper) {
         this.studyRepository = studyRepository;
         this.queryFactory = queryFactory;
+        this.studyMapper = studyMapper;
     }
 
     @Transactional
     public StudyResponseDto createStudy(StudyCreateRequestDto requestDto){
 
-        Study study = StudyMapper.toEntity(requestDto);
+        Study study = studyMapper.toEntity(requestDto);
 
         Study savedStudy = studyRepository.save(study);
 
-        return StudyMapper.toResponseDto(savedStudy);
+        return studyMapper.toResponseDto(savedStudy);
     }
 
     public Study getStudyForEdit(Long studyId, Long userId) {
@@ -62,9 +63,9 @@ public class StudyService {
             throw new UnauthorizedException("수정 권한이 없습니다.");
         }
 
-        Study editStudy = StudyMapper.updateStudyFromDto(study, requestDto);
+        studyMapper.updateStudyFromDto(requestDto, study);
 
-        return studyRepository.save(editStudy);
+        return studyRepository.save(study);
     }
 
     @Transactional
@@ -116,7 +117,7 @@ public class StudyService {
             .fetch().size();
 
         return new PageImpl<>(studyList, pageable, total)
-            .map(StudyMapper::toListDto);
+            .map(studyMapper::toListDto);
     }
 
 
@@ -144,7 +145,7 @@ public class StudyService {
             .fetch().size();
 
         return new PageImpl<>(studyList, pageable, total)
-            .map(StudyMapper::toResponseDto);
+            .map(studyMapper::toResponseDto);
     }
 
     public Page<StudyResponseDto> detailedSearchStudy(String hashtag, Pageable pageable) {
@@ -170,6 +171,6 @@ public class StudyService {
             .fetch().size();
 
         return new PageImpl<>(studyList, pageable, total)
-            .map(StudyMapper::toResponseDto);
+            .map(studyMapper::toResponseDto);
     }
 }

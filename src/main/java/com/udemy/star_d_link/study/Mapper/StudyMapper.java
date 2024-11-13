@@ -5,75 +5,34 @@ import com.udemy.star_d_link.study.Dto.Response.StudyListResponseDto;
 import com.udemy.star_d_link.study.Dto.Response.StudyResponseDto;
 import com.udemy.star_d_link.study.Dto.Request.StudyUpdateRequestDto;
 import com.udemy.star_d_link.study.Entity.Study;
+import org.mapstruct.Mapper;
+import org.mapstruct.Mapping;
+import org.mapstruct.MappingTarget;
+import org.mapstruct.factory.Mappers;
 
-public class StudyMapper {
+/*
+코드의 가독성을 위해 Mapper 클래스 작성
+Entity -> DTO나 DTO -> Entity 변환 작업시 사용
+ */
+
+@Mapper(componentModel = "spring")
+public interface StudyMapper {
+
+    StudyMapper INSTANCE = Mappers.getMapper(StudyMapper.class);
 
     // Study 엔티티를 StudyResponseDto로 변환하는 메소드
-    public static StudyResponseDto toResponseDto(Study study) {
-        return new StudyResponseDto(
-            study.getStudyId(),
-            study.getUserId(),
-            study.getTitle(),
-            study.getContent(),
-            study.getHashtag(),
-            study.getIsRecruit(),
-            study.getRegion(),
-            study.getIsOnline(),
-            study.getHeadCount(),
-            study.getCreateDate()
-        );
-    }
+    StudyResponseDto toResponseDto(Study study);
 
     // StudyCreateRequestDto를 Study 엔티티로 변환하는 메소드
-    public static Study toEntity(StudyCreateRequestDto requestDto) {
-        return Study.builder()
-            .userId(requestDto.getUserId())
-            .title(requestDto.getTitle())
-            .content(requestDto.getContent())
-            .hashtag(requestDto.getHashtag())
-            .isRecruit(requestDto.getIsRecruit())
-            .region(requestDto.getRegion())
-            .isOnline(requestDto.getIsOnline())
-            .headCount(requestDto.getHeadCount())
-            .createDate(requestDto.getCreateDate()) // 만약 엔티티에서 자동 생성되길 원한다면 제외 가능
-            .build();
-    }
+    Study toEntity(StudyCreateRequestDto requestDto);
 
-    // StudyResponseDto를 StudyUpdateRequestDto로 변환하는 메소드
-    public static StudyUpdateRequestDto toUpdateRequestDto(Study study) {
-        return new StudyUpdateRequestDto(
-            study.getTitle(),
-            study.getContent(),
-            study.getHashtag(),
-            study.getIsRecruit(),
-            study.getRegion(),
-            study.getIsOnline(),
-            study.getHeadCount()
-        );
-    }
+    // Study 엔티티를 StudyUpdateRequestDto로 변환하는 메소드
+    StudyUpdateRequestDto toUpdateRequestDto(Study study);
 
     // StudyUpdateRequestDto를 이용해 기존 Study 엔티티를 업데이트하는 메소드
-    public static Study updateStudyFromDto(Study study, StudyUpdateRequestDto requestDto) {
-        return study.toBuilder()
-            .title(requestDto.getTitle())
-            .content(requestDto.getContent())
-            .hashtag(requestDto.getHashtag())
-            .isRecruit(requestDto.getIsRecruit())
-            .region(requestDto.getRegion())
-            .isOnline(requestDto.getIsOnline())
-            .headCount(requestDto.getHeadCount())
-            .build();
-    }
+    @Mapping(target = "studyId", ignore = true) // 엔티티의 고유 ID는 업데이트하지 않도록 설정
+    void updateStudyFromDto(StudyUpdateRequestDto requestDto, @MappingTarget Study study);
 
-    // Study 엔티티를 StudyListDto로 변환하는 메소드
-    public static StudyListResponseDto toListDto(Study study) {
-        return new StudyListResponseDto(
-            study.getStudyId(),
-            study.getTitle(),
-            study.getIsRecruit(),
-            study.getRegion(),
-            study.getIsOnline(),
-            study.getCreateDate()
-        );
-    }
+    // Study 엔티티를 StudyListResponseDto로 변환하는 메소드
+    StudyListResponseDto toListDto(Study study);
 }

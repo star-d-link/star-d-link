@@ -21,11 +21,12 @@ import org.springframework.transaction.annotation.Transactional;
 public class StudyMembersService {
     private final StudyMemberRepository studyMemberRepository;
     private final StudyRepository studyRepository;
-
+    private final StudyMembersMapper studyMembersMapper;
     @Autowired
-    public StudyMembersService(StudyMemberRepository studyMemberRepository, StudyRepository studyRepository) {
+    public StudyMembersService(StudyMemberRepository studyMemberRepository, StudyRepository studyRepository, StudyMembersMapper studyMembersMapper) {
         this.studyMemberRepository = studyMemberRepository;
         this.studyRepository = studyRepository;
+        this.studyMembersMapper = studyMembersMapper;
     }
 
     @Transactional
@@ -38,19 +39,19 @@ public class StudyMembersService {
             throw new IllegalArgumentException("이미 스터디에 신청하셨습니다.");
         }
 
-        String role = study.getUserId().equals(userId) ? "팀장" : "팀원";
+        Role role = study.getUserId().equals(userId) ? Role.LEADER : Role.MEMBER;
 
-        StudyMembers studyMember = StudyMembersMapper.toEntity(userId, study, role);
+        StudyMembers studyMember = studyMembersMapper.toEntity(userId, study, role);
         StudyMembers saveMember = studyMemberRepository.save(studyMember);
 
-        return StudyMembersMapper.toResponseDto(saveMember);
+        return studyMembersMapper.toDto(saveMember);
     }
 
     public Page<StudyMemberResponseDto> getMemberList(int page, int size) {
         Pageable pageable = PageRequest.of(page, size, Sort.by("createDate").descending());
         Page<StudyMembers> studyPage = studyMemberRepository.findAll(pageable);
 
-        return studyPage.map(StudyMembersMapper::toResponseDto);
+        return studyPage.map(studyMembersMapper::toDto);
     }
 
     public StudyMemberResponseDto acceptMember(Long studyId, Long userId) {
@@ -61,11 +62,11 @@ public class StudyMembersService {
             throw new IllegalArgumentException("해당 스터디에 속하지 않는 멤버입니다.");
         }
 
-        StudyMembers updateMember = StudyMembersMapper.updateStatusToActive(member);
+        studyMembersMapper.updateStatusToActive(member);
 
-        StudyMembers saveMember = studyMemberRepository.save(updateMember);
+        StudyMembers saveMember = studyMemberRepository.save(member);
 
-        return StudyMembersMapper.toResponseDto(saveMember);
+        return studyMembersMapper.toDto(saveMember);
     }
 
     public void rejectMember(Long studyId, Long userId) {
