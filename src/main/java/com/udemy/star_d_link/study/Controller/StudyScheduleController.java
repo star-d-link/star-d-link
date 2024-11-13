@@ -1,0 +1,62 @@
+package com.udemy.star_d_link.study.Controller;
+
+import com.udemy.star_d_link.study.Dto.Request.StudyCreateRequestDto;
+import com.udemy.star_d_link.study.Dto.Request.StudyScheduleRequestDto;
+import com.udemy.star_d_link.study.Dto.Response.ApiResponse;
+import com.udemy.star_d_link.study.Dto.Response.StudyScheduleResponseDto;
+import com.udemy.star_d_link.study.Entity.StudySchedule;
+import com.udemy.star_d_link.study.Exception.UnauthorizedException;
+import com.udemy.star_d_link.study.Service.StudyMembersService;
+import com.udemy.star_d_link.study.Service.StudyScheduleService;
+import jakarta.validation.Valid;
+import java.net.URI;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+@RestController
+@RequestMapping("/study/{study_id}/schedule")
+public class StudyScheduleController {
+    private final StudyScheduleService studyScheduleService;
+    private final StudyMembersService studyMembersService;
+    @Autowired
+    public StudyScheduleController(StudyScheduleService studyScheduleService, StudyMembersService studyMembersService) {
+        this.studyScheduleService = studyScheduleService;
+        this.studyMembersService = studyMembersService;
+    }
+
+    @PutMapping("/add")
+    public ResponseEntity<ApiResponse<StudyScheduleResponseDto>> addSchedule(
+        @PathVariable("study_id") Long studyId,
+        @Valid @RequestBody StudyScheduleRequestDto requestDto,
+        @AuthenticationPrincipal UserDetails currentUser) {
+
+        if (currentUser == null) {
+            throw new UnauthorizedException("로그인이 필요합니다.");
+        }
+
+        // 실제로 적용할 때는 currentUser의 정보를 바탕으로 userId 사용 후 권한 확인
+        Long tempId = 1L;
+        boolean hasPermission = studyMembersService.hasPermission(studyId, tempId);
+        if (!hasPermission) {
+            throw new UnauthorizedException("스터디 일정 관리 권한이 없습니다.");
+        }
+
+        StudyScheduleResponseDto responseDto = studyScheduleService.addSchedule(studyId, requestDto);
+
+        String redirectUrl = "/study/" + studyId + "/schedule";
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.setLocation(URI.create(redirectUrl));
+
+        return new ResponseEntity<>(headers, HttpStatus.SEE_OTHER);
+    }
+}

@@ -79,4 +79,7 @@ public class Study {
             throw new IllegalStateException("좋아요 수는 0보다 작을 수 없습니다.");
         }
     }
+
+    @OneToMany(mappedBy = "study", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<StudySchedule> schedules = new ArrayList<>();
 }
