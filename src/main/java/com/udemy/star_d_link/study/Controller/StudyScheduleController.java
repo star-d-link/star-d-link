@@ -17,8 +17,10 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -46,7 +48,7 @@ public class StudyScheduleController {
 
         // 실제로 적용할 때는 currentUser의 정보를 바탕으로 userId 사용 후 권한 확인
         Long tempId = 1L;
-        boolean hasPermission = studyMembersService.hasPermission(studyId, tempId);
+        boolean hasPermission = studyMembersService.isMemberOfStudy(studyId, tempId);
         if (!hasPermission) {
             throw new UnauthorizedException("스터디 일정 조회 권한이 없습니다.");
         }
@@ -61,7 +63,7 @@ public class StudyScheduleController {
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 
-    @PutMapping("/add")
+    @PostMapping("/add")
     public ResponseEntity<ApiResponse<StudyScheduleResponseDto>> addSchedule(
         @PathVariable("study_id") Long studyId,
         @Valid @RequestBody StudyScheduleRequestDto requestDto,
@@ -79,6 +81,58 @@ public class StudyScheduleController {
         }
 
         StudyScheduleResponseDto responseDto = studyScheduleService.addSchedule(studyId, requestDto);
+
+        String redirectUrl = "/study/" + studyId + "/schedule";
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.setLocation(URI.create(redirectUrl));
+
+        return ResponseEntity.status(HttpStatus.SEE_OTHER).headers(headers).build();
+    }
+
+    @PutMapping("/{schedule_id}/update")
+    public ResponseEntity<ApiResponse<StudyScheduleResponseDto>> updateSchedule(
+        @PathVariable("study_id") Long studyId,
+        @PathVariable("schedule_id") Long scheduleId,
+        @Valid @RequestBody StudyScheduleRequestDto requestDto,
+        @AuthenticationPrincipal UserDetails currentUser) {
+
+        if (currentUser == null) {
+            throw new UnauthorizedException("로그인이 필요합니다.");
+        }
+
+        Long tempId = 1L;
+        boolean hasPermission = studyMembersService.hasPermission(studyId, tempId);
+        if (!hasPermission) {
+            throw new UnauthorizedException("스터디 일정 관리 권한이 없습니다.");
+        }
+
+        StudySchedule updateSchedule = studyScheduleService.updateSchedule(scheduleId, requestDto);
+        String redirectUrl = "/study/" + studyId + "/schedule";
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.setLocation(URI.create(redirectUrl));
+
+        return ResponseEntity.status(HttpStatus.SEE_OTHER).headers(headers).build();
+    }
+
+    @DeleteMapping("/{schedule_id}/delete") public ResponseEntity<ApiResponse<Void>> deleteSchedule(
+        @PathVariable("study_id") Long studyId,
+        @PathVariable("schedule_id") Long scheduleId,
+        @AuthenticationPrincipal UserDetails currentUser) {
+
+        if (currentUser == null) {
+            throw new UnauthorizedException("로그인이 필요합니다.");
+        }
+
+        // 실제로 적용할 때는 currentUser의 정보를 바탕으로 userId 사용 후 권한 확인
+        Long tempId = 1L;
+        boolean hasPermission = studyMembersService.hasPermission(studyId, tempId);
+        if (!hasPermission) {
+            throw new UnauthorizedException("스터디 일정 관리 권한이 없습니다.");
+        }
+
+        studyScheduleService.deleteSchedule(scheduleId);
 
         String redirectUrl = "/study/" + studyId + "/schedule";
 

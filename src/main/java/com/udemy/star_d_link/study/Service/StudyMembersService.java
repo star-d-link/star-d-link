@@ -9,6 +9,7 @@ import com.udemy.star_d_link.study.Mapper.StudyMembersMapper;
 import com.udemy.star_d_link.study.Repository.StudyMemberRepository;
 import com.udemy.star_d_link.study.Repository.StudyRepository;
 import java.util.NoSuchElementException;
+import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -104,5 +105,15 @@ public class StudyMembersService {
             .orElseThrow(() -> new NoSuchElementException("해당 스터디를 찾을 수 없습니다"));
 
         return study.getUserId().equals(userId);
+    }
+
+    public boolean isMemberOfStudy(Long studyId, Long userId) {
+
+        Study study = studyRepository.findById(studyId)
+            .orElseThrow(() -> new NoSuchElementException("해당 스터디를 찾을 수 없습니다: "));
+
+        Optional<StudyMembers> studyMember = studyMemberRepository.findByStudyAndUserIdAndStatusNot(study, userId, "대기중");
+
+        return studyMember.isPresent();
     }
 }

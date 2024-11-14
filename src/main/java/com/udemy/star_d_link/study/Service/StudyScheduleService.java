@@ -44,4 +44,23 @@ public class StudyScheduleService {
 
         return studyScheduleMapper.toDto(saveSchedule);
     }
+
+    public StudySchedule updateSchedule(Long scheduleId, StudyScheduleRequestDto requestDto) {
+        StudySchedule studySchedule = studyScheduleRepository.findByScheduleId(scheduleId)
+            .orElseThrow(() -> new RuntimeException("해당 스케쥴을 찾을 수 없습니다."));
+
+        studyScheduleMapper.updateScheduleFromDto(studySchedule, requestDto);
+
+        return studyScheduleRepository.save(studySchedule);
+
+    }
+
+    public void deleteSchedule(Long scheduleId) {
+
+        StudySchedule studySchedule = studyScheduleRepository.findByScheduleId(scheduleId)
+            .orElseThrow(() -> new RuntimeException("해당 스케쥴을 찾을 수 없습니다."));
+
+        studyScheduleRepository.delete(studySchedule);
+
+    }
 }

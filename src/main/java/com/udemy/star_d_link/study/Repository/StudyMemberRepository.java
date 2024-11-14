@@ -10,4 +10,5 @@ import org.springframework.data.jpa.repository.JpaRepository;
 public interface StudyMemberRepository extends JpaRepository<StudyMembers, Long> {
     boolean existsByUserIdAndStudy(Long userId, Study study);
     Optional<StudyMembers> findByUserIdAndStudy(Long userId, Study study);
+    Optional<StudyMembers> findByStudyAndUserIdAndStatusNot(Study study, Long userId, String status);
 }
