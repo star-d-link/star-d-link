@@ -1,7 +1,7 @@
 package com.udemy.star_d_link.study.Controller;
 
-import com.udemy.star_d_link.study.Dto.Request.StudyCreateRequestDto;
-import com.udemy.star_d_link.study.Dto.Request.StudyScheduleRequestDto;
+import com.udemy.star_d_link.study.Dto.Request.StudyScheduleCreateRequestDto;
+import com.udemy.star_d_link.study.Dto.Request.StudyScheduleUpdateRequestDto;
 import com.udemy.star_d_link.study.Dto.Response.ApiResponse;
 import com.udemy.star_d_link.study.Dto.Response.StudyScheduleResponseDto;
 import com.udemy.star_d_link.study.Entity.StudySchedule;
@@ -66,7 +66,7 @@ public class StudyScheduleController {
     @PostMapping("/add")
     public ResponseEntity<ApiResponse<StudyScheduleResponseDto>> addSchedule(
         @PathVariable("study_id") Long studyId,
-        @Valid @RequestBody StudyScheduleRequestDto requestDto,
+        @Valid @RequestBody StudyScheduleCreateRequestDto requestDto,
         @AuthenticationPrincipal UserDetails currentUser) {
 
         if (currentUser == null) {
@@ -94,7 +94,7 @@ public class StudyScheduleController {
     public ResponseEntity<ApiResponse<StudyScheduleResponseDto>> updateSchedule(
         @PathVariable("study_id") Long studyId,
         @PathVariable("schedule_id") Long scheduleId,
-        @Valid @RequestBody StudyScheduleRequestDto requestDto,
+        @Valid @RequestBody StudyScheduleUpdateRequestDto requestDto,
         @AuthenticationPrincipal UserDetails currentUser) {
 
         if (currentUser == null) {

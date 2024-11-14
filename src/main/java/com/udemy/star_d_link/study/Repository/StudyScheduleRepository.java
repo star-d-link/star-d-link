@@ -10,4 +10,5 @@ import org.springframework.data.jpa.repository.JpaRepository;
 public interface StudyScheduleRepository extends JpaRepository<StudySchedule, Long> {
     Optional<StudySchedule> findByScheduleId(long scheduleId);
     List<StudySchedule> findByStudy(Study study);
+    List<StudySchedule> findByRecurrenceGroup(long recurrenceGroup);
 }

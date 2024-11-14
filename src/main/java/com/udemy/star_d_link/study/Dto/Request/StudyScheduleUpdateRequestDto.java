@@ -1,6 +1,7 @@
 package com.udemy.star_d_link.study.Dto.Request;
 
-import com.udemy.star_d_link.study.Entity.Study;
+import com.udemy.star_d_link.study.Entity.RecurrenceType;
+import jakarta.validation.constraints.AssertTrue;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
 import java.time.LocalDateTime;
@@ -11,9 +12,7 @@ import lombok.NoArgsConstructor;
 @Getter
 @NoArgsConstructor
 @AllArgsConstructor
-public class StudyScheduleRequestDto {
-    @NotNull
-    private Long scheduleId;
+public class StudyScheduleUpdateRequestDto {
 
     @NotNull
     private Long studyId;
@@ -28,4 +27,9 @@ public class StudyScheduleRequestDto {
     private LocalDateTime scheduleDate;
 
     private String location;
+
+    // 반복 일정 관련 필드
+    private Boolean isRecurring;
+    private RecurrenceType recurrenceType;
+    private Integer recurrenceCount;
 }

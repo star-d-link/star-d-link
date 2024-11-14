@@ -1,6 +1,8 @@
 package com.udemy.star_d_link.study.Entity;
 
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -42,4 +44,7 @@ public class StudySchedule {
     private LocalDateTime scheduleDate;
 
     private String location;
+
+    // 반복 일정 관련 필드
+    private Long recurrenceGroup; // 반복 그룹
 }
