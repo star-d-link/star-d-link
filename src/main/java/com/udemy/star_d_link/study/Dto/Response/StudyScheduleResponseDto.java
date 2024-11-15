@@ -1,6 +1,5 @@
 package com.udemy.star_d_link.study.Dto.Response;
 
-import com.udemy.star_d_link.study.Entity.Study;
 import java.time.LocalDateTime;
 import lombok.AllArgsConstructor;
 import lombok.Getter;

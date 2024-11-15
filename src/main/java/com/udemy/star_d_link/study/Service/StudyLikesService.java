@@ -7,7 +7,6 @@ import com.udemy.star_d_link.study.Entity.User;
 import com.udemy.star_d_link.study.Mapper.StudyLikesMapper;
 import com.udemy.star_d_link.study.Repository.StudyLikeRepository;
 import com.udemy.star_d_link.study.Repository.StudyRepository;
-import com.udemy.star_d_link.study.Repository.UserRepository;
 import java.util.NoSuchElementException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;

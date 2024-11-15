@@ -1,7 +1,6 @@
 package com.udemy.star_d_link.study.Service;
 
 import com.udemy.star_d_link.study.Dto.Request.ParticipationRequestDto;
-import com.udemy.star_d_link.study.Entity.Study;
 import com.udemy.star_d_link.study.Entity.StudySchedule;
 import com.udemy.star_d_link.study.Entity.StudyScheduleParticipation;
 import com.udemy.star_d_link.study.Entity.User;

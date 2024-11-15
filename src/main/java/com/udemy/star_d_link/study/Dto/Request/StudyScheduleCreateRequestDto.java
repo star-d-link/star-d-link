@@ -1,7 +1,6 @@
 package com.udemy.star_d_link.study.Dto.Request;
 
 import com.udemy.star_d_link.study.Entity.RecurrenceType;
-import jakarta.validation.constraints.AssertTrue;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
 import java.time.LocalDateTime;

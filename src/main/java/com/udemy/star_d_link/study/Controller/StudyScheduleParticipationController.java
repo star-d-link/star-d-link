@@ -1,7 +1,6 @@
 package com.udemy.star_d_link.study.Controller;
 
 import com.udemy.star_d_link.study.Dto.Request.ParticipationRequestDto;
-import com.udemy.star_d_link.study.Dto.Request.StudyUpdateRequestDto;
 import com.udemy.star_d_link.study.Dto.Response.ApiResponse;
 import com.udemy.star_d_link.study.Entity.StudyScheduleParticipation;
 import com.udemy.star_d_link.study.Entity.User;

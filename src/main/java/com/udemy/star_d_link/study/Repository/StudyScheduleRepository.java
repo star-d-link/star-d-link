@@ -1,6 +1,5 @@
 package com.udemy.star_d_link.study.Repository;
 
-import com.udemy.star_d_link.study.Dto.Response.StudyScheduleResponseDto;
 import com.udemy.star_d_link.study.Entity.Study;
 import com.udemy.star_d_link.study.Entity.StudySchedule;
 import java.util.List;
