@@ -9,6 +9,6 @@ import org.springframework.data.jpa.repository.JpaRepository;
 public interface StudyLikeRepository extends JpaRepository<StudyLikes, Long> {
     Optional<StudyLikes> findByStudy(Study study);
     Optional<StudyLikes> findByUser(User user);
-    Optional<StudyLikes> findByStudyAndUserId(Study study, Long userId);
-    boolean existsByUserIdAndStudy(Long userId, Study study);
+    Optional<StudyLikes> findByUserAndStudy(User user, Study study);
+    boolean existsByUserAndStudy(User user, Study study);
 }

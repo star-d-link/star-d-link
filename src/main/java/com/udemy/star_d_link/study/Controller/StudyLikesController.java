@@ -2,8 +2,10 @@ package com.udemy.star_d_link.study.Controller;
 
 import com.udemy.star_d_link.study.Dto.Response.ApiResponse;
 import com.udemy.star_d_link.study.Dto.Response.StudyLikesResponseDto;
+import com.udemy.star_d_link.study.Entity.User;
 import com.udemy.star_d_link.study.Exception.UnauthorizedException;
 import com.udemy.star_d_link.study.Service.StudyLikesService;
+import com.udemy.star_d_link.study.Service.StudyService;
 import java.net.URI;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
@@ -21,9 +23,11 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/study/{study_id}/like")
 public class StudyLikesController {
     private final StudyLikesService studyLikesService;
-
+    private final StudyService studyService;
     @Autowired
-    public StudyLikesController(StudyLikesService studyLikesService) {
+    public StudyLikesController(StudyLikesService studyLikesService,
+        StudyService studyService) {
+        this.studyService = studyService;
         this.studyLikesService = studyLikesService;
     }
 
@@ -35,9 +39,9 @@ public class StudyLikesController {
         if (currentUser == null) {
             throw new UnauthorizedException("권한이 없습니다.");
         }
-        // 서비스 계층으로 study_id와 currentUser 전달하여 권한 확인 및 데이터 조회
-        Long tempId = 1L;
-        StudyLikesResponseDto responseDto = studyLikesService.addLikes(studyId, tempId);
+        User user = studyService.findUserByUsername(currentUser.getUsername());
+
+        StudyLikesResponseDto responseDto = studyLikesService.addLikes(studyId, user);
 
         ApiResponse<StudyLikesResponseDto> response = new ApiResponse<>(
             "success",
@@ -61,10 +65,9 @@ public class StudyLikesController {
             throw new UnauthorizedException("권한이 없습니다.");
         }
 
-        // 서비스 계층으로 study_id와 currentUser 전달하여 권한 확인 및 데이터 조회
-        Long tempId = 1L;
+        User user = studyService.findUserByUsername(currentUser.getUsername());
 
-        studyLikesService.deleteLikes(studyId, tempId);
+        studyLikesService.deleteLikes(studyId, user);
 
         ApiResponse<Void> response = new ApiResponse<>(
             "success",
@@ -78,10 +81,4 @@ public class StudyLikesController {
         headers.setLocation(URI.create(redirectUrl));
         return new ResponseEntity<>(headers, HttpStatus.SEE_OTHER);
     }
-
-    private Long getUserIdFromUserDetails(UserDetails currentUser) {
-        // userRepository나 UserService 등을 통해 userId를 조회
-        return 1L;  // 실제로는 currentUser.getUsername()을 통해 User Entity에서 조회
-    }
-
 }

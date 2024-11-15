@@ -7,6 +7,7 @@ import com.udemy.star_d_link.study.Dto.Response.StudyMemberResponseDto;
 import com.udemy.star_d_link.study.Dto.Response.StudyResponseDto;
 import com.udemy.star_d_link.study.Dto.Request.StudyUpdateRequestDto;
 import com.udemy.star_d_link.study.Entity.Study;
+import com.udemy.star_d_link.study.Entity.User;
 import com.udemy.star_d_link.study.Exception.UnauthorizedException;
 import com.udemy.star_d_link.study.Mapper.StudyMapper;
 import com.udemy.star_d_link.study.Service.StudyMembersService;
@@ -62,7 +63,9 @@ public class StudyController {
             throw new UnauthorizedException("작성 권한이 없습니다.");
         }
 
-        StudyResponseDto responseDto = studyService.createStudy(requestDto);
+        User user = studyService.findUserByUsername(currentUser.getUsername());
+
+        StudyResponseDto responseDto = studyService.createStudy(requestDto, user);
 
         ApiResponse<StudyResponseDto> response = new ApiResponse<>(
             "success",
@@ -100,8 +103,9 @@ public class StudyController {
             throw new UnauthorizedException("인증이 필요합니다.");
         }
         // 서비스 계층으로 study_id와 currentUser 전달하여 권한 확인 및 데이터 조회
-        Long tempId = 1L;
-        Study study = studyService.getStudyForEdit(study_id, tempId);
+        User user = studyService.findUserByUsername(currentUser.getUsername());
+
+        Study study = studyService.getStudyForEdit(study_id, user);
 
         StudyUpdateRequestDto responseDto = studyMapper.toUpdateRequestDto(study);
 
@@ -124,11 +128,9 @@ public class StudyController {
             throw new UnauthorizedException("수정 권한이 없습니다.");
         }
         // 실제로 적용할 때는 currentUser의 정보를 바탕으로 userId 사용 후 권한 확인
-        Long tempId = 1L;
+        User user = studyService.findUserByUsername(currentUser.getUsername());
 
-        Study editStudy = studyService.editStudyByUserId(study_id, tempId, requestDto);
-
-
+        Study editStudy = studyService.editStudyByUserId(study_id, user, requestDto);
 
         StudyResponseDto studyResponseDto = studyMapper.toResponseDto(editStudy);
 
@@ -149,10 +151,9 @@ public class StudyController {
             throw new UnauthorizedException("인증이 필요합니다.");
         }
 
-        // 실제로 적용할 때는 currentUser의 정보를 바탕으로 userId 사용 후 권한 확인
-        Long tempId = 1L;
+        User user = studyService.findUserByUsername(currentUser.getUsername());
 
-        studyService.deleteStudyByUserId(study_id, tempId);
+        studyService.deleteStudyByUserId(study_id, user);
 
         ApiResponse<Void> response = new ApiResponse<>(
             "success",
@@ -192,9 +193,9 @@ public class StudyController {
         }
 
         // 실제로 적용할 때는 currentUser의 정보를 바탕으로 userId 사용 후 권한 확인
-        Long tempId = 1L;
+        User user = studyService.findUserByUsername(currentUser.getUsername());
 
-        StudyMemberResponseDto responseDto = studyMembersService.applyStudy(studyId, tempId);
+        StudyMemberResponseDto responseDto = studyMembersService.applyStudy(studyId, user);
 
         String redirectUrl = "/study/" + studyId;
 

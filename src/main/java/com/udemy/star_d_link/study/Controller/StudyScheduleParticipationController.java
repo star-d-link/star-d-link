@@ -4,8 +4,10 @@ import com.udemy.star_d_link.study.Dto.Request.ParticipationRequestDto;
 import com.udemy.star_d_link.study.Dto.Request.StudyUpdateRequestDto;
 import com.udemy.star_d_link.study.Dto.Response.ApiResponse;
 import com.udemy.star_d_link.study.Entity.StudyScheduleParticipation;
+import com.udemy.star_d_link.study.Entity.User;
 import com.udemy.star_d_link.study.Exception.UnauthorizedException;
 import com.udemy.star_d_link.study.Service.StudyScheduleParticipationService;
+import com.udemy.star_d_link.study.Service.StudyService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -21,11 +23,12 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/study/{study_id}/schedule/{schedule_id}/participation")
 public class StudyScheduleParticipationController {
     private final StudyScheduleParticipationService participationService;
-
+    private final StudyService studyService;
     @Autowired
     public StudyScheduleParticipationController(
-        StudyScheduleParticipationService participationService) {
+        StudyScheduleParticipationService participationService, StudyService studyService) {
         this.participationService = participationService;
+        this.studyService = studyService;
     }
 
     @PutMapping("/respond")
@@ -38,8 +41,8 @@ public class StudyScheduleParticipationController {
             throw new UnauthorizedException("로그인이 필요합니다.");
         }
 
-        Long userId = 1L; // 실제로는 currentUser에서 가져옴
-        StudyScheduleParticipation responseDto = participationService.addParticipation(userId, requestDto);
+        User user = studyService.findUserByUsername(currentUser.getUsername());
+        StudyScheduleParticipation responseDto = participationService.addParticipation(user, requestDto);
 
         ApiResponse<StudyScheduleParticipation> response = new ApiResponse<>(
             "success",

@@ -8,9 +8,11 @@ import com.udemy.star_d_link.study.Dto.Response.StudyResponseDto;
 import com.udemy.star_d_link.study.Dto.Request.StudyUpdateRequestDto;
 import com.udemy.star_d_link.study.Entity.QStudy;
 import com.udemy.star_d_link.study.Entity.Study;
+import com.udemy.star_d_link.study.Entity.User;
 import com.udemy.star_d_link.study.Exception.UnauthorizedException;
 import com.udemy.star_d_link.study.Mapper.StudyMapper;
 import com.udemy.star_d_link.study.Repository.StudyRepository;
+import com.udemy.star_d_link.study.Repository.UserRepository;
 import java.util.List;
 import java.util.NoSuchElementException;
 import org.springframework.data.domain.Page;
@@ -27,14 +29,17 @@ public class StudyService {
     private final StudyRepository studyRepository;
     private final JPAQueryFactory queryFactory;
     private final StudyMapper studyMapper;
-    public StudyService(StudyRepository studyRepository, JPAQueryFactory queryFactory, StudyMapper studyMapper) {
+    private final UserRepository userRepository;
+    public StudyService(StudyRepository studyRepository, JPAQueryFactory queryFactory, StudyMapper studyMapper,
+        UserRepository userRepository) {
         this.studyRepository = studyRepository;
         this.queryFactory = queryFactory;
         this.studyMapper = studyMapper;
+        this.userRepository = userRepository;
     }
 
     @Transactional
-    public StudyResponseDto createStudy(StudyCreateRequestDto requestDto){
+    public StudyResponseDto createStudy(StudyCreateRequestDto requestDto, User user){
 
         Study study = studyMapper.toEntity(requestDto);
 
@@ -43,23 +48,23 @@ public class StudyService {
         return studyMapper.toResponseDto(savedStudy);
     }
 
-    public Study getStudyForEdit(Long studyId, Long userId) {
+    public Study getStudyForEdit(Long studyId, User user) {
 
         Study study = studyRepository.findById(studyId)
             .orElseThrow(() -> new RuntimeException("해당 글을 찾을 수 없습니다."));
 
-        if (!study.getUserId().equals(userId)) {
+        if (!study.getUser().equals(user)) {
             throw new UnauthorizedException("수정 권한이 없습니다.");
         }
 
         return study;
     }
 
-    public Study editStudyByUserId(Long studyId, Long userId, StudyUpdateRequestDto requestDto) {
-        Study study = studyRepository.findById(userId)
+    public Study editStudyByUserId(Long studyId, User user, StudyUpdateRequestDto requestDto) {
+        Study study = studyRepository.findById(user.getUserId())
             .orElseThrow(() -> new RuntimeException("해당 글을 찾을 수 없습니다."));
 
-        if (!study.getUserId().equals(userId)) {
+        if (!study.getUser().equals(user)) {
             throw new UnauthorizedException("수정 권한이 없습니다.");
         }
 
@@ -69,12 +74,12 @@ public class StudyService {
     }
 
     @Transactional
-    public void deleteStudyByUserId(Long studyId, Long userId) {
+    public void deleteStudyByUserId(Long studyId, User user) {
 
-        Study study = studyRepository.findById(studyId)
+        Study study = studyRepository.findById(user.getUserId())
             .orElseThrow(() -> new RuntimeException("해당 글을 찾을 수 없습니다."));
 
-        if (!study.getUserId().equals(userId)) {
+        if (!study.getUser().equals(user)) {
             throw new UnauthorizedException("해당 글을 삭제할 권한이 없습니다.");
         }
 
@@ -172,5 +177,16 @@ public class StudyService {
 
         return new PageImpl<>(studyList, pageable, total)
             .map(studyMapper::toResponseDto);
+    }
+
+
+    // 임시로 User를 조회하는 메서드들 추후 변경
+    public User findUserByUsername(String username) {
+        return userRepository.findByUsername(username)
+            .orElseThrow(() -> new NoSuchElementException("해당 유저를 찾을 수 없습니다"));
+    }
+    public User findUserByUserId(Long userId) {
+        return userRepository.findByUserId(userId)
+            .orElseThrow(() -> new NoSuchElementException("해당 유저를 찾을 수 없습니다"));
     }
 }

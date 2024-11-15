@@ -4,9 +4,11 @@ import com.udemy.star_d_link.study.Dto.Response.ApiResponse;
 import com.udemy.star_d_link.study.Dto.Response.StudyMemberResponseDto;
 import com.udemy.star_d_link.study.Entity.Role;
 import com.udemy.star_d_link.study.Entity.StudyMembers;
+import com.udemy.star_d_link.study.Entity.User;
 import com.udemy.star_d_link.study.Exception.UnauthorizedException;
 import com.udemy.star_d_link.study.Mapper.StudyMembersMapper;
 import com.udemy.star_d_link.study.Service.StudyMembersService;
+import com.udemy.star_d_link.study.Service.StudyService;
 import java.net.URI;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpHeaders;
@@ -27,9 +29,12 @@ import org.springframework.web.bind.annotation.RestController;
 public class StudyMembersController {
     private final StudyMembersService studyMembersService;
     private final StudyMembersMapper studymembersmapper;
-    public StudyMembersController(StudyMembersService studyMembersService, StudyMembersMapper studymembersmapper) {
+    private final StudyService studyService;
+    public StudyMembersController(StudyMembersService studyMembersService, StudyMembersMapper studymembersmapper,
+        StudyService studyService) {
         this.studyMembersService = studyMembersService;
         this.studymembersmapper = studymembersmapper;
+        this.studyService = studyService;
     }
 
     @GetMapping("/")
@@ -44,8 +49,9 @@ public class StudyMembersController {
         }
 
         // 실제로 적용할 때는 currentUser의 정보를 바탕으로 userId 사용 후 권한 확인
-        Long tempId = 1L;
-        boolean hasPermission = studyMembersService.hasPermission(studyId, tempId);
+        User user = studyService.findUserByUsername(currentUser.getUsername());
+
+        boolean hasPermission = studyMembersService.hasPermission(studyId, user);
         if (!hasPermission) {
             throw new UnauthorizedException("스터디 멤버 관리 권한이 없습니다.");
         }
@@ -72,8 +78,8 @@ public class StudyMembersController {
         }
 
         // 실제로 적용할 때는 currentUser의 정보를 바탕으로 userId 사용 후 권한 확인
-        Long tempId = 1L;
-        boolean hasPermission = studyMembersService.hasPermission(studyId, tempId);
+        User proposer = studyService.findUserByUserId(memberId);
+        boolean hasPermission = studyMembersService.hasPermission(studyId, proposer);
 
         if (!hasPermission) {
             throw new UnauthorizedException("스터디 멤버 관리 권한이 없습니다.");
@@ -100,14 +106,14 @@ public class StudyMembersController {
         }
 
         // 실제로 적용할 때는 currentUser의 정보를 바탕으로 userId 사용 후 권한 확인
-        Long tempId = 1L;
-        boolean hasPermission = studyMembersService.hasPermission(studyId, tempId);
+        User user = studyService.findUserByUsername(currentUser.getUsername());
+        boolean hasPermission = studyMembersService.hasPermission(studyId, user);
 
         if (!hasPermission) {
             throw new UnauthorizedException("스터디 멤버 관리 권한이 없습니다.");
         }
 
-        studyMembersService.rejectMember(studyId, tempId);
+        studyMembersService.rejectMember(studyId, user);
 
         String redirectUrl = "/study/" + studyId + "/manage";
 
