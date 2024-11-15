@@ -1,6 +1,7 @@
 package com.udemy.star_d_link.study.Repository;
 
 import com.udemy.star_d_link.study.Entity.Study;
+import com.udemy.star_d_link.study.Entity.User;
 import io.micrometer.common.lang.NonNullApi;
 import java.util.Optional;
 import org.springframework.data.domain.Page;
@@ -12,7 +13,7 @@ import org.springframework.stereotype.Repository;
 @NonNullApi
 public interface StudyRepository extends JpaRepository<Study, Long> {
     Optional<Study> findByStudyId(Long studyId);
-    Optional<Study> findByUserId(Long UserId);
+    Optional<Study> findByUser(User user);
     Page<Study> findAll(Pageable pageable);
     Page<Study> findByTitleContainingIgnoreCase(String title, Pageable pageable);
 }

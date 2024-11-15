@@ -1,36 +1,37 @@
 package com.udemy.star_d_link.study.Entity;
 
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
-import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
-import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 @Entity
-@Builder(toBuilder = true)
+@Data
 @NoArgsConstructor
 @AllArgsConstructor
-@Data
-@Getter
-@Table(name = "study_likes")
-public class StudyLikes {
+@Builder
+public class StudyScheduleParticipation {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long likeId;
+    private Long participationId;
+
+    @ManyToOne
+    @JoinColumn(name = "schedule_id", nullable = false)
+    private StudySchedule studySchedule;
 
     @ManyToOne
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
 
-    @ManyToOne
-    @JoinColumn(name = "study_id", nullable = false)
-    private Study study;
+    @Enumerated(EnumType.STRING)
+    private ParticipationStatus status;
 
 }

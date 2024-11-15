@@ -4,12 +4,17 @@ import com.udemy.star_d_link.study.Dto.Request.StudyScheduleCreateRequestDto;
 import com.udemy.star_d_link.study.Dto.Request.StudyScheduleAllUpdateRequestDto;
 import com.udemy.star_d_link.study.Dto.Request.StudyScheduleSingleUpdateRequestDto;
 import com.udemy.star_d_link.study.Dto.Response.StudyScheduleResponseDto;
+import com.udemy.star_d_link.study.Entity.ParticipationStatus;
 import com.udemy.star_d_link.study.Entity.RecurrenceType;
 import com.udemy.star_d_link.study.Entity.Study;
+import com.udemy.star_d_link.study.Entity.StudyMembers;
 import com.udemy.star_d_link.study.Entity.StudySchedule;
-import com.udemy.star_d_link.study.Mapper.StudyMapper;
+import com.udemy.star_d_link.study.Entity.StudyScheduleParticipation;
 import com.udemy.star_d_link.study.Mapper.StudyScheduleMapper;
+import com.udemy.star_d_link.study.Mapper.StudyScheduleParticipationMapper;
+import com.udemy.star_d_link.study.Repository.StudyMemberRepository;
 import com.udemy.star_d_link.study.Repository.StudyRepository;
+import com.udemy.star_d_link.study.Repository.StudyScheduleParticipationRepository;
 import com.udemy.star_d_link.study.Repository.StudyScheduleRepository;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -24,13 +29,20 @@ public class StudyScheduleService {
 
     private final StudyScheduleRepository studyScheduleRepository;
     private final StudyRepository studyRepository;
+    private final StudyMemberRepository studyMemberRepository;
+    private final StudyScheduleParticipationRepository participationRepository;
     private final StudyScheduleMapper studyScheduleMapper;
+    private final StudyScheduleParticipationMapper studyScheduleParticipationMapper;
+
     @Autowired
     public StudyScheduleService(StudyScheduleRepository studyScheduleRepository, StudyRepository studyRepository,
-        StudyMapper studyMapper, StudyScheduleMapper studyScheduleMapper) {
+        StudyScheduleMapper studyScheduleMapper, StudyScheduleParticipationRepository participationRepository, StudyMemberRepository studyMemberRepository, StudyScheduleParticipationMapper studyScheduleParticipationMapper) {
         this.studyScheduleRepository = studyScheduleRepository;
         this.studyRepository = studyRepository;
+        this.studyMemberRepository = studyMemberRepository;
+        this.participationRepository = participationRepository;
         this.studyScheduleMapper = studyScheduleMapper;
+        this.studyScheduleParticipationMapper = studyScheduleParticipationMapper;
     }
 
     public List<StudyScheduleResponseDto> getScheduleList(Long studyId) {
@@ -44,6 +56,11 @@ public class StudyScheduleService {
     public StudyScheduleResponseDto addSchedule(Long studyId, StudyScheduleCreateRequestDto requestDto) {
         Study study = studyRepository.findById(studyId)
             .orElseThrow(() -> new NoSuchElementException("해당 스터디를 찾을 수 없습니다"));
+
+        List<StudyMembers> studyMembers = studyMemberRepository.findByStudy(study);
+        if (studyMembers == null || studyMembers.isEmpty()) {
+            throw new IllegalStateException("스터디에 멤버가 존재하지 않습니다.");
+        }
 
         List<StudySchedule> schedulesToSave = new ArrayList<>();
 
@@ -74,10 +91,22 @@ public class StudyScheduleService {
         else {
             // 단일 일정 생성
             StudySchedule studySchedule = studyScheduleMapper.toEntity(requestDto, study);
+
             schedulesToSave.add(studySchedule);
         }
 
         List<StudySchedule> savedSchedules = studyScheduleRepository.saveAll(schedulesToSave);
+
+        // 참여 정보 생성 및 저장 (Mapper 사용)
+        List<StudyScheduleParticipation> participationToSave = new ArrayList<>();
+        for (StudySchedule schedule : savedSchedules) {
+            for (StudyMembers member : studyMembers) {
+                StudyScheduleParticipation participation = studyScheduleParticipationMapper.toEntity(schedule, member.getUser(), ParticipationStatus.PENDING);
+                participationToSave.add(participation);
+            }
+        }
+        participationRepository.saveAll(participationToSave);
+
         return studyScheduleMapper.toDto(savedSchedules.get(0));
     }
     @Transactional
