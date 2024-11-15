@@ -1,7 +1,8 @@
 package com.udemy.star_d_link.study.Service;
 
 import com.udemy.star_d_link.study.Dto.Request.StudyScheduleCreateRequestDto;
-import com.udemy.star_d_link.study.Dto.Request.StudyScheduleUpdateRequestDto;
+import com.udemy.star_d_link.study.Dto.Request.StudyScheduleAllUpdateRequestDto;
+import com.udemy.star_d_link.study.Dto.Request.StudyScheduleSingleUpdateRequestDto;
 import com.udemy.star_d_link.study.Dto.Response.StudyScheduleResponseDto;
 import com.udemy.star_d_link.study.Entity.RecurrenceType;
 import com.udemy.star_d_link.study.Entity.Study;
@@ -16,6 +17,7 @@ import java.util.List;
 import java.util.NoSuchElementException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 public class StudyScheduleService {
@@ -78,25 +80,31 @@ public class StudyScheduleService {
         List<StudySchedule> savedSchedules = studyScheduleRepository.saveAll(schedulesToSave);
         return studyScheduleMapper.toDto(savedSchedules.get(0));
     }
+    @Transactional
+    public void updateAllSchedule(Long recurrenceGroupId, StudyScheduleAllUpdateRequestDto requestDto) {
+        // recurrenceGroupId를 이용해 반복 그룹 전체 조회
+        List<StudySchedule> schedules = studyScheduleRepository.findByRecurrenceGroup(recurrenceGroupId);
 
-    public StudySchedule updateSchedule(Long scheduleId, StudyScheduleUpdateRequestDto requestDto) {
-        StudySchedule studySchedule = studyScheduleRepository.findByScheduleId(scheduleId)
-            .orElseThrow(() -> new RuntimeException("해당 스케쥴을 찾을 수 없습니다."));
-
-        if (studySchedule.getRecurrenceGroup() != null) {
-            List<StudySchedule> recurringSchedules = studyScheduleRepository.findByRecurrenceGroup(studySchedule.getRecurrenceGroup());
-            for (StudySchedule recurringSchedule : recurringSchedules) {
-                studyScheduleMapper.updateScheduleFromDto(recurringSchedule, requestDto);
-            }
-            studyScheduleRepository.saveAll(recurringSchedules);
-        }
-        else {
-            studyScheduleMapper.updateScheduleFromDto(studySchedule, requestDto);
-            studyScheduleRepository.save(studySchedule);
+        if (schedules.isEmpty()) {
+            throw new NoSuchElementException("해당 반복 그룹에 대한 스케줄을 찾을 수 없습니다.");
         }
 
-        return studySchedule;
+        // 반복 그룹의 모든 스케줄을 업데이트
+        for (StudySchedule schedule : schedules) {
+            studyScheduleMapper.updateAllScheduleFromDto(schedule, requestDto);
+        }
 
+        studyScheduleRepository.saveAll(schedules);
+    }
+
+    @Transactional
+    public void updateSingleSchedule(Long scheduleId, StudyScheduleSingleUpdateRequestDto requestDto) {
+        StudySchedule schedule = studyScheduleRepository.findByScheduleId(scheduleId)
+            .orElseThrow(() -> new NoSuchElementException("해당 스케줄을 찾을 수 없습니다."));
+
+        // 개별 스케줄 업데이트
+        studyScheduleMapper.updateSingleScheduleFromDto(schedule, requestDto);
+        studyScheduleRepository.save(schedule);
     }
 
     public void deleteSchedule(Long scheduleId) {

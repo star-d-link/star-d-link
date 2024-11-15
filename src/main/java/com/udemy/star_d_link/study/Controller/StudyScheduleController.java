@@ -1,10 +1,10 @@
 package com.udemy.star_d_link.study.Controller;
 
+import com.udemy.star_d_link.study.Dto.Request.StudyScheduleAllUpdateRequestDto;
 import com.udemy.star_d_link.study.Dto.Request.StudyScheduleCreateRequestDto;
-import com.udemy.star_d_link.study.Dto.Request.StudyScheduleUpdateRequestDto;
+import com.udemy.star_d_link.study.Dto.Request.StudyScheduleSingleUpdateRequestDto;
 import com.udemy.star_d_link.study.Dto.Response.ApiResponse;
 import com.udemy.star_d_link.study.Dto.Response.StudyScheduleResponseDto;
-import com.udemy.star_d_link.study.Entity.StudySchedule;
 import com.udemy.star_d_link.study.Exception.UnauthorizedException;
 import com.udemy.star_d_link.study.Service.StudyMembersService;
 import com.udemy.star_d_link.study.Service.StudyScheduleService;
@@ -90,24 +90,26 @@ public class StudyScheduleController {
         return ResponseEntity.status(HttpStatus.SEE_OTHER).headers(headers).build();
     }
 
-    @PutMapping("/{schedule_id}/update")
-    public ResponseEntity<ApiResponse<StudyScheduleResponseDto>> updateSchedule(
+    // 반복 일정 전부 수정
+    @PutMapping("/update-entire/{recurrence_group_id}")
+    public ResponseEntity<ApiResponse<Void>> updateEntireSchedule(
         @PathVariable("study_id") Long studyId,
-        @PathVariable("schedule_id") Long scheduleId,
-        @Valid @RequestBody StudyScheduleUpdateRequestDto requestDto,
+        @PathVariable("recurrence_group_id") Long recurrenceGroupId,
+        @Valid @RequestBody StudyScheduleAllUpdateRequestDto requestDto,
         @AuthenticationPrincipal UserDetails currentUser) {
 
         if (currentUser == null) {
             throw new UnauthorizedException("로그인이 필요합니다.");
         }
 
+        // 실제로 적용할 때는 currentUser의 정보를 바탕으로 userId 사용 후 권한 확인
         Long tempId = 1L;
         boolean hasPermission = studyMembersService.hasPermission(studyId, tempId);
         if (!hasPermission) {
             throw new UnauthorizedException("스터디 일정 관리 권한이 없습니다.");
         }
 
-        StudySchedule updateSchedule = studyScheduleService.updateSchedule(scheduleId, requestDto);
+        studyScheduleService.updateAllSchedule(recurrenceGroupId, requestDto);
         String redirectUrl = "/study/" + studyId + "/schedule";
 
         HttpHeaders headers = new HttpHeaders();
@@ -115,6 +117,35 @@ public class StudyScheduleController {
 
         return ResponseEntity.status(HttpStatus.SEE_OTHER).headers(headers).build();
     }
+
+    // 특정 일정만 수정
+    @PutMapping("/update-single/{schedule_id}")
+    public ResponseEntity<ApiResponse<Void>> updateSingleSchedule(
+        @PathVariable("study_id") Long studyId,
+        @PathVariable("schedule_id") Long scheduleId,
+        @Valid @RequestBody StudyScheduleSingleUpdateRequestDto requestDto,
+        @AuthenticationPrincipal UserDetails currentUser) {
+
+        if (currentUser == null) {
+            throw new UnauthorizedException("로그인이 필요합니다.");
+        }
+
+        // 실제로 적용할 때는 currentUser의 정보를 바탕으로 userId 사용 후 권한 확인
+        Long tempId = 1L;
+        boolean hasPermission = studyMembersService.hasPermission(studyId, tempId);
+        if (!hasPermission) {
+            throw new UnauthorizedException("스터디 일정 관리 권한이 없습니다.");
+        }
+
+        studyScheduleService.updateSingleSchedule(scheduleId, requestDto);
+        String redirectUrl = "/study/" + studyId + "/schedule";
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.setLocation(URI.create(redirectUrl));
+
+        return ResponseEntity.status(HttpStatus.SEE_OTHER).headers(headers).build();
+    }
+
 
     @DeleteMapping("/{schedule_id}/delete") public ResponseEntity<ApiResponse<Void>> deleteSchedule(
         @PathVariable("study_id") Long studyId,

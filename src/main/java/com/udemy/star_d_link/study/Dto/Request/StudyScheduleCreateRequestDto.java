@@ -12,7 +12,7 @@ import lombok.NoArgsConstructor;
 @Getter
 @NoArgsConstructor
 @AllArgsConstructor
-public class StudyScheduleUpdateRequestDto {
+public class StudyScheduleCreateRequestDto {
 
     @NotNull
     private Long studyId;
@@ -27,6 +27,8 @@ public class StudyScheduleUpdateRequestDto {
     private LocalDateTime scheduleDate;
 
     private String location;
+
+    private Integer recurrenceGroup;
 
     // 반복 일정 관련 필드
     private Boolean isRecurring;

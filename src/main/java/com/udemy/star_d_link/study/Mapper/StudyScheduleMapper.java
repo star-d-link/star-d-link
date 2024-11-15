@@ -1,7 +1,8 @@
 package com.udemy.star_d_link.study.Mapper;
 
 import com.udemy.star_d_link.study.Dto.Request.StudyScheduleCreateRequestDto;
-import com.udemy.star_d_link.study.Dto.Request.StudyScheduleUpdateRequestDto;
+import com.udemy.star_d_link.study.Dto.Request.StudyScheduleAllUpdateRequestDto;
+import com.udemy.star_d_link.study.Dto.Request.StudyScheduleSingleUpdateRequestDto;
 import com.udemy.star_d_link.study.Dto.Response.StudyScheduleResponseDto;
 import com.udemy.star_d_link.study.Entity.Study;
 import com.udemy.star_d_link.study.Entity.StudySchedule;
@@ -24,8 +25,14 @@ public interface StudyScheduleMapper {
 
     List<StudyScheduleResponseDto> toDtoList(List<StudySchedule> studyScheduleList);
 
-    @Mapping(target = "scheduleId", ignore = true)
-    void updateScheduleFromDto(@MappingTarget StudySchedule studySchedule, StudyScheduleUpdateRequestDto requestDto);
+    // 전체 업데이트용
+    @Mapping(target = "scheduleId", ignore = true) // scheduleId는 수정하지 않음
+    @Mapping(target = "scheduleDate", ignore = true) // 전체 수정에서는 개별 날짜 수정하지 않음
+    void updateAllScheduleFromDto(@MappingTarget StudySchedule studySchedule, StudyScheduleAllUpdateRequestDto requestDto);
+
+    // 개별 업데이트용
+    @Mapping(target = "scheduleId", ignore = true) // scheduleId는 수정하지 않음
+    void updateSingleScheduleFromDto(@MappingTarget StudySchedule studySchedule, StudyScheduleSingleUpdateRequestDto requestDto);
 
     // StudyScheduleCreateRequestDto와 Study를 사용해 StudySchedule 생성
     @Mapping(target = "scheduleId", ignore = true)
