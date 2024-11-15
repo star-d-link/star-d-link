@@ -82,18 +82,18 @@ public class StudyMembersService {
         studyMemberRepository.delete(member);
     }
 
-    public StudyMembers changeMemberRole(Long studyId, User user, Role newRole, User currentUser) {
+    public StudyMembers changeMemberRole(Long studyId, User user, Role newRole, User member) {
         Study study = studyRepository.findById(studyId)
             .orElseThrow(() -> new NoSuchElementException("해당 스터디를 찾을 수 없습니다: "));
 
-        StudyMembers currentMember = studyMemberRepository.findByUserAndStudy(currentUser, study)
+        StudyMembers currentMember = studyMemberRepository.findByUserAndStudy(user, study)
             .orElseThrow(() -> new UnauthorizedException("권한이 없습니다."));
 
         if (currentMember.getRole() != Role.LEADER && currentMember.getRole() != Role.SUB_LEADER) {
             throw new UnauthorizedException("멤버 역할을 변경할 권한이 없습니다.");
         }
 
-        StudyMembers targetMember = studyMemberRepository.findByUserAndStudy(user, study)
+        StudyMembers targetMember = studyMemberRepository.findByUserAndStudy(member, study)
             .orElseThrow(() -> new NoSuchElementException("해당 멤버를 찾을 수 없습니다."));
 
         targetMember.setRole(newRole);

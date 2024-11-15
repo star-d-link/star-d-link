@@ -77,7 +77,6 @@ public class StudyMembersController {
             throw new UnauthorizedException("로그인이 필요합니다.");
         }
 
-        // 실제로 적용할 때는 currentUser의 정보를 바탕으로 userId 사용 후 권한 확인
         User proposer = studyService.findUserByUserId(memberId);
         boolean hasPermission = studyMembersService.hasPermission(studyId, proposer);
 
@@ -85,7 +84,7 @@ public class StudyMembersController {
             throw new UnauthorizedException("스터디 멤버 관리 권한이 없습니다.");
         }
 
-        StudyMemberResponseDto responseDto = studyMembersService.acceptMember(studyId, memberId);
+        StudyMemberResponseDto responseDto = studyMembersService.acceptMember(studyId, proposer);
 
         String redirectUrl = "/study/" + studyId + "/manage";
 
@@ -134,10 +133,10 @@ public class StudyMembersController {
             throw new UnauthorizedException("로그인이 필요합니다.");
         }
 
-        // 현재 사용자의 userId 확인
-        Long currentUserId = 1L; // 임시로 userId를 설정합니다. 실제로는 currentUser에서 가져옵니다.
+        User user = studyService.findUserByUsername(currentUser.getUsername());
+        User member = studyService.findUserByUserId(userId);
 
-        StudyMembers updatedMember = studyMembersService.changeMemberRole(studyId, userId, newRole, currentUserId);
+        StudyMembers updatedMember = studyMembersService.changeMemberRole(studyId, user, newRole, member);
 
         StudyMemberResponseDto responseDto = studymembersmapper.toDto(updatedMember);
 

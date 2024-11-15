@@ -61,7 +61,7 @@ public class StudyService {
     }
 
     public Study editStudyByUserId(Long studyId, User user, StudyUpdateRequestDto requestDto) {
-        Study study = studyRepository.findById(user.getUserId())
+        Study study = studyRepository.findById(studyId)
             .orElseThrow(() -> new RuntimeException("해당 글을 찾을 수 없습니다."));
 
         if (!study.getUser().equals(user)) {
@@ -76,7 +76,7 @@ public class StudyService {
     @Transactional
     public void deleteStudyByUserId(Long studyId, User user) {
 
-        Study study = studyRepository.findById(user.getUserId())
+        Study study = studyRepository.findById(studyId)
             .orElseThrow(() -> new RuntimeException("해당 글을 찾을 수 없습니다."));
 
         if (!study.getUser().equals(user)) {
