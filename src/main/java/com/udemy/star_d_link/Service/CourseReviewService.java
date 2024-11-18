@@ -9,6 +9,7 @@ import com.udemy.star_d_link.Dto.CourseReviewModifyRequestDto;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.NoSuchElementException;
+import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -16,16 +17,11 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+@RequiredArgsConstructor
 @Service
 public class CourseReviewService {
     private final CourseReviewRepository courseReviewRepository;
     private final CourseReviewFileRepository courseReviewFileRepository;
-
-    public CourseReviewService(CourseReviewRepository courseReviewRepository,
-        CourseReviewFileRepository courseReviewFileRepository){
-        this.courseReviewRepository = courseReviewRepository;
-        this.courseReviewFileRepository = courseReviewFileRepository;
-    }
 
     public Page<CourseReview> getList(int page){
 
@@ -46,7 +42,7 @@ public class CourseReviewService {
             .updatedAt(LocalDate.now())
             .postType(courseReviewCreateRequestDto.getPostType())
             .name(courseReviewCreateRequestDto.getName())
-            .rating(0)
+            .rating(courseReviewCreateRequestDto.getRating())
             .build();
         List<CourseReviewFile> fileList = courseReviewCreateRequestDto.getFileListDto().stream()
             .map(fileUrl -> CourseReviewFile.of(fileUrl.getFileUrl(), newCourseReview)).toList();

@@ -8,6 +8,7 @@ import com.udemy.star_d_link.Dto.CourseReviewCreateRequestDto;
 import com.udemy.star_d_link.Dto.CourseReviewModifyRequestDto;
 
 import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
@@ -25,24 +26,19 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
+@RequiredArgsConstructor
 @RequestMapping(value = "/courseReview")
 public class CourseReviewcontroller {
     private final CourseReviewService courseReviewService;
     private final CourseReviewFileService courseReviewFileService;
 
-    @Autowired
-    public CourseReviewcontroller(CourseReviewService courseReviewService,
-        CourseReviewFileService courseReviewFileService){
-        this.courseReviewService = courseReviewService;
-        this.courseReviewFileService = courseReviewFileService;
-    }
 
-    @GetMapping(value = "create")
+    @GetMapping(value = "/create")
     public String createReview(){
         return "createReview";
     }
 
-    @PostMapping(value = "create", produces = MediaType.APPLICATION_JSON_VALUE)
+    @PostMapping(value = "/create", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<ApiResponse<CourseReview>> createCourseReview(
         @Valid @RequestBody CourseReviewCreateRequestDto courseReviewCreateRequestDto,
         @AuthenticationPrincipal UserDetails currentUser){
