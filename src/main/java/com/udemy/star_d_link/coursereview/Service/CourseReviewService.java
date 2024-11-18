@@ -1,11 +1,11 @@
-package com.udemy.star_d_link.Service;
+package com.udemy.star_d_link.coursereview.Service;
 
-import com.udemy.star_d_link.Entity.CourseReview;
-import com.udemy.star_d_link.Entity.CourseReviewFile;
-import com.udemy.star_d_link.Repository.CourseReviewFileRepository;
-import com.udemy.star_d_link.Repository.CourseReviewRepository;
-import com.udemy.star_d_link.Dto.CourseReviewCreateRequestDto;
-import com.udemy.star_d_link.Dto.CourseReviewModifyRequestDto;
+import com.udemy.star_d_link.coursereview.Entity.CourseReview;
+import com.udemy.star_d_link.coursereview.Entity.CourseReviewFile;
+import com.udemy.star_d_link.coursereview.Repository.CourseReviewFileRepository;
+import com.udemy.star_d_link.coursereview.Repository.CourseReviewRepository;
+import com.udemy.star_d_link.coursereview.Dto.CourseReviewCreateRequestDto;
+import com.udemy.star_d_link.coursereview.Dto.CourseReviewModifyRequestDto;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.NoSuchElementException;

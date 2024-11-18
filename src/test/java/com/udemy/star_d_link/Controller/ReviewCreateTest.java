@@ -2,9 +2,9 @@ package com.udemy.star_d_link.Controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-import com.udemy.star_d_link.Service.CourseReviewService;
-import com.udemy.star_d_link.Dto.CourseReviewCreateRequestDto;
-import com.udemy.star_d_link.Dto.CourseReviewModifyRequestDto;
+import com.udemy.star_d_link.coursereview.Service.CourseReviewService;
+import com.udemy.star_d_link.coursereview.Dto.CourseReviewCreateRequestDto;
+import com.udemy.star_d_link.coursereview.Dto.CourseReviewModifyRequestDto;
 import java.time.LocalDate;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;

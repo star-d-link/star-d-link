@@ -1,4 +1,4 @@
-package com.udemy.star_d_link.Dto;
+package com.udemy.star_d_link.coursereview.Dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;

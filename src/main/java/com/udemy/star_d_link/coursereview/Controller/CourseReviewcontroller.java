@@ -1,15 +1,14 @@
-package com.udemy.star_d_link.Controller;
+package com.udemy.star_d_link.coursereview.Controller;
 
-import com.udemy.star_d_link.Entity.CourseReview;
-import com.udemy.star_d_link.Service.CourseReviewFileService;
-import com.udemy.star_d_link.Service.CourseReviewService;
-import com.udemy.star_d_link.Dto.ApiResponse;
-import com.udemy.star_d_link.Dto.CourseReviewCreateRequestDto;
-import com.udemy.star_d_link.Dto.CourseReviewModifyRequestDto;
+import com.udemy.star_d_link.coursereview.Entity.CourseReview;
+import com.udemy.star_d_link.coursereview.Service.CourseReviewFileService;
+import com.udemy.star_d_link.coursereview.Service.CourseReviewService;
+import com.udemy.star_d_link.coursereview.Dto.ApiResponse;
+import com.udemy.star_d_link.coursereview.Dto.CourseReviewCreateRequestDto;
+import com.udemy.star_d_link.coursereview.Dto.CourseReviewModifyRequestDto;
 
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;

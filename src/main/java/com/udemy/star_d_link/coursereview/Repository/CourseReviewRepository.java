@@ -1,6 +1,6 @@
-package com.udemy.star_d_link.Repository;
+package com.udemy.star_d_link.coursereview.Repository;
 
-import com.udemy.star_d_link.Entity.CourseReview;
+import com.udemy.star_d_link.coursereview.Entity.CourseReview;
 import java.util.List;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;

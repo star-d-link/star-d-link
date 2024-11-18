@@ -1,6 +1,6 @@
-package com.udemy.star_d_link.Dto;
+package com.udemy.star_d_link.coursereview.Dto;
 
-import com.udemy.star_d_link.Entity.CourseReview;
+import com.udemy.star_d_link.coursereview.Entity.CourseReview;
 import java.time.LocalDate;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
