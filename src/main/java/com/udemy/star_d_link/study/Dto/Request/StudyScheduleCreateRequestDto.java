@@ -17,10 +17,10 @@ public class StudyScheduleCreateRequestDto {
     private Long studyId;
 
     @NotEmpty(message = "스터디 제목은 필수 입력 항목입니다.")
-    private String title;
+    private String scheduleTitle;
 
     @NotEmpty(message = "스터디 내용은 필수 입력 항목입니다.")
-    private String content;
+    private String scheduleContent;
 
     @NotEmpty(message = "스터디 날짜는 필수 입력 항목입니다.")
     private LocalDateTime scheduleDate;

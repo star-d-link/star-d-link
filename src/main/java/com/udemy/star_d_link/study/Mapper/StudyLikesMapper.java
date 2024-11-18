@@ -18,5 +18,6 @@ public interface StudyLikesMapper {
 
     // StudyLikesResponseDto를 StudyLikes 엔티티로 변환하는 메소드
     @Mapping(target = "likeId", ignore = true) // 새로운 엔티티 생성 시 likeId는 무시
+    @Mapping(target = "study", ignore = true)
     StudyLikes toEntity(StudyLikesResponseDto dto, User user, Study study);
 }

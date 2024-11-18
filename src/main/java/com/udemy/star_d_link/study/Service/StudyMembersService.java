@@ -64,7 +64,7 @@ public class StudyMembersService {
             throw new IllegalArgumentException("해당 스터디에 속하지 않는 멤버입니다.");
         }
 
-        studyMembersMapper.updateStatusToActive(member);
+        studyMembersMapper.updateStatusToActive(member, member);
 
         StudyMembers saveMember = studyMemberRepository.save(member);
 

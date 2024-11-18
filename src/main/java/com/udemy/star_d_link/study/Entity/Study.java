@@ -59,15 +59,16 @@ public class Study {
     @Column(nullable = false)
     private Integer headCount;
 
-    @Temporal(TemporalType.TIMESTAMP)
     @Column(nullable = false, updatable = false)
     @CreationTimestamp
     private LocalDate createDate;
 
     @OneToMany(mappedBy = "study", cascade = CascadeType.ALL, orphanRemoval = true)
+    @Builder.Default
     private List<StudyLikes> likes = new ArrayList<>();
 
     @Column(nullable = false)
+    @Builder.Default
     private Integer likesCount = 0;
 
     public void incrementLikes() {
@@ -75,6 +76,7 @@ public class Study {
     }
 
     @OneToMany(mappedBy = "study", cascade = CascadeType.ALL, orphanRemoval = true)
+    @Builder.Default
     private List<StudyMembers> members = new ArrayList<>();
 
     public void decrementLikes() {
@@ -86,5 +88,6 @@ public class Study {
     }
 
     @OneToMany(mappedBy = "study", cascade = CascadeType.ALL, orphanRemoval = true)
+    @Builder.Default
     private List<StudySchedule> schedules = new ArrayList<>();
 }

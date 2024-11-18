@@ -21,6 +21,6 @@ public interface StudyMembersMapper {
     StudyMemberResponseDto toDto(StudyMembers studyMembers);
 
     @Mapping(target = "status", constant = "참여중")
-    void updateStatusToActive(@MappingTarget StudyMembers member);
+    void updateStatusToActive(StudyMembers source, @MappingTarget StudyMembers member);
 
 }

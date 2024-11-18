@@ -28,10 +28,14 @@ public interface StudyScheduleMapper {
     // 전체 업데이트용
     @Mapping(target = "scheduleId", ignore = true) // scheduleId는 수정하지 않음
     @Mapping(target = "scheduleDate", ignore = true) // 전체 수정에서는 개별 날짜 수정하지 않음
+    @Mapping(target = "study", ignore = true)
+    @Mapping(target = "recurrenceGroup", ignore = true)
     void updateAllScheduleFromDto(@MappingTarget StudySchedule studySchedule, StudyScheduleAllUpdateRequestDto requestDto);
 
     // 개별 업데이트용
     @Mapping(target = "scheduleId", ignore = true) // scheduleId는 수정하지 않음
+    @Mapping(target = "study", ignore = true)
+    @Mapping(target = "recurrenceGroup", ignore = true)
     void updateSingleScheduleFromDto(@MappingTarget StudySchedule studySchedule, StudyScheduleSingleUpdateRequestDto requestDto);
 
     // StudyScheduleCreateRequestDto와 Study를 사용해 StudySchedule 생성

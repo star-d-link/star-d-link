@@ -37,9 +37,9 @@ public class StudySchedule {
     @JoinColumn(name = "study_id", nullable = false)
     private Study study;
 
-    private String title;
+    private String scheduleTitle;
 
-    private String content;
+    private String scheduleContent;
 
     private LocalDateTime scheduleDate;
 

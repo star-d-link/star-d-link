@@ -15,11 +15,11 @@ public class StudyScheduleAllUpdateRequestDto {
     @NotNull
     private Long recurrenceGroupId;
 
-    @NotEmpty(message = "스터디 제목은 필수 입력 항목입니다.")
-    private String title;
+    @NotEmpty(message = "스케쥴 제목은 필수 입력 항목입니다.")
+    private String scheduleTitle;
 
-    @NotEmpty(message = "스터디 내용은 필수 입력 항목입니다.")
-    private String content;
+    @NotEmpty(message = "스케쥴 내용은 필수 입력 항목입니다.")
+    private String scheduleContent;
 
     private String location;
 

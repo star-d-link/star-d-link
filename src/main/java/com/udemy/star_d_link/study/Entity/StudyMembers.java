@@ -47,6 +47,4 @@ public class StudyMembers {
     @Column(nullable = false)
     private String status;
 
-    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<StudyMembers> studyMemberships = new ArrayList<>();
 }
