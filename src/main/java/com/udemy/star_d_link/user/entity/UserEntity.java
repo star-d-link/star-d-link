@@ -50,7 +50,7 @@ public class UserEntity {
     private String phoneNumber;
 
     @Column(nullable = false, length = 20)
-    private String birthDate;
+    private LocalDateTime birthDate;
 
     @Column(nullable = false, length = 100)
     private String region;
