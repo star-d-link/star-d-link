@@ -1,4 +1,4 @@
-package com.udemy.star_d_link.course.Dto;
+package com.udemy.star_d_link.Dto;
 
 import java.time.LocalDate;
 import lombok.AllArgsConstructor;
@@ -8,16 +8,12 @@ import lombok.NoArgsConstructor;
 @Getter
 @NoArgsConstructor
 @AllArgsConstructor
-public class CourseReviewModifyRequestDto {
-    //private SiteUser siteUser;
+public class CourseReviewListDto {
+    private Integer boardId;
     private Integer userId;
     private Integer likeCount;
     private String title;
-    private String content;
-    private String hashtag;
-    private LocalDate updatedAt;
+    private LocalDate createdAt;
     private Integer postType;
     private String name;
-    private Integer rating;
-
 }

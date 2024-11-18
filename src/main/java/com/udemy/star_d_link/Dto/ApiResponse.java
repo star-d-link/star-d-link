@@ -1,10 +1,12 @@
-package com.udemy.star_d_link.course.Dto;
+package com.udemy.star_d_link.Dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 @Builder
+@Getter
 @NoArgsConstructor
 @AllArgsConstructor
 public class ApiResponse<T> {

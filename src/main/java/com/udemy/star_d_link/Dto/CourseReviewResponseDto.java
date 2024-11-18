@@ -1,4 +1,4 @@
-package com.udemy.star_d_link.course.Dto;
+package com.udemy.star_d_link.Dto;
 
 import com.udemy.star_d_link.Entity.CourseReview;
 import java.time.LocalDate;

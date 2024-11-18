@@ -17,6 +17,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
@@ -92,4 +93,17 @@ public class ReviewCreateTest {
             .andExpect(jsonPath("$.data.name").value("수정된 강사명"))
             .andDo(print());
     }
+
+    @Test
+    @WithMockUser(username = "1", roles = "USER")
+    public void deleteReviewTest() throws Exception {
+        // 삭제할 리뷰 ID가 1이라고 가정
+        mockMvc.perform(delete("/courseReview/delete/1")  // assuming the review ID is 1
+                .with(csrf()))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$.status").value("success"))
+            .andExpect(jsonPath("$.message").value("글이 삭제되었습니다."))
+            .andDo(print());
+    }
+
 }

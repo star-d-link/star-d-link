@@ -1,16 +1,17 @@
 package com.udemy.star_d_link.Controller;
 
 import com.udemy.star_d_link.Entity.CourseReview;
+import com.udemy.star_d_link.Service.CourseReviewFileService;
 import com.udemy.star_d_link.Service.CourseReviewService;
-import com.udemy.star_d_link.course.Dto.ApiResponse;
-import com.udemy.star_d_link.course.Dto.CourseReviewCreateRequestDto;
-import com.udemy.star_d_link.course.Dto.CourseReviewModifyRequestDto;
-import com.udemy.star_d_link.course.Dto.CourseReviewResponseDto;
+import com.udemy.star_d_link.Dto.ApiResponse;
+import com.udemy.star_d_link.Dto.CourseReviewCreateRequestDto;
+import com.udemy.star_d_link.Dto.CourseReviewModifyRequestDto;
+
 import jakarta.validation.Valid;
-import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -27,10 +28,13 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping(value = "/courseReview")
 public class CourseReviewcontroller {
     private final CourseReviewService courseReviewService;
+    private final CourseReviewFileService courseReviewFileService;
 
     @Autowired
-    public CourseReviewcontroller(CourseReviewService courseReviewService){
+    public CourseReviewcontroller(CourseReviewService courseReviewService,
+        CourseReviewFileService courseReviewFileService){
         this.courseReviewService = courseReviewService;
+        this.courseReviewFileService = courseReviewFileService;
     }
 
     @GetMapping(value = "create")
@@ -38,11 +42,11 @@ public class CourseReviewcontroller {
         return "createReview";
     }
 
-    @PostMapping(value = "create")
+    @PostMapping(value = "create", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<ApiResponse<CourseReview>> createCourseReview(
         @Valid @RequestBody CourseReviewCreateRequestDto courseReviewCreateRequestDto,
-        @AuthenticationPrincipal UserDetails userDetails){
-        if(userDetails == null ){
+        @AuthenticationPrincipal UserDetails currentUser){
+        if(currentUser == null ){
             ApiResponse<CourseReview> apiResponse = new ApiResponse<>(
                 "error",
                 "비회원은 작성 권한이 없습니다.",
@@ -52,8 +56,8 @@ public class CourseReviewcontroller {
         }
 
         try{
-            CourseReview newCourseReview = courseReviewService.createCourseReview(courseReviewCreateRequestDto, Integer.parseInt(
-                userDetails.getUsername()));
+            CourseReview newCourseReview = courseReviewService.createCourseReview(courseReviewCreateRequestDto, Long.parseLong(
+                currentUser.getUsername()));
                 ApiResponse<CourseReview> apiResponse = new ApiResponse<>(
                     "success",
                     "글이 작성되었습니다.",
@@ -71,10 +75,10 @@ public class CourseReviewcontroller {
         }
     }
     @GetMapping("/modify/{boardId}")
-    public ResponseEntity<ApiResponse<CourseReview>> getModifyCourseReview(@PathVariable Integer boardId,
-        @AuthenticationPrincipal UserDetails userDetails){
+    public ResponseEntity<ApiResponse<CourseReview>> getModifyCourseReview(@PathVariable Long boardId,
+        @AuthenticationPrincipal UserDetails currentUser){
         CourseReview courseReview = courseReviewService.getCourseReviewDetail(boardId);
-        if(userDetails == null || !userDetails.getUsername().equals(courseReview.getUserId())){
+        if(currentUser == null || !currentUser.getUsername().equals(courseReview.getUserId())){
             ApiResponse<CourseReview> apiResponse = new ApiResponse<>(
                 "error",
                 "작성자만 수정 가능합니다",
@@ -91,11 +95,12 @@ public class CourseReviewcontroller {
     }
 
     @PutMapping("/modify/{boardId}")
-    public ResponseEntity<ApiResponse<CourseReview>> putModifyCourseReview(@PathVariable Integer boardId,
-        CourseReviewModifyRequestDto courseReviewModifyRequestDto,
-        @AuthenticationPrincipal UserDetails userDetails){
+    public ResponseEntity<ApiResponse<CourseReview>> putModifyCourseReview(@PathVariable Long boardId,
+        @RequestBody CourseReviewModifyRequestDto courseReviewModifyRequestDto,
+        @AuthenticationPrincipal UserDetails currentUser){
         CourseReview courseReview = courseReviewService.getCourseReviewDetail(boardId);
-        if(userDetails == null || !userDetails.getUsername().equals(courseReview.getUserId())){
+
+        if(currentUser == null/* || !userDetails.getUsername().equals(courseReview.getUserId())*/){
             ApiResponse<CourseReview> apiResponse = new ApiResponse<>(
                 "error",
                 "작성자만 수정 가능합니다",
@@ -103,12 +108,12 @@ public class CourseReviewcontroller {
             );
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(apiResponse);
         }
-        CourseReview modifiedReview = courseReviewService.modifyCourseReview(courseReviewModifyRequestDto, boardId, Integer.parseInt(
-            userDetails.getUsername()));
+        CourseReview modifiedReview = courseReviewService.modifyCourseReview(courseReviewModifyRequestDto, boardId, Long.parseLong(
+            currentUser.getUsername()));
 
         ApiResponse<CourseReview> apiResponse = new ApiResponse<>(
             "success",
-            "수정 완료되었습니다.",
+            "글이 수정되었습니다.",
             modifiedReview
         );
         return ResponseEntity.status(HttpStatus.OK).body(apiResponse);
@@ -129,7 +134,7 @@ public class CourseReviewcontroller {
 
     @GetMapping("/{boardId}")
     public ResponseEntity<ApiResponse<CourseReview>> getReview(
-        @PathVariable Integer boardId){
+        @PathVariable Long boardId){
         CourseReview courseReview = courseReviewService.getCourseReviewDetail(boardId);
         ApiResponse apiResponse = new ApiResponse(
             "success",
@@ -139,7 +144,7 @@ public class CourseReviewcontroller {
         return ResponseEntity.status(HttpStatus.OK).body(apiResponse);
     }
     @GetMapping("/delete/{boardId}")
-    public ResponseEntity<ApiResponse<CourseReview>> deleteCourseReview(@PathVariable Integer boardId,
+    public ResponseEntity<ApiResponse<CourseReview>> deleteCourseReview(@PathVariable Long boardId,
         @AuthenticationPrincipal UserDetails userDetails){
         CourseReview courseReview = courseReviewService.getCourseReviewDetail(boardId);
         if(userDetails == null || !userDetails.getUsername().equals(courseReview.getUserId())){
@@ -152,7 +157,7 @@ public class CourseReviewcontroller {
         }
 
 
-        courseReviewService.deleteCourseReview(boardId, Integer.parseInt(
+        courseReviewService.deleteCourseReview(boardId, Long.parseLong(
             userDetails.getUsername()));
         ApiResponse<CourseReview> apiResponse = new ApiResponse<>(
             "success",

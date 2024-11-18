@@ -1,29 +1,29 @@
-package com.udemy.star_d_link.course.Dto;
+package com.udemy.star_d_link.Dto;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.ManyToOne;
+import com.udemy.star_d_link.Dto.File.CourseReviewFileCreateRequestDto;
+import com.udemy.star_d_link.Dto.File.CourseReviewFileModifyRequestDto;
 import java.time.LocalDate;
+import java.util.List;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
-@Getter
 @Builder
+@Getter
 @NoArgsConstructor
 @AllArgsConstructor
-public class CourseReviewCreateRequestDto {
+public class CourseReviewModifyRequestDto {
     //private SiteUser siteUser;
     private Integer userId;
     private Integer likeCount;
     private String title;
     private String content;
     private String hashtag;
-    private LocalDate createdAt;
     private LocalDate updatedAt;
     private Integer postType;
     private String name;
     private Integer rating;
-
-
+    private List<CourseReviewFileModifyRequestDto> fileDeleteDtoList;
+    private List<CourseReviewFileCreateRequestDto> fileCreateDtoList;
 }
