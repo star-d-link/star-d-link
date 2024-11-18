@@ -10,8 +10,8 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class CourseReviewResponseDto {
-    private Integer boardId;
-    private Integer userId;
+    private Long boardId;
+    private Long userId;
     private Integer likeCount;
     private String title;
     private String content;
