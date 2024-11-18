@@ -1,4 +1,4 @@
-package com.udemy.star_d_link.coursereview.config;
+package com.udemy.star_d_link.config;
 
 import lombok.extern.log4j.Log4j2;
 import org.springframework.context.annotation.Bean;
