@@ -1,7 +1,6 @@
 package com.udemy.star_d_link.coursereview.Controller;
 
 import com.udemy.star_d_link.coursereview.Entity.CourseReview;
-import com.udemy.star_d_link.coursereview.Service.CourseReviewFileService;
 import com.udemy.star_d_link.coursereview.Service.CourseReviewService;
 import com.udemy.star_d_link.coursereview.Dto.ApiResponse;
 import com.udemy.star_d_link.coursereview.Dto.CourseReviewCreateRequestDto;
@@ -29,7 +28,6 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping(value = "/courseReview")
 public class CourseReviewcontroller {
     private final CourseReviewService courseReviewService;
-    private final CourseReviewFileService courseReviewFileService;
 
 
     @GetMapping(value = "/create")
