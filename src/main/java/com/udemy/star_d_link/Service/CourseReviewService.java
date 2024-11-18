@@ -49,7 +49,7 @@ public class CourseReviewService {
             .rating(0)
             .build();
         List<CourseReviewFile> fileList = courseReviewCreateRequestDto.getFileListDto().stream()
-            .map(fileUrl -> CourseReviewFile.of(fileUrl, newCourseReview)).toList();
+            .map(fileUrl -> CourseReviewFile.of(fileUrl.getFileUrl(), newCourseReview)).toList();
         courseReviewFileRepository.saveAll(fileList);
 
         return courseReviewRepository.save(newCourseReview);
@@ -75,7 +75,7 @@ public class CourseReviewService {
             .updatedAt(LocalDate.now())
             .build();
         List<CourseReviewFile> fileList = courseReviewModifyRequestDto.getFileCreateDtoList().stream()
-            .map(fileUrl -> CourseReviewFile.of(fileUrl, modifiedReview)).toList();
+            .map(fileUrl -> CourseReviewFile.of(fileUrl.getFileUrl(), modifiedReview)).toList();
         courseReviewFileRepository.saveAll(fileList);
 
         return courseReviewRepository.save(modifiedReview);
