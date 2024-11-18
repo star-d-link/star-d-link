@@ -11,15 +11,18 @@ import java.time.LocalDate;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
+import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.annotation.LastModifiedDate;
 
 
 @Builder(toBuilder = true)
 @NoArgsConstructor
 @AllArgsConstructor
-@Data
+@Getter
 @Entity
 @Table(name = "course_file")
 public class CourseReviewFile {
@@ -34,10 +37,10 @@ public class CourseReviewFile {
     CourseReview courseReview;
 
 
-    @CreationTimestamp
+    @CreatedDate
     @Column(updatable = false)
     LocalDate createdAt;
-    @UpdateTimestamp
+    @LastModifiedDate
     LocalDate updatedAt;
 
     public static CourseReviewFile of(String fileUrl, CourseReview courseReview) {

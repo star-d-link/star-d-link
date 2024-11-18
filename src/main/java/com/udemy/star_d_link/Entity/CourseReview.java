@@ -19,11 +19,13 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
+import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.annotation.LastModifiedDate;
 
 @Builder(toBuilder = true)
 @NoArgsConstructor
 @AllArgsConstructor
-@Data
+@Getter
 @Entity
 @Table(name = "course_review")
 public class CourseReview {
@@ -46,10 +48,10 @@ public class CourseReview {
     @Column(columnDefinition = "TEXT")
     private String hashtag;
 
-    @CreationTimestamp
+    @CreatedDate
     @Column(updatable = false)
     private LocalDate createdAt;
-    @UpdateTimestamp
+    @LastModifiedDate
     private LocalDate updatedAt;
 
     @Column(nullable = false)
