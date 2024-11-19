@@ -1,5 +1,6 @@
 package com.udemy.star_d_link.study.Entity;
 
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
@@ -12,7 +13,6 @@ import jakarta.persistence.Table;
 import java.time.LocalDateTime;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
-import lombok.Data;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -25,7 +25,6 @@ import lombok.NoArgsConstructor;
 @Builder(toBuilder = true)
 @NoArgsConstructor
 @AllArgsConstructor
-@Data
 @Getter
 @Table(name = "study_schedule")
 public class StudySchedule {
@@ -37,12 +36,16 @@ public class StudySchedule {
     @JoinColumn(name = "study_id", nullable = false)
     private Study study;
 
+    @Column(nullable = false)
     private String scheduleTitle;
 
+    @Column(nullable = false)
     private String scheduleContent;
 
+    @Column(nullable = false)
     private LocalDateTime scheduleDate;
 
+    @Column(nullable = false)
     private String location;
 
     // 반복 일정 관련 필드

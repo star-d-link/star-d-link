@@ -68,6 +68,24 @@ public class StudyScheduleController {
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 
+    @GetMapping(value = "/add")
+    public String scheduleForm(
+        @PathVariable("study_id") Long studyId,
+        @AuthenticationPrincipal UserDetails currentUser){
+
+        if (currentUser == null) {
+            throw new UnauthorizedException("로그인이 필요합니다.");
+        }
+
+        User user = studyService.findUserByUsername(currentUser.getUsername());
+        boolean hasManagementPermission = studyMembersService.hasPermission(studyId, user);
+        if (!hasManagementPermission) {
+            throw new UnauthorizedException("스터디 일정 관리 권한이 없습니다.");
+        }
+
+        return "signup";
+    }
+
     @PostMapping("/add")
     public ResponseEntity<ApiResponse<StudyScheduleResponseDto>> addSchedule(
         @PathVariable("study_id") Long studyId,
@@ -79,8 +97,8 @@ public class StudyScheduleController {
         }
 
         User user = studyService.findUserByUsername(currentUser.getUsername());
-        boolean hasPermission = studyMembersService.hasPermission(studyId, user);
-        if (!hasPermission) {
+        boolean hasManagementPermission = studyMembersService.hasPermission(studyId, user);
+        if (!hasManagementPermission) {
             throw new UnauthorizedException("스터디 일정 관리 권한이 없습니다.");
         }
 
@@ -107,8 +125,8 @@ public class StudyScheduleController {
         }
 
         User user = studyService.findUserByUsername(currentUser.getUsername());
-        boolean hasPermission = studyMembersService.hasPermission(studyId, user);
-        if (!hasPermission) {
+        boolean hasManagementPermission = studyMembersService.hasPermission(studyId, user);
+        if (!hasManagementPermission) {
             throw new UnauthorizedException("스터디 일정 관리 권한이 없습니다.");
         }
 
@@ -135,8 +153,8 @@ public class StudyScheduleController {
 
         // 실제로 적용할 때는 currentUser의 정보를 바탕으로 userId 사용 후 권한 확인
         User user = studyService.findUserByUsername(currentUser.getUsername());
-        boolean hasPermission = studyMembersService.hasPermission(studyId, user);
-        if (!hasPermission) {
+        boolean hasManagementPermission = studyMembersService.hasPermission(studyId, user);
+        if (!hasManagementPermission) {
             throw new UnauthorizedException("스터디 일정 관리 권한이 없습니다.");
         }
 
@@ -161,9 +179,9 @@ public class StudyScheduleController {
 
         // 실제로 적용할 때는 currentUser의 정보를 바탕으로 userId 사용 후 권한 확인
         User user = studyService.findUserByUsername(currentUser.getUsername());
-        boolean hasPermission = studyMembersService.hasPermission(studyId, user);
-        if (!hasPermission) {
-            throw new UnauthorizedException("스터디 일정 관리 권한이 없습니다.");
+        boolean hasManagementPermission = studyMembersService.hasPermission(studyId, user);
+        if (!hasManagementPermission) {
+            throw new UnauthorizedException("스터디 일정 삭제 권한이 없습니다.");
         }
 
         studyScheduleService.deleteSchedule(scheduleId);

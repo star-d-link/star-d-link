@@ -108,6 +108,17 @@ public class StudyMembersService {
         return study.getUser().equals(user);
     }
 
+    public boolean hasManagementPermission(Long studyId, User user) {
+        Study study = studyRepository.findById(studyId)
+            .orElseThrow(() -> new NoSuchElementException("해당 스터디를 찾을 수 없습니다"));
+
+        StudyMembers studyMember = studyMemberRepository.findByUserAndStudy(user, study)
+            .orElseThrow(() -> new NoSuchElementException("해당 스터디에 사용자가 가입되어 있지 않습니다."));
+
+        // 사용자가 리더 또는 부리더인지 확인
+        return studyMember.getRole() == Role.LEADER || studyMember.getRole() == Role.SUB_LEADER;
+    }
+
     public boolean isMemberOfStudy(Long studyId, User user) {
 
         Study study = studyRepository.findById(studyId)
