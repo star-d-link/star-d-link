@@ -10,11 +10,12 @@ import com.udemy.star_d_link.study.Entity.QStudy;
 import com.udemy.star_d_link.study.Entity.Study;
 import com.udemy.star_d_link.study.Entity.User;
 import com.udemy.star_d_link.study.Exception.UnauthorizedException;
-import com.udemy.star_d_link.study.Mapper.StudyMapper;
 import com.udemy.star_d_link.study.Repository.StudyRepository;
 import com.udemy.star_d_link.study.Repository.UserRepository;
+import java.time.LocalDate;
 import java.util.List;
 import java.util.NoSuchElementException;
+import java.util.stream.Collectors;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
@@ -26,24 +27,30 @@ public class StudyService {
 
     private final StudyRepository studyRepository;
     private final JPAQueryFactory queryFactory;
-    private final StudyMapper studyMapper;
     private final UserRepository userRepository;
-    public StudyService(StudyRepository studyRepository, JPAQueryFactory queryFactory, StudyMapper studyMapper,
+    public StudyService(StudyRepository studyRepository, JPAQueryFactory queryFactory,
         UserRepository userRepository) {
         this.studyRepository = studyRepository;
         this.queryFactory = queryFactory;
-        this.studyMapper = studyMapper;
         this.userRepository = userRepository;
     }
 
     @Transactional
-    public StudyResponseDto createStudy(StudyCreateRequestDto requestDto, User user){
-
-        Study study = studyMapper.toEntity(requestDto);
+    public StudyResponseDto createStudy(StudyCreateRequestDto requestDto, User user) {
+        Study study = Study.builder()
+            .title(requestDto.getTitle())
+            .content(requestDto.getContent())
+            .hashtag(requestDto.getHashtag())
+            .isRecruit(requestDto.getIsRecruit())
+            .region(requestDto.getRegion())
+            .isOnline(requestDto.getIsOnline())
+            .headCount(requestDto.getHeadCount())
+            .user(user)
+            .build();
 
         Study savedStudy = studyRepository.save(study);
 
-        return studyMapper.toResponseDto(savedStudy);
+        return StudyResponseDto.fromEntity(savedStudy);
     }
 
     public Study getStudyForEdit(Long studyId, User user) {
@@ -58,7 +65,7 @@ public class StudyService {
         return study;
     }
 
-    public Study editStudyByUserId(Long studyId, User user, StudyUpdateRequestDto requestDto) {
+    public StudyResponseDto  editStudyByUserId(Long studyId, User user, StudyUpdateRequestDto requestDto) {
         Study study = studyRepository.findById(studyId)
             .orElseThrow(() -> new RuntimeException("해당 글을 찾을 수 없습니다."));
 
@@ -66,9 +73,18 @@ public class StudyService {
             throw new UnauthorizedException("수정 권한이 없습니다.");
         }
 
-        studyMapper.updateStudyFromDto(requestDto, study);
+        study = study.toBuilder()
+            .title(requestDto.getTitle())
+            .content(requestDto.getContent())
+            .hashtag(requestDto.getHashtag())
+            .isRecruit(requestDto.getIsRecruit())
+            .region(requestDto.getRegion())
+            .isOnline(requestDto.getIsOnline())
+            .headCount(requestDto.getHeadCount())
+            .build();
 
-        return studyRepository.save(study);
+        Study savedStudy = studyRepository.save(study);
+        return StudyResponseDto.fromEntity(savedStudy);
     }
 
     @Transactional
@@ -119,8 +135,18 @@ public class StudyService {
             .where(builder)
             .fetch().size();
 
-        return new PageImpl<>(studyList, pageable, total)
-            .map(studyMapper::toListDto);
+        List<StudyListResponseDto> studyListDtos = studyList.stream()
+            .map(entity -> new StudyListResponseDto(
+                entity.getStudyId(),
+                entity.getTitle(),
+                entity.getIsRecruit(),
+                entity.getRegion(),
+                entity.getIsOnline(),
+                entity.getCreateDate()
+            ))
+            .collect(Collectors.toList());
+
+        return new PageImpl<>(studyListDtos, pageable, total);
     }
 
 
@@ -147,8 +173,9 @@ public class StudyService {
             .where(builder)
             .fetch().size();
 
-        return new PageImpl<>(studyList, pageable, total)
-            .map(studyMapper::toResponseDto);
+        List<StudyResponseDto> studyResponseDtos = mapToStudyResponseDtoList(studyList);
+
+        return new PageImpl<>(studyResponseDtos, pageable, total);
     }
 
     public Page<StudyResponseDto> detailedSearchStudy(String hashtag, Pageable pageable) {
@@ -173,10 +200,27 @@ public class StudyService {
             .where(builder)
             .fetch().size();
 
-        return new PageImpl<>(studyList, pageable, total)
-            .map(studyMapper::toResponseDto);
+        List<StudyResponseDto> studyResponseDtos = mapToStudyResponseDtoList(studyList);
+
+        return new PageImpl<>(studyResponseDtos, pageable, total);
     }
 
+    private List<StudyResponseDto> mapToStudyResponseDtoList(List<Study> studyList) {
+        return studyList.stream()
+            .map(entity -> new StudyResponseDto(
+                entity.getStudyId(),
+                entity.getUser(),
+                entity.getTitle(),
+                entity.getContent(),
+                entity.getHashtag(),
+                entity.getIsRecruit(),
+                entity.getRegion(),
+                entity.getIsOnline(),
+                entity.getHeadCount(),
+                entity.getCreateDate()
+            ))
+            .collect(Collectors.toList());
+    }
 
     // 임시로 User를 조회하는 메서드들 추후 변경
     public User findUserByUsername(String username) {

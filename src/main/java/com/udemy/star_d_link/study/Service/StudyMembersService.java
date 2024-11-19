@@ -6,7 +6,6 @@ import com.udemy.star_d_link.study.Entity.Study;
 import com.udemy.star_d_link.study.Entity.StudyMembers;
 import com.udemy.star_d_link.study.Entity.User;
 import com.udemy.star_d_link.study.Exception.UnauthorizedException;
-import com.udemy.star_d_link.study.Mapper.StudyMembersMapper;
 import com.udemy.star_d_link.study.Repository.StudyMemberRepository;
 import com.udemy.star_d_link.study.Repository.StudyRepository;
 import java.util.NoSuchElementException;
@@ -23,12 +22,10 @@ import org.springframework.transaction.annotation.Transactional;
 public class StudyMembersService {
     private final StudyMemberRepository studyMemberRepository;
     private final StudyRepository studyRepository;
-    private final StudyMembersMapper studyMembersMapper;
     @Autowired
-    public StudyMembersService(StudyMemberRepository studyMemberRepository, StudyRepository studyRepository, StudyMembersMapper studyMembersMapper) {
+    public StudyMembersService(StudyMemberRepository studyMemberRepository, StudyRepository studyRepository) {
         this.studyMemberRepository = studyMemberRepository;
         this.studyRepository = studyRepository;
-        this.studyMembersMapper = studyMembersMapper;
     }
 
     @Transactional
@@ -43,17 +40,22 @@ public class StudyMembersService {
 
         Role role = study.getUser().equals(user) ? Role.LEADER : Role.MEMBER;
 
-        StudyMembers studyMember = studyMembersMapper.toEntity(user, study, role);
+        StudyMembers studyMember = StudyMembers.builder()
+            .user(user)
+            .study(study)
+            .role(role)
+            .status("대기중")
+            .build();
         StudyMembers saveMember = studyMemberRepository.save(studyMember);
-
-        return studyMembersMapper.toDto(saveMember);
+        return StudyMemberResponseDto.fromEntity(saveMember);
     }
 
     public Page<StudyMemberResponseDto> getMemberList(int page, int size) {
         Pageable pageable = PageRequest.of(page, size, Sort.by("createDate").descending());
         Page<StudyMembers> studyPage = studyMemberRepository.findAll(pageable);
 
-        return studyPage.map(studyMembersMapper::toDto);
+        return studyPage.map(StudyMemberResponseDto::fromEntity);
+
     }
 
     public StudyMemberResponseDto acceptMember(Long studyId, User proposer) {
@@ -64,11 +66,12 @@ public class StudyMembersService {
             throw new IllegalArgumentException("해당 스터디에 속하지 않는 멤버입니다.");
         }
 
-        studyMembersMapper.updateStatusToActive(member, member);
+        member = member.toBuilder()
+            .status("참여중")
+            .build();
 
         StudyMembers saveMember = studyMemberRepository.save(member);
-
-        return studyMembersMapper.toDto(saveMember);
+        return StudyMemberResponseDto.fromEntity(saveMember);
     }
 
     public void rejectMember(Long studyId, User user) {
@@ -96,7 +99,9 @@ public class StudyMembersService {
         StudyMembers targetMember = studyMemberRepository.findByUserAndStudy(member, study)
             .orElseThrow(() -> new NoSuchElementException("해당 멤버를 찾을 수 없습니다."));
 
-        studyMembersMapper.updateMemberRole(targetMember, newRole);
+        targetMember = targetMember.toBuilder()
+            .role(newRole)
+            .build();
         return studyMemberRepository.save(targetMember);
     }
 

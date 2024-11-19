@@ -1,5 +1,6 @@
 package com.udemy.star_d_link.study.Entity;
 
+import com.udemy.star_d_link.study.Dto.Response.StudyScheduleResponseDto;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -15,6 +16,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.ToString;
 
 /*
  스터디 일정 관리에 대한 Entity
@@ -23,6 +25,7 @@ import lombok.NoArgsConstructor;
 
 @Entity
 @Builder(toBuilder = true)
+@ToString
 @NoArgsConstructor
 @AllArgsConstructor
 @Getter
@@ -50,4 +53,15 @@ public class StudySchedule {
 
     // 반복 일정 관련 필드
     private Long recurrenceGroup; // 반복 그룹
+
+    public StudyScheduleResponseDto toResponseDto() {
+        return new StudyScheduleResponseDto(
+            scheduleId,
+            study,
+            scheduleTitle,
+            scheduleContent,
+            scheduleDate,
+            location
+        );
+    }
 }

@@ -21,7 +21,10 @@ public class StudyScheduleSingleUpdateRequestDto {
     @NotEmpty(message = "스터디 내용은 필수 입력 항목입니다.")
     private String scheduleContent;
 
+    @NotEmpty(message = "스터디 날짜는 필수 입력 항목입니다.")
     private LocalDateTime scheduleDate;
 
+    @NotEmpty(message = "스터디 장소는 필수 입력 항목입니다.")
     private String location;
+
 }

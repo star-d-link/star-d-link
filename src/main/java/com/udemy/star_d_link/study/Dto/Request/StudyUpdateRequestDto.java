@@ -1,6 +1,7 @@
 package com.udemy.star_d_link.study.Dto.Request;
 
 import com.udemy.star_d_link.study.Dto.Response.StudyResponseDto;
+import com.udemy.star_d_link.study.Entity.Study;
 import jakarta.validation.constraints.NotEmpty;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -22,15 +23,15 @@ public class StudyUpdateRequestDto {
     private Boolean isOnline;
     private Integer headCount;
 
-    private StudyUpdateRequestDto createStudyUpdateRequestDto(StudyResponseDto studyResponseDto) {
-        return new StudyUpdateRequestDto(
-            studyResponseDto.getTitle(),
-            studyResponseDto.getContent(),
-            studyResponseDto.getHashtag(),
-            studyResponseDto.getIsRecruit(),
-            studyResponseDto.getRegion(),
-            studyResponseDto.getIsOnline(),
-            studyResponseDto.getHeadCount()
-        );
+    public void updateEntity(Study study) {
+        study = study.toBuilder()
+            .title(this.title)
+            .content(this.content)
+            .hashtag(this.hashtag)
+            .isRecruit(this.isRecruit)
+            .region(this.region)
+            .isOnline(this.isOnline)
+            .headCount(this.headCount)
+            .build();
     }
 }

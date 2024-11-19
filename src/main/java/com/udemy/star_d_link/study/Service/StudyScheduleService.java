@@ -10,8 +10,6 @@ import com.udemy.star_d_link.study.Entity.Study;
 import com.udemy.star_d_link.study.Entity.StudyMembers;
 import com.udemy.star_d_link.study.Entity.StudySchedule;
 import com.udemy.star_d_link.study.Entity.StudyScheduleParticipation;
-import com.udemy.star_d_link.study.Mapper.StudyScheduleMapper;
-import com.udemy.star_d_link.study.Mapper.StudyScheduleParticipationMapper;
 import com.udemy.star_d_link.study.Repository.StudyMemberRepository;
 import com.udemy.star_d_link.study.Repository.StudyRepository;
 import com.udemy.star_d_link.study.Repository.StudyScheduleParticipationRepository;
@@ -20,6 +18,7 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.NoSuchElementException;
+import java.util.stream.Collectors;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -31,26 +30,23 @@ public class StudyScheduleService {
     private final StudyRepository studyRepository;
     private final StudyMemberRepository studyMemberRepository;
     private final StudyScheduleParticipationRepository participationRepository;
-    private final StudyScheduleMapper studyScheduleMapper;
-    private final StudyScheduleParticipationMapper studyScheduleParticipationMapper;
 
     @Autowired
     public StudyScheduleService(StudyScheduleRepository studyScheduleRepository, StudyRepository studyRepository,
-        StudyScheduleMapper studyScheduleMapper, StudyScheduleParticipationRepository participationRepository, StudyMemberRepository studyMemberRepository, StudyScheduleParticipationMapper studyScheduleParticipationMapper) {
+        StudyScheduleParticipationRepository participationRepository, StudyMemberRepository studyMemberRepository) {
         this.studyScheduleRepository = studyScheduleRepository;
         this.studyRepository = studyRepository;
         this.studyMemberRepository = studyMemberRepository;
-        this.participationRepository = participationRepository;
-        this.studyScheduleMapper = studyScheduleMapper;
-        this.studyScheduleParticipationMapper = studyScheduleParticipationMapper;
-    }
+        this.participationRepository = participationRepository;}
 
     public List<StudyScheduleResponseDto> getScheduleList(Long studyId) {
         Study study = studyRepository.findById(studyId)
             .orElseThrow(() -> new NoSuchElementException("해당 스터디를 찾을 수 없습니다"));
         List<StudySchedule> studyScheduleList = studyScheduleRepository.findByStudy(study);
 
-        return studyScheduleMapper.toDtoList(studyScheduleList);
+        return studyScheduleList.stream()
+            .map(StudyScheduleResponseDto::fromEntity)
+            .collect(Collectors.toList());
     }
 
     public StudyScheduleResponseDto addSchedule(Long studyId, StudyScheduleCreateRequestDto requestDto) {
@@ -66,13 +62,13 @@ public class StudyScheduleService {
 
         if (Boolean.TRUE.equals(requestDto.getIsRecurring())) {
             // 첫 번째 스케줄 생성
-            StudySchedule initialSchedule = studyScheduleMapper.toInitialEntity(requestDto, study);
+            StudySchedule initialSchedule = createInitialSchedule(study, requestDto, null);
 
             // 첫 번째 스케줄 저장 후 recurrenceGroup 설정
             StudySchedule savedInitialSchedule = studyScheduleRepository.save(initialSchedule);
             Long recurrenceGroup = savedInitialSchedule.getScheduleId(); // 그룹 ID 설정
 
-            // 첫 번째 스케줄의 recurrenceGroup 업데이트를 위해 새로운 객체 생성
+            // 첫 번째 스케줄의 recurrenceGroup 업데이트
             savedInitialSchedule = savedInitialSchedule.toBuilder()
                 .recurrenceGroup(recurrenceGroup)
                 .build();
@@ -83,31 +79,35 @@ public class StudyScheduleService {
             int count = 0;
             while (requestDto.getRecurrenceCount() == null || count < requestDto.getRecurrenceCount() - 1) {
                 currentScheduleDate = calculateNextScheduleDate(currentScheduleDate, requestDto.getRecurrenceType());
-                StudySchedule newSchedule = studyScheduleMapper.toRecurringEntity(initialSchedule, currentScheduleDate, recurrenceGroup);
+                StudySchedule newSchedule = createRecurringSchedule(study, requestDto, currentScheduleDate, recurrenceGroup);
                 schedulesToSave.add(newSchedule);
                 count++;
             }
-        }
-        else {
+        } else {
             // 단일 일정 생성
-            StudySchedule studySchedule = studyScheduleMapper.toEntity(requestDto, study);
-
+            StudySchedule studySchedule = createInitialSchedule(study, requestDto, null);
             schedulesToSave.add(studySchedule);
         }
 
         List<StudySchedule> savedSchedules = studyScheduleRepository.saveAll(schedulesToSave);
 
-        // 참여 정보 생성 및 저장 (Mapper 사용)
+        // 참여 정보 생성 및 저장
         List<StudyScheduleParticipation> participationToSave = new ArrayList<>();
         for (StudySchedule schedule : savedSchedules) {
             for (StudyMembers member : studyMembers) {
-                StudyScheduleParticipation participation = studyScheduleParticipationMapper.toEntity(schedule, member.getUser(), ParticipationStatus.PENDING);
+                StudyScheduleParticipation participation = StudyScheduleParticipation.builder()
+                    .studySchedule(schedule)
+                    .user(member.getUser())
+                    .status(ParticipationStatus.PENDING)
+                    .build();
                 participationToSave.add(participation);
             }
         }
         participationRepository.saveAll(participationToSave);
 
-        return studyScheduleMapper.toDto(savedSchedules.get(0));
+        // 첫 번째 스케줄에 대한 DTO 반환
+        return StudyScheduleResponseDto.fromEntity(savedSchedules.get(0));
+
     }
     @Transactional
     public void updateAllSchedule(Long recurrenceGroupId, StudyScheduleAllUpdateRequestDto requestDto) {
@@ -119,8 +119,15 @@ public class StudyScheduleService {
         }
 
         // 반복 그룹의 모든 스케줄을 업데이트
+        List<StudySchedule> updatedSchedules = new ArrayList<>();
         for (StudySchedule schedule : schedules) {
-            studyScheduleMapper.updateAllScheduleFromDto(schedule, requestDto);
+            StudySchedule updatedSchedule = schedule.toBuilder()
+                .scheduleTitle(requestDto.getScheduleTitle())
+                .scheduleContent(requestDto.getScheduleContent())
+                .location(requestDto.getLocation())
+                .build();
+
+            updatedSchedules.add(updatedSchedule);
         }
 
         studyScheduleRepository.saveAll(schedules);
@@ -132,7 +139,12 @@ public class StudyScheduleService {
             .orElseThrow(() -> new NoSuchElementException("해당 스케줄을 찾을 수 없습니다."));
 
         // 개별 스케줄 업데이트
-        studyScheduleMapper.updateSingleScheduleFromDto(schedule, requestDto);
+        StudySchedule updatedSchedule = schedule.toBuilder()
+            .scheduleTitle(requestDto.getScheduleTitle())
+            .scheduleContent(requestDto.getScheduleContent())
+            .scheduleDate(requestDto.getScheduleDate())
+            .location(requestDto.getLocation())
+            .build();
         studyScheduleRepository.save(schedule);
     }
 
@@ -151,6 +163,29 @@ public class StudyScheduleService {
             studyScheduleRepository.delete(studySchedule);
         }
     }
+
+    private StudySchedule createInitialSchedule(Study study, StudyScheduleCreateRequestDto requestDto, Long recurrenceGroup) {
+        return StudySchedule.builder()
+            .study(study)
+            .scheduleTitle(requestDto.getScheduleTitle())
+            .scheduleContent(requestDto.getScheduleContent())
+            .scheduleDate(requestDto.getScheduleDate())
+            .location(requestDto.getLocation())
+            .recurrenceGroup(recurrenceGroup)
+            .build();
+    }
+
+    private StudySchedule createRecurringSchedule(Study study, StudyScheduleCreateRequestDto requestDto, LocalDateTime scheduleDate, Long recurrenceGroup) {
+        return StudySchedule.builder()
+            .study(study)
+            .scheduleTitle(requestDto.getScheduleTitle())
+            .scheduleContent(requestDto.getScheduleContent())
+            .scheduleDate(scheduleDate)
+            .location(requestDto.getLocation())
+            .recurrenceGroup(recurrenceGroup)
+            .build();
+    }
+
 
     private LocalDateTime calculateNextScheduleDate(LocalDateTime currentDate, RecurrenceType recurrenceType) {
         switch (recurrenceType) {

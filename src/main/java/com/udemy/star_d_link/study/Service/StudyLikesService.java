@@ -4,7 +4,6 @@ import com.udemy.star_d_link.study.Dto.Response.StudyLikesResponseDto;
 import com.udemy.star_d_link.study.Entity.Study;
 import com.udemy.star_d_link.study.Entity.StudyLikes;
 import com.udemy.star_d_link.study.Entity.User;
-import com.udemy.star_d_link.study.Mapper.StudyLikesMapper;
 import com.udemy.star_d_link.study.Repository.StudyLikeRepository;
 import com.udemy.star_d_link.study.Repository.StudyRepository;
 import java.util.NoSuchElementException;
@@ -18,10 +17,8 @@ public class StudyLikesService {
     private StudyRepository studyRepository;
 
     private final StudyLikeRepository studyLikeRepository;
-    private final StudyLikesMapper studyLikesMapper;
-    public StudyLikesService(StudyLikeRepository studyLikeRepository, StudyLikesMapper studyLikesMapper) {
+    public StudyLikesService(StudyLikeRepository studyLikeRepository) {
         this.studyLikeRepository = studyLikeRepository;
-        this.studyLikesMapper = studyLikesMapper;
 
     }
 
@@ -36,13 +33,16 @@ public class StudyLikesService {
         if (alreadyLike) {
             throw new IllegalArgumentException("이미 좋아요를 눌렀습니다");
         }
-        StudyLikes studyLikes = studyLikesMapper.toEntity(null, user, study);
+        StudyLikes studyLikes = StudyLikes.builder()
+            .user(user)
+            .study(study)
+            .build();
         StudyLikes savedStudyLikes = studyLikeRepository.save(studyLikes);
 
         study.incrementLikes();
         studyRepository.save(study);
 
-        return studyLikesMapper.toDto(savedStudyLikes);
+        return StudyLikesResponseDto.fromEntity(savedStudyLikes);
     }
 
     @Transactional

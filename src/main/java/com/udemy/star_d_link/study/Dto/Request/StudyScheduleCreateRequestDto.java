@@ -1,6 +1,8 @@
 package com.udemy.star_d_link.study.Dto.Request;
 
 import com.udemy.star_d_link.study.Entity.RecurrenceType;
+import com.udemy.star_d_link.study.Entity.Study;
+import com.udemy.star_d_link.study.Entity.StudySchedule;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
 import java.time.LocalDateTime;
@@ -33,4 +35,15 @@ public class StudyScheduleCreateRequestDto {
     private Boolean isRecurring;
     private RecurrenceType recurrenceType;
     private Integer recurrenceCount;
+
+    public StudySchedule toEntity(Study study) {
+        return StudySchedule.builder()
+            .study(study)
+            .scheduleTitle(scheduleTitle)
+            .scheduleContent(scheduleContent)
+            .scheduleDate(scheduleDate)
+            .location(location)
+            .recurrenceGroup(null)  // 처음 생성할 때는 null, 나중에 업데이트 가능
+            .build();
+    }
 }

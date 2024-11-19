@@ -11,8 +11,10 @@ import jakarta.persistence.ManyToOne;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.NoArgsConstructor;
+import lombok.ToString;
 
 @Entity
+@ToString
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
