@@ -6,5 +6,5 @@ import java.util.List;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface CourseReviewFileRepository extends JpaRepository<CourseReviewFile, Integer> {
-    List<CourseReviewFile> findByCourseReivew(CourseReview courseReview);
+    List<CourseReviewFile> findByCourseReview(CourseReview courseReview);
 }
