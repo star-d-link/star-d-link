@@ -23,4 +23,8 @@ public interface StudyMembersMapper {
     @Mapping(target = "status", constant = "참여중")
     void updateStatusToActive(StudyMembers source, @MappingTarget StudyMembers member);
 
+    @Mapping(target = "role", source = "newRole")
+    void updateMemberRole(@MappingTarget StudyMembers targetMember, Role newRole);
+
+
 }

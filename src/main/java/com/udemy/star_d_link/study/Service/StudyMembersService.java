@@ -96,7 +96,7 @@ public class StudyMembersService {
         StudyMembers targetMember = studyMemberRepository.findByUserAndStudy(member, study)
             .orElseThrow(() -> new NoSuchElementException("해당 멤버를 찾을 수 없습니다."));
 
-        targetMember.setRole(newRole);
+        studyMembersMapper.updateMemberRole(targetMember, newRole);
         return studyMemberRepository.save(targetMember);
     }
 
