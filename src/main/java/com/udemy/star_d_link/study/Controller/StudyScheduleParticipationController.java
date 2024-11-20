@@ -2,6 +2,7 @@ package com.udemy.star_d_link.study.Controller;
 
 import com.udemy.star_d_link.study.Dto.Request.ParticipationRequestDto;
 import com.udemy.star_d_link.study.Dto.Response.ApiResponse;
+import com.udemy.star_d_link.study.Dto.Response.StudyScheduleParticipationResponseDto;
 import com.udemy.star_d_link.study.Entity.StudyScheduleParticipation;
 import com.udemy.star_d_link.study.Entity.User;
 import com.udemy.star_d_link.study.Exception.UnauthorizedException;
@@ -31,7 +32,7 @@ public class StudyScheduleParticipationController {
     }
 
     @PutMapping("/respond")
-    public ResponseEntity<ApiResponse<StudyScheduleParticipation>> respondToSchedule(
+    public ResponseEntity<ApiResponse<StudyScheduleParticipationResponseDto>> respondToSchedule(
         @PathVariable("schedule_id") Long scheduleId,
         @RequestBody ParticipationRequestDto requestDto,
         @AuthenticationPrincipal UserDetails currentUser) {
@@ -41,9 +42,12 @@ public class StudyScheduleParticipationController {
         }
 
         User user = studyService.findUserByUsername(currentUser.getUsername());
-        StudyScheduleParticipation responseDto = participationService.addParticipation(user, requestDto);
 
-        ApiResponse<StudyScheduleParticipation> response = new ApiResponse<>(
+        StudyScheduleParticipation participation = participationService.addParticipation(user, requestDto);
+
+        StudyScheduleParticipationResponseDto responseDto = StudyScheduleParticipationResponseDto.fromEntity(participation);
+
+        ApiResponse<StudyScheduleParticipationResponseDto> response = new ApiResponse<>(
             "success",
             "스케쥴 참여 여부 등록 완료.",
             responseDto

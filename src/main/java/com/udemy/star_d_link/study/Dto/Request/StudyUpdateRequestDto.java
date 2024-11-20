@@ -23,15 +23,15 @@ public class StudyUpdateRequestDto {
     private Boolean isOnline;
     private Integer headCount;
 
-    public void updateEntity(Study study) {
-        study = study.toBuilder()
-            .title(this.title)
-            .content(this.content)
-            .hashtag(this.hashtag)
-            .isRecruit(this.isRecruit)
-            .region(this.region)
-            .isOnline(this.isOnline)
-            .headCount(this.headCount)
-            .build();
+    public static StudyUpdateRequestDto fromEntity(Study study) {
+        return new StudyUpdateRequestDto(
+            study.getTitle(),
+            study.getContent(),
+            study.getHashtag(),
+            study.getIsRecruit(),
+            study.getRegion(),
+            study.getIsOnline(),
+            study.getHeadCount()
+        );
     }
 }

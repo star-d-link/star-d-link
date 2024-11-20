@@ -7,13 +7,14 @@ import java.util.Optional;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.querydsl.QuerydslPredicateExecutor;
 import org.springframework.stereotype.Repository;
 
 @Repository
 @NonNullApi
-public interface StudyRepository extends JpaRepository<Study, Long> {
+public interface StudyRepository extends JpaRepository<Study, Long>,
+    QuerydslPredicateExecutor<Study> {
     Optional<Study> findByStudyId(Long studyId);
     Optional<Study> findByUser(User user);
-    Page<Study> findAll(Pageable pageable);
     Page<Study> findByTitleContainingIgnoreCase(String title, Pageable pageable);
 }

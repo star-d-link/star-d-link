@@ -5,6 +5,7 @@ import com.udemy.star_d_link.study.Dto.Request.StudyScheduleCreateRequestDto;
 import com.udemy.star_d_link.study.Dto.Request.StudyScheduleSingleUpdateRequestDto;
 import com.udemy.star_d_link.study.Dto.Response.ApiResponse;
 import com.udemy.star_d_link.study.Dto.Response.StudyScheduleResponseDto;
+import com.udemy.star_d_link.study.Entity.StudySchedule;
 import com.udemy.star_d_link.study.Entity.User;
 import com.udemy.star_d_link.study.Exception.UnauthorizedException;
 import com.udemy.star_d_link.study.Service.StudyMembersService;
@@ -78,8 +79,7 @@ public class StudyScheduleController {
         }
 
         User user = studyService.findUserByUsername(currentUser.getUsername());
-        boolean hasManagementPermission = studyMembersService.hasManagementPermission(studyId, user);
-        if (!hasManagementPermission) {
+        if (!studyMembersService.hasManagementPermission(studyId, user)) {
             throw new UnauthorizedException("스터디 일정 관리 권한이 없습니다.");
         }
 
@@ -97,19 +97,21 @@ public class StudyScheduleController {
         }
 
         User user = studyService.findUserByUsername(currentUser.getUsername());
-        boolean hasManagementPermission = studyMembersService.hasManagementPermission(studyId, user);
-        if (!hasManagementPermission) {
+        if (!studyMembersService.hasManagementPermission(studyId, user)) {
             throw new UnauthorizedException("스터디 일정 관리 권한이 없습니다.");
         }
 
-        StudyScheduleResponseDto responseDto = studyScheduleService.addSchedule(studyId, requestDto);
+        StudySchedule savedSchedule = studyScheduleService.addSchedule(studyId, requestDto);
 
-        String redirectUrl = "/study/" + studyId + "/schedule";
+        StudyScheduleResponseDto responseDto = StudyScheduleResponseDto.fromEntity(savedSchedule);
 
-        HttpHeaders headers = new HttpHeaders();
-        headers.setLocation(URI.create(redirectUrl));
+        ApiResponse<StudyScheduleResponseDto> response = new ApiResponse<>(
+            "success",
+            "스터디 일정 추가 완료",
+            responseDto
+        );
 
-        return ResponseEntity.status(HttpStatus.SEE_OTHER).headers(headers).build();
+        return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 
     // 반복 일정 전부 수정
@@ -125,8 +127,7 @@ public class StudyScheduleController {
         }
 
         User user = studyService.findUserByUsername(currentUser.getUsername());
-        boolean hasManagementPermission = studyMembersService.hasManagementPermission(studyId, user);
-        if (!hasManagementPermission) {
+        if (!studyMembersService.hasManagementPermission(studyId, user)) {
             throw new UnauthorizedException("스터디 일정 관리 권한이 없습니다.");
         }
 
@@ -153,8 +154,7 @@ public class StudyScheduleController {
 
         // 실제로 적용할 때는 currentUser의 정보를 바탕으로 userId 사용 후 권한 확인
         User user = studyService.findUserByUsername(currentUser.getUsername());
-        boolean hasManagementPermission = studyMembersService.hasManagementPermission(studyId, user);
-        if (!hasManagementPermission) {
+        if (!studyMembersService.hasManagementPermission(studyId, user)) {
             throw new UnauthorizedException("스터디 일정 관리 권한이 없습니다.");
         }
 

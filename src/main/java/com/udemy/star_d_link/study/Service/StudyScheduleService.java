@@ -49,7 +49,7 @@ public class StudyScheduleService {
             .collect(Collectors.toList());
     }
 
-    public StudyScheduleResponseDto addSchedule(Long studyId, StudyScheduleCreateRequestDto requestDto) {
+    public StudySchedule addSchedule(Long studyId, StudyScheduleCreateRequestDto requestDto) {
         Study study = studyRepository.findById(studyId)
             .orElseThrow(() -> new NoSuchElementException("해당 스터디를 찾을 수 없습니다"));
 
@@ -105,8 +105,8 @@ public class StudyScheduleService {
         }
         participationRepository.saveAll(participationToSave);
 
-        // 첫 번째 스케줄에 대한 DTO 반환
-        return StudyScheduleResponseDto.fromEntity(savedSchedules.get(0));
+        // 첫 번째 스케줄 반환
+        return savedSchedules.get(0);
 
     }
     @Transactional

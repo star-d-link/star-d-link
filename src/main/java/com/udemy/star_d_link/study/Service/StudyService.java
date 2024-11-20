@@ -37,19 +37,8 @@ public class StudyService {
 
     @Transactional
     public StudyResponseDto createStudy(StudyCreateRequestDto requestDto, User user) {
-        Study study = Study.builder()
-            .title(requestDto.getTitle())
-            .content(requestDto.getContent())
-            .hashtag(requestDto.getHashtag())
-            .isRecruit(requestDto.getIsRecruit())
-            .region(requestDto.getRegion())
-            .isOnline(requestDto.getIsOnline())
-            .headCount(requestDto.getHeadCount())
-            .user(user)
-            .build();
-
+        Study study = requestDto.toEntity(user);
         Study savedStudy = studyRepository.save(study);
-
         return StudyResponseDto.fromEntity(savedStudy);
     }
 
@@ -65,7 +54,8 @@ public class StudyService {
         return study;
     }
 
-    public StudyResponseDto  editStudyByUserId(Long studyId, User user, StudyUpdateRequestDto requestDto) {
+    @Transactional
+    public Study editStudyByUserId(Long studyId, User user, StudyUpdateRequestDto requestDto) {
         Study study = studyRepository.findById(studyId)
             .orElseThrow(() -> new RuntimeException("해당 글을 찾을 수 없습니다."));
 
@@ -83,8 +73,7 @@ public class StudyService {
             .headCount(requestDto.getHeadCount())
             .build();
 
-        Study savedStudy = studyRepository.save(study);
-        return StudyResponseDto.fromEntity(savedStudy);
+        return studyRepository.save(study);
     }
 
     @Transactional
@@ -107,11 +96,8 @@ public class StudyService {
 
     public Page<StudyListResponseDto> getStudyList(Boolean isOnline, String region, Boolean isRecruit, Pageable pageable) {
         QStudy study = QStudy.study;
-
         BooleanBuilder builder = new BooleanBuilder();
 
-
-        // 각 조건이 null이 아니면 맞는 조건을 builder에 추가
         if (isOnline != null) {
             builder.and(study.isOnline.eq(isOnline));
         }
@@ -122,31 +108,8 @@ public class StudyService {
             builder.and(study.isRecruit.eq(isRecruit));
         }
 
-        List<Study> studyList = queryFactory
-            .selectFrom(study)
-            .where(builder)
-            .offset(pageable.getOffset()) // 페이지 시작점
-            .limit(pageable.getPageSize()) // 페이지 크기(default : 10)
-            .fetch();
-
-        long total = queryFactory
-            .select(study)
-            .from(study)
-            .where(builder)
-            .fetch().size();
-
-        List<StudyListResponseDto> studyListDtos = studyList.stream()
-            .map(entity -> new StudyListResponseDto(
-                entity.getStudyId(),
-                entity.getTitle(),
-                entity.getIsRecruit(),
-                entity.getRegion(),
-                entity.getIsOnline(),
-                entity.getCreateDate()
-            ))
-            .collect(Collectors.toList());
-
-        return new PageImpl<>(studyListDtos, pageable, total);
+        Page<Study> studyPage = studyRepository.findAll(builder, pageable);
+        return studyPage.map(StudyListResponseDto::fromEntity);
     }
 
 
@@ -160,22 +123,8 @@ public class StudyService {
             builder.or(study.content.containsIgnoreCase(keyword));
         }
 
-        List<Study> studyList = queryFactory
-            .selectFrom(study)
-            .where(builder)
-            .offset(pageable.getOffset())
-            .limit(pageable.getPageSize())
-            .fetch();
-
-        long total = queryFactory
-            .select(study)
-            .from(study)
-            .where(builder)
-            .fetch().size();
-
-        List<StudyResponseDto> studyResponseDtos = mapToStudyResponseDtoList(studyList);
-
-        return new PageImpl<>(studyResponseDtos, pageable, total);
+        Page<Study> studyPage = studyRepository.findAll(builder, pageable);
+        return studyPage.map(StudyResponseDto::fromEntity);
     }
 
     public Page<StudyResponseDto> detailedSearchStudy(String hashtag, Pageable pageable) {
@@ -187,39 +136,8 @@ public class StudyService {
             builder.and(study.hashtag.containsIgnoreCase(hashtag));
         }
 
-        List<Study> studyList = queryFactory
-            .selectFrom(study)
-            .where(builder)
-            .offset(pageable.getOffset())
-            .limit(pageable.getPageSize())
-            .fetch();
-
-        long total = queryFactory
-            .select(study)
-            .from(study)
-            .where(builder)
-            .fetch().size();
-
-        List<StudyResponseDto> studyResponseDtos = mapToStudyResponseDtoList(studyList);
-
-        return new PageImpl<>(studyResponseDtos, pageable, total);
-    }
-
-    private List<StudyResponseDto> mapToStudyResponseDtoList(List<Study> studyList) {
-        return studyList.stream()
-            .map(entity -> new StudyResponseDto(
-                entity.getStudyId(),
-                entity.getUser(),
-                entity.getTitle(),
-                entity.getContent(),
-                entity.getHashtag(),
-                entity.getIsRecruit(),
-                entity.getRegion(),
-                entity.getIsOnline(),
-                entity.getHeadCount(),
-                entity.getCreateDate()
-            ))
-            .collect(Collectors.toList());
+        Page<Study> studyPage = studyRepository.findAll(builder, pageable);
+        return studyPage.map(StudyResponseDto::fromEntity);
     }
 
     // 임시로 User를 조회하는 메서드들 추후 변경

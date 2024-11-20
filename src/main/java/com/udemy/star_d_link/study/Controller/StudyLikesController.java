@@ -41,13 +41,7 @@ public class StudyLikesController {
         }
         User user = studyService.findUserByUsername(currentUser.getUsername());
 
-        StudyLikesResponseDto responseDto = studyLikesService.addLikes(studyId, user);
-
-        ApiResponse<StudyLikesResponseDto> response = new ApiResponse<>(
-            "success",
-            "작성이 완료되었습니다.",
-            responseDto
-        );
+        studyLikesService.addLikes(studyId, user);
 
         String redirectUrl = "/study/" + studyId;
 

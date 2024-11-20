@@ -29,7 +29,7 @@ public class StudyMembersService {
     }
 
     @Transactional
-    public StudyMemberResponseDto applyStudy(Long studyId, User user) {
+    public StudyMembers applyStudy(Long studyId, User user) {
         Study study = studyRepository.findById(studyId)
             .orElseThrow(() -> new NoSuchElementException("해당 스터디를 찾을 수 없습니다: "));
 
@@ -39,30 +39,22 @@ public class StudyMembersService {
         }
 
         Role role = study.getUser().equals(user) ? Role.LEADER : Role.MEMBER;
-
-        StudyMembers studyMember = StudyMembers.builder()
-            .user(user)
-            .study(study)
-            .role(role)
-            .status("대기중")
-            .build();
-        StudyMembers saveMember = studyMemberRepository.save(studyMember);
-        return StudyMemberResponseDto.fromEntity(saveMember);
+        StudyMembers studyMember = new StudyMembers(user, study, role, "대기중");
+        return studyMemberRepository.save(studyMember);
     }
 
-    public Page<StudyMemberResponseDto> getMemberList(int page, int size) {
+    @Transactional(readOnly = true)
+    public Page<StudyMembers> getMemberList(int page, int size) {
         Pageable pageable = PageRequest.of(page, size, Sort.by("createDate").descending());
-        Page<StudyMembers> studyPage = studyMemberRepository.findAll(pageable);
-
-        return studyPage.map(StudyMemberResponseDto::fromEntity);
-
+        return studyMemberRepository.findAll(pageable);
     }
 
-    public StudyMemberResponseDto acceptMember(Long studyId, User proposer) {
+    @Transactional
+    public StudyMembers acceptMember(Long studyId, User proposer) {
         StudyMembers member = studyMemberRepository.findByUser(proposer)
             .orElseThrow(() -> new NoSuchElementException("해당 멤버를 찾을 수 없습니다: "));
 
-        if(!member.getStudy().getStudyId().equals(studyId)) {
+        if (!member.getStudy().getStudyId().equals(studyId)) {
             throw new IllegalArgumentException("해당 스터디에 속하지 않는 멤버입니다.");
         }
 
@@ -70,8 +62,7 @@ public class StudyMembersService {
             .status("참여중")
             .build();
 
-        StudyMembers saveMember = studyMemberRepository.save(member);
-        return StudyMemberResponseDto.fromEntity(saveMember);
+        return studyMemberRepository.save(member);
     }
 
     public void rejectMember(Long studyId, User user) {

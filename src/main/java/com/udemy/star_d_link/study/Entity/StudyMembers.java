@@ -43,4 +43,11 @@ public class StudyMembers {
     @Column(nullable = false)
     private String status;
 
+    public StudyMembers(User user, Study study, Role role, String status) {
+        this.user = user;
+        this.study = study;
+        this.role = role;
+        this.status = status;
+    }
+
 }

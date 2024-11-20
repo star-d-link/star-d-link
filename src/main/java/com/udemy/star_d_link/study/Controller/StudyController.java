@@ -7,9 +7,9 @@ import com.udemy.star_d_link.study.Dto.Response.StudyMemberResponseDto;
 import com.udemy.star_d_link.study.Dto.Response.StudyResponseDto;
 import com.udemy.star_d_link.study.Dto.Request.StudyUpdateRequestDto;
 import com.udemy.star_d_link.study.Entity.Study;
+import com.udemy.star_d_link.study.Entity.StudyMembers;
 import com.udemy.star_d_link.study.Entity.User;
 import com.udemy.star_d_link.study.Exception.UnauthorizedException;
-import com.udemy.star_d_link.study.Mapper.StudyMapper;
 import com.udemy.star_d_link.study.Service.StudyMembersService;
 import com.udemy.star_d_link.study.Service.StudyService;
 import jakarta.validation.Valid;
@@ -40,13 +40,11 @@ import org.springframework.web.bind.annotation.RestController;
 public class StudyController {
     private final StudyService studyService;
     private final StudyMembersService studyMembersService;
-    private final StudyMapper studyMapper;
 
     @Autowired
-    public StudyController(StudyService studyService, StudyMembersService studyMembersService, StudyMapper studyMapper) {
+    public StudyController(StudyService studyService, StudyMembersService studyMembersService) {
         this.studyService = studyService;
         this.studyMembersService = studyMembersService;
-        this.studyMapper = studyMapper;
     }
 
     @GetMapping(value = "/create")
@@ -65,7 +63,9 @@ public class StudyController {
 
         User user = studyService.findUserByUsername(currentUser.getUsername());
 
-        StudyResponseDto responseDto = studyService.createStudy(requestDto, user);
+        Study savedStudy = studyService.createStudy(requestDto, user);
+
+        StudyResponseDto responseDto = StudyResponseDto.fromEntity(savedStudy);
 
         ApiResponse<StudyResponseDto> response = new ApiResponse<>(
             "success",
@@ -83,7 +83,7 @@ public class StudyController {
         Study study = studyService.findByStudyId(study_id);
 
         // Study 엔티티를 StudyResponseDto로 변환
-        StudyResponseDto responseDto = studyMapper.toResponseDto(study);
+        StudyResponseDto responseDto = StudyResponseDto.fromEntity(study);
 
         ApiResponse<StudyResponseDto> response = new ApiResponse<>(
             "success",
@@ -107,7 +107,7 @@ public class StudyController {
 
         Study study = studyService.getStudyForEdit(study_id, user);
 
-        StudyUpdateRequestDto responseDto = studyMapper.toUpdateRequestDto(study);
+        StudyUpdateRequestDto responseDto = StudyUpdateRequestDto.fromEntity(study);
 
         ApiResponse<StudyUpdateRequestDto> response = new ApiResponse<>(
             "success",
@@ -132,7 +132,7 @@ public class StudyController {
 
         Study editStudy = studyService.editStudyByUserId(study_id, user, requestDto);
 
-        StudyResponseDto studyResponseDto = studyMapper.toResponseDto(editStudy);
+        StudyResponseDto studyResponseDto = StudyResponseDto.fromEntity(editStudy);
 
         ApiResponse<StudyResponseDto> response = new ApiResponse<>(
             "success",
@@ -171,7 +171,9 @@ public class StudyController {
         @RequestParam(value = "region", required = false) String region,
         @RequestParam(value = "isRecruit", required = false) Boolean isRecruit) {
 
-        Page<StudyListResponseDto> dtoPage = studyService.getStudyList(isOnline, region, isRecruit, pageable);
+        Page<Study> studyPage = studyService.getStudyList(isOnline, region, isRecruit, pageable);
+
+        Page<StudyListResponseDto> dtoPage = studyPage.map(StudyListResponseDto::fromEntity);
 
         ApiResponse<Page<StudyListResponseDto>> response = new ApiResponse<>(
             "success",
@@ -192,10 +194,11 @@ public class StudyController {
             throw new UnauthorizedException("로그인이 필요합니다.");
         }
 
-        // 실제로 적용할 때는 currentUser의 정보를 바탕으로 userId 사용 후 권한 확인
         User user = studyService.findUserByUsername(currentUser.getUsername());
 
-        StudyMemberResponseDto responseDto = studyMembersService.applyStudy(studyId, user);
+        StudyMembers applyMember = studyMembersService.applyStudy(studyId, user);
+
+        StudyMemberResponseDto responseDto = StudyMemberResponseDto.fromEntity(applyMember);
 
         String redirectUrl = "/study/" + studyId;
 
@@ -213,12 +216,14 @@ public class StudyController {
         @RequestParam("keyword") String keyword,
         @PageableDefault(size = 10, sort = "createDate", direction = Sort.Direction.DESC) Pageable pageable) {
 
-        Page<StudyResponseDto> studyPage = studyService.searchStudy(keyword, pageable);
+        Page<Study> studyPage = studyService.searchStudy(keyword, pageable);
+
+        Page<StudyResponseDto> dtoPage = studyPage.map(StudyResponseDto::fromEntity);
 
         ApiResponse<Page<StudyResponseDto>> response = new ApiResponse<>(
             "success",
             "검색 결과 조회 완료",
-            studyPage
+            dtoPage
         );
 
         return ResponseEntity.status(HttpStatus.OK).body(response);
@@ -231,13 +236,16 @@ public class StudyController {
         @RequestParam("hashtag") String hashtag,
         @PageableDefault(size = 10, sort = "createDate", direction = Sort.Direction.DESC) Pageable pageable) {
 
-        Page<StudyResponseDto> detailedStudyPage = studyService.detailedSearchStudy(hashtag, pageable);
+        Page<Study> detailedStudyPage = studyService.detailedSearchStudy(hashtag, pageable);
+
+        Page<StudyResponseDto> dtoPage = detailedStudyPage.map(StudyResponseDto::fromEntity);
 
         ApiResponse<Page<StudyResponseDto>> response = new ApiResponse<>(
             "success",
             "상세 검색 결과 조회 완료",
-            detailedStudyPage
+            dtoPage
         );
+
 
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }

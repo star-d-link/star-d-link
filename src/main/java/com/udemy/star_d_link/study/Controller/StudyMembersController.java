@@ -6,7 +6,6 @@ import com.udemy.star_d_link.study.Entity.Role;
 import com.udemy.star_d_link.study.Entity.StudyMembers;
 import com.udemy.star_d_link.study.Entity.User;
 import com.udemy.star_d_link.study.Exception.UnauthorizedException;
-import com.udemy.star_d_link.study.Mapper.StudyMembersMapper;
 import com.udemy.star_d_link.study.Service.StudyMembersService;
 import com.udemy.star_d_link.study.Service.StudyService;
 import java.net.URI;
@@ -28,12 +27,9 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/study/{study_id}/manage")
 public class StudyMembersController {
     private final StudyMembersService studyMembersService;
-    private final StudyMembersMapper studymembersmapper;
     private final StudyService studyService;
-    public StudyMembersController(StudyMembersService studyMembersService, StudyMembersMapper studymembersmapper,
-        StudyService studyService) {
+    public StudyMembersController(StudyMembersService studyMembersService, StudyService studyService) {
         this.studyMembersService = studyMembersService;
-        this.studymembersmapper = studymembersmapper;
         this.studyService = studyService;
     }
 
@@ -56,7 +52,9 @@ public class StudyMembersController {
             throw new UnauthorizedException("스터디 멤버 관리 권한이 없습니다.");
         }
 
-        Page<StudyMemberResponseDto> dtoPage = studyMembersService.getMemberList(page, size);
+        Page<StudyMembers> membersPage = studyMembersService.getMemberList(page, size);
+
+        Page<StudyMemberResponseDto> dtoPage = membersPage.map(member -> StudyMemberResponseDto.fromEntity(member));
 
         ApiResponse<Page<StudyMemberResponseDto>> response = new ApiResponse<>(
             "success",
@@ -83,8 +81,9 @@ public class StudyMembersController {
         if (!hasPermission) {
             throw new UnauthorizedException("스터디 멤버 관리 권한이 없습니다.");
         }
+        StudyMembers acceptedMember = studyMembersService.acceptMember(studyId, proposer);
 
-        StudyMemberResponseDto responseDto = studyMembersService.acceptMember(studyId, proposer);
+        StudyMemberResponseDto responseDto = StudyMemberResponseDto.fromEntity(acceptedMember);
 
         String redirectUrl = "/study/" + studyId + "/manage";
 
@@ -138,7 +137,7 @@ public class StudyMembersController {
 
         StudyMembers updatedMember = studyMembersService.changeMemberRole(studyId, user, newRole, member);
 
-        StudyMemberResponseDto responseDto = studymembersmapper.toDto(updatedMember);
+        StudyMemberResponseDto responseDto = StudyMemberResponseDto.fromEntity(updatedMember);
 
         ApiResponse<StudyMemberResponseDto> response = new ApiResponse<>(
             "success",
