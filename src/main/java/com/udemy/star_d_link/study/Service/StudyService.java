@@ -3,8 +3,6 @@ package com.udemy.star_d_link.study.Service;
 import com.querydsl.core.BooleanBuilder;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import com.udemy.star_d_link.study.Dto.Request.StudyCreateRequestDto;
-import com.udemy.star_d_link.study.Dto.Response.StudyListResponseDto;
-import com.udemy.star_d_link.study.Dto.Response.StudyResponseDto;
 import com.udemy.star_d_link.study.Dto.Request.StudyUpdateRequestDto;
 import com.udemy.star_d_link.study.Entity.QStudy;
 import com.udemy.star_d_link.study.Entity.Study;
@@ -12,12 +10,8 @@ import com.udemy.star_d_link.study.Entity.User;
 import com.udemy.star_d_link.study.Exception.UnauthorizedException;
 import com.udemy.star_d_link.study.Repository.StudyRepository;
 import com.udemy.star_d_link.study.Repository.UserRepository;
-import java.time.LocalDate;
-import java.util.List;
 import java.util.NoSuchElementException;
-import java.util.stream.Collectors;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -36,10 +30,9 @@ public class StudyService {
     }
 
     @Transactional
-    public StudyResponseDto createStudy(StudyCreateRequestDto requestDto, User user) {
+    public Study createStudy(StudyCreateRequestDto requestDto, User user) {
         Study study = requestDto.toEntity(user);
-        Study savedStudy = studyRepository.save(study);
-        return StudyResponseDto.fromEntity(savedStudy);
+        return studyRepository.save(study);
     }
 
     public Study getStudyForEdit(Long studyId, User user) {
@@ -94,7 +87,7 @@ public class StudyService {
             .orElseThrow(() -> new NoSuchElementException("스터디 모집글 내용을 찾을 수 없습니다: " + studyId));
     }
 
-    public Page<StudyListResponseDto> getStudyList(Boolean isOnline, String region, Boolean isRecruit, Pageable pageable) {
+    public Page<Study> getStudyList(Boolean isOnline, String region, Boolean isRecruit, Pageable pageable) {
         QStudy study = QStudy.study;
         BooleanBuilder builder = new BooleanBuilder();
 
@@ -108,12 +101,11 @@ public class StudyService {
             builder.and(study.isRecruit.eq(isRecruit));
         }
 
-        Page<Study> studyPage = studyRepository.findAll(builder, pageable);
-        return studyPage.map(StudyListResponseDto::fromEntity);
+        return studyRepository.findAll(builder, pageable);
     }
 
 
-    public Page<StudyResponseDto> searchStudy(String keyword, Pageable pageable) {
+    public Page<Study> searchStudy(String keyword, Pageable pageable) {
         QStudy study = QStudy.study;
 
         BooleanBuilder builder = new BooleanBuilder();
@@ -123,11 +115,10 @@ public class StudyService {
             builder.or(study.content.containsIgnoreCase(keyword));
         }
 
-        Page<Study> studyPage = studyRepository.findAll(builder, pageable);
-        return studyPage.map(StudyResponseDto::fromEntity);
+        return studyRepository.findAll(builder, pageable);
     }
 
-    public Page<StudyResponseDto> detailedSearchStudy(String hashtag, Pageable pageable) {
+    public Page<Study> detailedSearchStudy(String hashtag, Pageable pageable) {
         QStudy study = QStudy.study;
 
         BooleanBuilder builder = new BooleanBuilder();
@@ -136,8 +127,7 @@ public class StudyService {
             builder.and(study.hashtag.containsIgnoreCase(hashtag));
         }
 
-        Page<Study> studyPage = studyRepository.findAll(builder, pageable);
-        return studyPage.map(StudyResponseDto::fromEntity);
+        return studyRepository.findAll(builder, pageable);
     }
 
     // 임시로 User를 조회하는 메서드들 추후 변경
