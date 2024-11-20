@@ -3,6 +3,7 @@ package com.udemy.star_d_link.user.repository;
 import com.udemy.star_d_link.user.entity.UserEntity;
 import com.udemy.star_d_link.user.exception.UserExceptions;
 import com.udemy.star_d_link.user.exception.UserTaskException;
+import java.time.LocalDateTime;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -52,7 +53,7 @@ class UserRepositoryTest {
             .nickname("nickname" + num)
             .email("email" + num)
             .phoneNumber("phoneNumber" + num)
-            .birthDate("birthDate" + num)
+            .birthDate(LocalDateTime.now())
             .region("region" + num)
             .role(num <= 8 ? "USER" : "ADMIN")
             .build();
