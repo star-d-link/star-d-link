@@ -13,6 +13,7 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.factory.PasswordEncoderFactories;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
@@ -61,9 +62,14 @@ public class SecurityConfig {
         return httpSecurity.build();
     }
 
+    /**
+     * 스프링이 권장하는 PasswordEncoder를 생성한다
+     * 현재 기준은 {@link BCryptPasswordEncoder}를 사용하고 있다.
+     * @return
+     */
     @Bean
     public PasswordEncoder passwordEncoder() {
-        return new BCryptPasswordEncoder();
+        return PasswordEncoderFactories.createDelegatingPasswordEncoder();
     }
 
 
@@ -96,4 +102,6 @@ public class SecurityConfig {
 
         return source;
     }
+
+
 }
