@@ -1,6 +1,5 @@
 package com.udemy.star_d_link.study.Dto.Response;
 
-import com.udemy.star_d_link.study.Entity.Role;
 import com.udemy.star_d_link.study.Entity.StudyMembers;
 import lombok.AllArgsConstructor;
 import lombok.Getter;

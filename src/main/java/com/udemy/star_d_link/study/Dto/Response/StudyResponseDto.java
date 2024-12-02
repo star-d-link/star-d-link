@@ -17,8 +17,11 @@ public class StudyResponseDto {
     private String hashtag;
     private Boolean isRecruit;
     private String region;
+    private Double latitude;
+    private Double longitude;
     private Boolean isOnline;
     private Integer headCount;
+    private Integer LikesCount;
     private LocalDate createDate;
 
     public static StudyResponseDto fromEntity(Study study) {
@@ -30,8 +33,11 @@ public class StudyResponseDto {
             study.getHashtag(),
             study.getIsRecruit(),
             study.getRegion(),
+            study.getLatitude(),
+            study.getLongitude(),
             study.getIsOnline(),
             study.getHeadCount(),
+            study.getLikesCount(),
             study.getCreateDate()
         );
     }

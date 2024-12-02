@@ -16,7 +16,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 @Service
 public class StudyService {
-
     private final StudyRepository studyRepository;
     private final UserRepository userRepository;
     public StudyService(StudyRepository studyRepository, UserRepository userRepository) {
@@ -90,7 +89,7 @@ public class StudyService {
         if (isOnline != null) {
             builder.and(study.isOnline.eq(isOnline));
         }
-        if (region != null) {
+        if (region != null && !region.trim().isEmpty()) {
             builder.and(study.region.eq(region));
         }
         if (isRecruit != null) {
@@ -116,12 +115,16 @@ public class StudyService {
 
     public Page<Study> detailedSearchStudy(String hashtag, Pageable pageable) {
         QStudy study = QStudy.study;
-
         BooleanBuilder builder = new BooleanBuilder();
 
-        if (hashtag != null && !hashtag.trim().isEmpty()) {
-            builder.and(study.hashtag.containsIgnoreCase(hashtag));
+        if (hashtag == null || hashtag.trim().isEmpty()) {
+            throw new IllegalArgumentException("해시태그는 필수입니다.");
         }
+
+        if (!hashtag.startsWith("#")) {
+            hashtag = "#" + hashtag;  // 만약 #이 없으면 #을 추가
+        }
+        builder.and(study.hashtag.containsIgnoreCase(hashtag));
 
         return studyRepository.findAll(builder, pageable);
     }

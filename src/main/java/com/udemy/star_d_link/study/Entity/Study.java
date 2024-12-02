@@ -52,14 +52,19 @@ public class Study {
     @Column(nullable = false)
     private Boolean isRecruit;
 
-    @Column(length = 100)
-    private String region;
-
     @Column(nullable = false)
     private Boolean isOnline;
 
     @Column(nullable = false)
     private Integer headCount;
+
+    // 위도 경도
+    private Double latitude;
+    private Double longitude;
+
+    // 대략적인 지역
+    @Column(length = 100)
+    private String region;
 
     @Column(nullable = false, updatable = false)
     @CreationTimestamp
