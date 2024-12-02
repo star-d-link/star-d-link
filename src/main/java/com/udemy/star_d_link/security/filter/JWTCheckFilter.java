@@ -43,7 +43,10 @@ public class JWTCheckFilter extends OncePerRequestFilter {
         if (request.getServletPath().startsWith("/h2-console")) {
             return true;
         }
-
+        // study 임시
+        if (request.getServletPath().startsWith("/study")) {
+            return true;
+        }
 
         // TODO: JWTCheck가 필요없는 경로들을 나중에 더 추가해야한다.
         return false;

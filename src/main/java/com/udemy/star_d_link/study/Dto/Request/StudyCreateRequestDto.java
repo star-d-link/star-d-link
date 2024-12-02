@@ -29,6 +29,9 @@ public class StudyCreateRequestDto {
     private Integer headCount;
     private LocalDate createDate;
 
+    private Double latitude;
+    private Double longitude;
+
     public Study toEntity(String username) {
         return Study.builder()
             .title(this.title)
@@ -36,6 +39,8 @@ public class StudyCreateRequestDto {
             .hashtag(this.hashtag)
             .isRecruit(this.isRecruit)
             .region(this.region)
+            .latitude(this.latitude)
+            .longitude(this.longitude)
             .isOnline(this.isOnline)
             .headCount(this.headCount)
             .createDate(this.createDate)
