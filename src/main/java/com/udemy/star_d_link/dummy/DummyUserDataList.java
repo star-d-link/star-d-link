@@ -24,7 +24,7 @@ public class DummyUserDataList {
                 .phoneNumber("phoneNumber" + i)
                 .birthDate(LocalDateTime.now())
                 .region("region" + i)
-                .role(i < 2 ? "ADMIN" : "USER")
+                .role(i < 2 ? "ROLE_ADMIN" : "ROLE_USER")
                 .build()
         ).toList();
     }

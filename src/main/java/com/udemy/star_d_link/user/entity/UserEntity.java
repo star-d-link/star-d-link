@@ -37,22 +37,22 @@ public class UserEntity {
     @Column(nullable = false, length = 250)
     private String password;
 
-    @Column(nullable = false, length = 40)
+    @Column(nullable = false, unique = true)
     private String nickname;
 
-    @Column(nullable = false, length = 40)
+    @Column(nullable = false, length = 40, unique = true)
     private String email;
 
     @Column(length = 250)
     private String profileUrl;
 
-    @Column(nullable = false, length = 20)
+    @Column(length = 20)
     private String phoneNumber;
 
-    @Column(nullable = false, length = 20)
+    @Column(length = 20)
     private LocalDateTime birthDate;
 
-    @Column(nullable = false, length = 100)
+    @Column(length = 100)
     private String region;
 
     @Column(nullable = false, length = 20)
@@ -63,5 +63,9 @@ public class UserEntity {
 
     @LastModifiedDate
     private LocalDateTime updatedAt;
+
+    public void changeNickname(String nickname) {
+        this.nickname = nickname;
+    }
 
 }
