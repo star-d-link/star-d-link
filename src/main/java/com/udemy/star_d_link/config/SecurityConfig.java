@@ -11,6 +11,7 @@ import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -44,9 +45,7 @@ public class SecurityConfig {
             .csrf(AbstractHttpConfigurer::disable)
             .formLogin(AbstractHttpConfigurer::disable)
             .httpBasic(AbstractHttpConfigurer::disable)
-            .sessionManagement(sessionManagementConfigurer -> {
-                sessionManagementConfigurer.sessionCreationPolicy(SessionCreationPolicy.STATELESS);
-            })
+            .oauth2Login(Customizer.withDefaults())
             .authorizeHttpRequests(auth -> auth
                 .requestMatchers("/login", "/", "/signup", "/h2-console/**").permitAll()
                 .requestMatchers("/admin").hasRole("ADMIN")
@@ -56,6 +55,9 @@ public class SecurityConfig {
             .addFilterAt(
                 new LoginFilter(authenticationManager(authenticationConfiguration), jwtUtil),
                 UsernamePasswordAuthenticationFilter.class)
+            .sessionManagement(sessionManagementConfigurer -> {
+                sessionManagementConfigurer.sessionCreationPolicy(SessionCreationPolicy.STATELESS);
+            })
             // iframe 허용 (h2 console)
             .headers((headers) -> headers.addHeaderWriter(new XFrameOptionsHeaderWriter(
                 XFrameOptionsMode.SAMEORIGIN)))
