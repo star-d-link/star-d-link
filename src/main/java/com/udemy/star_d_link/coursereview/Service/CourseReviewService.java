@@ -20,17 +20,20 @@ import org.springframework.transaction.annotation.Transactional;
 @RequiredArgsConstructor
 @Service
 public class CourseReviewService {
+
     private final CourseReviewRepository courseReviewRepository;
     private final CourseReviewFileRepository courseReviewFileRepository;
 
-    public Page<CourseReview> getList(int page){
+    public Page<CourseReview> getList(int page) {
 
         Pageable pageable = PageRequest.of(page, 10, Sort.by(Sort.Order.desc("createAt")));
         return courseReviewRepository.findAll(pageable);
     }
 
     @Transactional
-    public CourseReview createCourseReview(CourseReviewCreateRequestDto courseReviewCreateRequestDto, Long userId /*SiteUser siteUser*/){
+    public CourseReview createCourseReview(
+        CourseReviewCreateRequestDto courseReviewCreateRequestDto,
+        Long userId /*SiteUser siteUser*/) {
         CourseReview newCourseReview = CourseReview.builder()
             /*.siteUser(siteUser)*/
             .userId(userId) //나중에 삭제
@@ -50,14 +53,16 @@ public class CourseReviewService {
 
         return courseReviewRepository.save(newCourseReview);
     }
+
     @Transactional
-    public CourseReview modifyCourseReview(CourseReviewModifyRequestDto courseReviewModifyRequestDto,
-        Long boadrId, Long userId){
+    public CourseReview modifyCourseReview(
+        CourseReviewModifyRequestDto courseReviewModifyRequestDto,
+        Long boadrId, Long userId) {
 
         CourseReview courseReview = courseReviewRepository.findById(boadrId)
-            .orElseThrow(()-> new RuntimeException("해당 글을 찾을 수 없습니다."));
+            .orElseThrow(() -> new RuntimeException("해당 글을 찾을 수 없습니다."));
 
-        if(!courseReview.getUserId().equals(userId)){
+        if (!courseReview.getUserId().equals(userId)) {
             throw new RuntimeException("작성자만 수정 가능합니다.");
         }
 
@@ -70,13 +75,15 @@ public class CourseReviewService {
             .rating(courseReviewModifyRequestDto.getRating())
             .updatedAt(LocalDate.now())
             .build();
-        List<CourseReviewFile> fileList = courseReviewModifyRequestDto.getFileCreateDtoList().stream()
+        List<CourseReviewFile> fileList = courseReviewModifyRequestDto.getFileCreateDtoList()
+            .stream()
             .map(fileUrl -> CourseReviewFile.of(fileUrl.getFileUrl(), modifiedReview)).toList();
         courseReviewFileRepository.saveAll(fileList);
 
         return courseReviewRepository.save(modifiedReview);
     }
-    public CourseReview getCourseReviewDetail(Long boardId){
+
+    public CourseReview getCourseReviewDetail(Long boardId) {
         CourseReview courseReview = courseReviewRepository.findById(boardId)
             .orElseThrow(() -> new NoSuchElementException("강의 리뷰글이 존재하지 않습니다."));
         return courseReview;
@@ -84,8 +91,8 @@ public class CourseReviewService {
 
     public void deleteCourseReview(Long boardId, Long userId) {
         CourseReview courseReview = courseReviewRepository.findById(boardId)
-            .orElseThrow(()->new NoSuchElementException("강의 리뷰글이 존재하지 않습니다."));
-        if(!courseReview.getUserId().equals(userId)){
+            .orElseThrow(() -> new NoSuchElementException("강의 리뷰글이 존재하지 않습니다."));
+        if (!courseReview.getUserId().equals(userId)) {
             throw new RuntimeException("작성자만 삭제 가능합니다.");
         }
         this.courseReviewRepository.delete(courseReview);

@@ -6,7 +6,6 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
-//import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import java.time.LocalDate;
@@ -33,7 +32,7 @@ public class CourseReview {
     private Long userId;//나중에 삭제
     /*
     @ManyToOne
-    private SiteUser siteUser;*/
+    private UserEntity siteUser;*/
 
     private Integer likeCount;
 
@@ -59,6 +58,9 @@ public class CourseReview {
 
     @OneToMany(mappedBy = "courseReview", cascade = CascadeType.ALL)
     private List<CourseReviewFile> courseReviewFileList;
+
+    @OneToMany(mappedBy = "courseReview", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<CourseReviewComment> comments;
 
     public void addFile(CourseReviewFile courseReviewFile) {
         this.courseReviewFileList.add(courseReviewFile);

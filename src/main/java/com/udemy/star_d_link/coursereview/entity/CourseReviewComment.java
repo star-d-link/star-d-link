@@ -1,31 +1,41 @@
-package com.udemy.star_d_link.coursereview.entity;
+package com.udemy.star_d_link.coursereview.Entity;
 
+import com.udemy.star_d_link.user.entity.UserEntity;
 import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
+
 
 import java.time.LocalDateTime;
+import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.annotation.LastModifiedDate;
 
-@Entity
-@Getter
-@Setter
+@Builder(toBuilder = true)
 @NoArgsConstructor
+@AllArgsConstructor
+@Getter
+@Entity
 @Table(name = "course_review_comment")
 public class CourseReviewComment {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long commentId; // PK
 
-    @Column(nullable = false)
-    private Long boardId; // Board ID (외래 키)
+    @ManyToOne
+    private CourseReview courseReview; // Board ID (외래 키)
+
+    @ManyToOne
+    private UserEntity userEntity;
 
     @Column(nullable = false, columnDefinition = "TEXT")
     private String content; // 본문
 
-    @Column(nullable = false)
-    private LocalDateTime createdAt; // 생성일시
+    @CreatedDate
+    @Column(updatable = false)
+    private LocalDateTime createdAt;
 
-    @Column(nullable = false)
-    private LocalDateTime updatedAt; // 수정일시
+    @LastModifiedDate
+    private LocalDateTime updatedAt;
 }
