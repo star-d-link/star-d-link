@@ -35,11 +35,11 @@ public class JWTFilter extends OncePerRequestFilter {
         String authorization = request.getHeader("Authorization");
         log.info("authorization: " + authorization);
 
-//        if (authorization == null || !authorization.startsWith("Bearer ")) {
-//            log.info("ACCESS TOKEN NOT FOUND");
-//            filterChain.doFilter(request, response);
-//            return;
-//        }
+        if (authorization == null || !authorization.startsWith("Bearer ")) {
+            log.info("ACCESS TOKEN NOT FOUND");
+            filterChain.doFilter(request, response);
+            return;
+        }
 
         log.info("authorization: " + authorization);
         String token = "";
