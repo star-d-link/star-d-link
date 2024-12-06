@@ -6,9 +6,12 @@ import java.util.Map;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 
-@Data
+@Getter
+@Setter
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
@@ -38,10 +41,23 @@ public class UserDTO {
         this.role = userEntity.getRole();
     }
 
+    public UserEntity toEntity() {
+        return UserEntity.builder()
+            .username(username)
+            .password(password)
+            .nickname(nickname)
+            .email(email)
+            .profileUrl(profileUrl)
+            .phoneNumber(phoneNumber)
+            .birthDate(birthDate)
+            .region(region)
+            .role(role)
+            .build();
+    }
+
     public Map<String, Object> getDataMap() {
         return Map.of(
             "username", username,
-            "password", password,
             "nickname", nickname,
             "email", email,
             "phoneNumber", phoneNumber,
