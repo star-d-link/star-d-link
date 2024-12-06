@@ -43,6 +43,9 @@ public class UserEntity {
     @Column(nullable = false, length = 40, unique = true)
     private String email;
 
+    @Column(nullable = false, length = 20)
+    private String role;
+
     @Column(length = 250)
     private String profileUrl;
 
@@ -55,8 +58,7 @@ public class UserEntity {
     @Column(length = 100)
     private String region;
 
-    @Column(nullable = false, length = 20)
-    private String role;
+
 
     @CreatedDate
     private LocalDateTime createdAt;
@@ -67,5 +69,10 @@ public class UserEntity {
     public void changeNickname(String nickname) {
         this.nickname = nickname;
     }
+
+    public void changeEmail(String email) {
+        this.email = email;
+    }
+
 
 }

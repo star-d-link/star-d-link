@@ -2,6 +2,7 @@ package com.udemy.star_d_link.config;
 
 import com.udemy.star_d_link.security.filter.JWTFilter;
 import com.udemy.star_d_link.security.filter.LoginFilter;
+import com.udemy.star_d_link.security.handler.CustomSuccessHandler;
 import com.udemy.star_d_link.security.service.CustomOauth2UserService;
 import com.udemy.star_d_link.security.util.JWTUtil;
 import java.util.Collections;
@@ -39,6 +40,7 @@ public class SecurityConfig {
     private final AuthenticationConfiguration authenticationConfiguration;
     private final JWTUtil jwtUtil;
     private final CustomOauth2UserService customOauth2UserService;
+    private final CustomSuccessHandler customSuccessHandler;
 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity httpSecurity) throws Exception {
@@ -47,11 +49,14 @@ public class SecurityConfig {
             .csrf(AbstractHttpConfigurer::disable)
             .formLogin(AbstractHttpConfigurer::disable)
             .httpBasic(AbstractHttpConfigurer::disable)
-            .oauth2Login(oauth2 -> oauth2.userInfoEndpoint(
-                userInfoEndpointConfig -> userInfoEndpointConfig.userService(
-                    customOauth2UserService)))
+            .oauth2Login(oauth2 -> oauth2
+                .userInfoEndpoint(userInfoEndpointConfig -> userInfoEndpointConfig
+                    .userService(customOauth2UserService))
+                .successHandler(customSuccessHandler)
+            )
             .authorizeHttpRequests(auth -> auth
-                .requestMatchers("/login", "/", "/signup", "/h2-console/**").permitAll()
+                .requestMatchers("/login", "/", "/signup", "/h2-console/**"
+                , "/oauth2/**", "/login/oauth2/**").permitAll()
                 .requestMatchers("/admin").hasRole("ADMIN")
                 .anyRequest().authenticated()
             )

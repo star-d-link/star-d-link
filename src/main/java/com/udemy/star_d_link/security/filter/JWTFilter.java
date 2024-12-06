@@ -33,16 +33,21 @@ public class JWTFilter extends OncePerRequestFilter {
         FilterChain filterChain) throws ServletException, IOException {
 
         String authorization = request.getHeader("Authorization");
-
-        if (authorization == null || !authorization.startsWith("Bearer ")) {
-            log.info("ACCESS TOKEN NOT FOUND");
-            filterChain.doFilter(request, response);
-            return;
-        }
-
         log.info("authorization: " + authorization);
 
-        String token = authorization.split(" ")[1];
+//        if (authorization == null || !authorization.startsWith("Bearer ")) {
+//            log.info("ACCESS TOKEN NOT FOUND");
+//            filterChain.doFilter(request, response);
+//            return;
+//        }
+
+        log.info("authorization: " + authorization);
+        String token = "";
+
+        if (authorization != null) {
+            token = authorization.split(" ")[1];
+
+        }
 
         if (jwtUtil.isExpired(token)) {
             log.info("ACCESS TOKEN IS EXPIRED");

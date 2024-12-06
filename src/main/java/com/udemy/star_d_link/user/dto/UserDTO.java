@@ -58,7 +58,6 @@ public class UserDTO {
     public Map<String, Object> getDataMap() {
         return Map.of(
             "username", username,
-            "password", password,
             "nickname", nickname,
             "email", email,
             "phoneNumber", phoneNumber,
