@@ -14,8 +14,6 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class StudyCreateRequestDto {
-    @NotNull
-    private String username;
 
     @NotEmpty(message = "스터디 제목은 필수 입력 항목입니다.")
     private String title;
