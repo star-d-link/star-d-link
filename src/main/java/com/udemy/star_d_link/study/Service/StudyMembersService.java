@@ -6,6 +6,7 @@ import com.udemy.star_d_link.study.Entity.StudyMembers;
 import com.udemy.star_d_link.study.Exception.UnauthorizedException;
 import com.udemy.star_d_link.study.Repository.StudyMemberRepository;
 import com.udemy.star_d_link.study.Repository.StudyRepository;
+import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -42,9 +43,9 @@ public class StudyMembersService {
     }
 
     @Transactional(readOnly = true)
-    public Page<StudyMembers> getMemberList(int page, int size) {
-        Pageable pageable = PageRequest.of(page, size, Sort.by("createDate").descending());
-        return studyMemberRepository.findAll(pageable);
+    public List<StudyMembers> getMemberList(Long studyId, int page, int size) {
+        Pageable pageable = PageRequest.of(page, size);
+        return studyMemberRepository.findByStudy_StudyId(studyId, pageable);
     }
 
     @Transactional

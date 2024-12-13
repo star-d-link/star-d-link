@@ -7,6 +7,7 @@ import com.udemy.star_d_link.study.Entity.StudyMembers;
 import com.udemy.star_d_link.study.Exception.UnauthorizedException;
 import com.udemy.star_d_link.study.Service.StudyMembersService;
 import java.net.URI;
+import java.util.List;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -29,8 +30,8 @@ public class StudyMembersController {
         this.studyMembersService = studyMembersService;
     }
 
-    @GetMapping("/")
-    public ResponseEntity<ApiResponse<Page<StudyMemberResponseDto>>> getMemberList(
+    @GetMapping
+    public ResponseEntity<ApiResponse<List<StudyMemberResponseDto>>> getMemberList(
         @PathVariable("study_id") Long studyId,
         @AuthenticationPrincipal UserDetails currentUser,
         @RequestParam(defaultValue = "0") int page,
@@ -45,14 +46,15 @@ public class StudyMembersController {
             throw new UnauthorizedException("스터디 멤버 관리 권한이 없습니다.");
         }
 
-        Page<StudyMembers> membersPage = studyMembersService.getMemberList(page, size);
+        List<StudyMembers> membersList = studyMembersService.getMemberList(studyId, page, size);
 
-        Page<StudyMemberResponseDto> dtoPage = membersPage.map(StudyMemberResponseDto::fromEntity);
-
-        ApiResponse<Page<StudyMemberResponseDto>> response = new ApiResponse<>(
+        List<StudyMemberResponseDto> dtoList = membersList.stream()
+            .map(StudyMemberResponseDto::fromEntity)
+            .toList();
+        ApiResponse<List<StudyMemberResponseDto>> response = new ApiResponse<>(
             "success",
             "스터디 목록 조회 완료",
-            dtoPage
+            dtoList
         );
 
         return ResponseEntity.status(HttpStatus.OK).body(response);
@@ -67,7 +69,7 @@ public class StudyMembersController {
         if (currentUser == null) {
             throw new UnauthorizedException("로그인이 필요합니다.");
         }
-        boolean hasPermission = studyMembersService.hasPermission(studyId, proposer);
+        boolean hasPermission = studyMembersService.hasPermission(studyId, currentUser.getUsername());
 
         if (!hasPermission) {
             throw new UnauthorizedException("스터디 멤버 관리 권한이 없습니다.");
