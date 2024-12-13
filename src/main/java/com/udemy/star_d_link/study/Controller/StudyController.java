@@ -13,6 +13,7 @@ import com.udemy.star_d_link.study.Service.StudyMembersService;
 import com.udemy.star_d_link.study.Service.StudyService;
 import jakarta.validation.Valid;
 import java.net.URI;
+import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -46,7 +47,13 @@ public class StudyController {
     }
 
     @GetMapping(value = "/create")
-    public String signForm(){
+    public String signForm(
+        @AuthenticationPrincipal UserDetails currentUser){
+
+        if (currentUser == null) {
+            throw new UnauthorizedException("작성 권한이 없습니다.");
+        }
+
         return "signup";
     }
 
@@ -58,6 +65,7 @@ public class StudyController {
         if (currentUser == null) {
             throw new UnauthorizedException("작성 권한이 없습니다.");
         }
+
         Study savedStudy = studyService.createStudy(requestDto, currentUser.getUsername());
 
         StudyResponseDto responseDto = StudyResponseDto.fromEntity(savedStudy);
@@ -110,7 +118,7 @@ public class StudyController {
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 
-    @PutMapping("/{study_id}/edit")
+    @PutMapping("/{study_id}")
     public ResponseEntity<ApiResponse<StudyResponseDto>> putStudyEditForm(
         @PathVariable Long study_id,
         @RequestBody StudyUpdateRequestDto requestDto,
@@ -233,5 +241,24 @@ public class StudyController {
 
 
         return ResponseEntity.status(HttpStatus.OK).body(response);
+    }
+
+    @GetMapping("/admin/list")
+    public ResponseEntity<ApiResponse<List<StudyResponseDto>>> getAdminStudies(
+        @AuthenticationPrincipal UserDetails currentUser) {
+
+        if (currentUser == null) {
+            throw new UnauthorizedException("로그인이 필요합니다.");
+        }
+
+        List<StudyResponseDto> studies = studyService.getStudiesByAdmin(currentUser.getUsername());
+
+        ApiResponse<List<StudyResponseDto>> response = new ApiResponse<>(
+            "success",
+            "관리자 스터디 목록 조회 성공",
+            studies
+        );
+
+        return ResponseEntity.ok(response);
     }
 }

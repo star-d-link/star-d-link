@@ -3,12 +3,15 @@ package com.udemy.star_d_link.study.Service;
 import com.querydsl.core.BooleanBuilder;
 import com.udemy.star_d_link.study.Dto.Request.StudyCreateRequestDto;
 import com.udemy.star_d_link.study.Dto.Request.StudyUpdateRequestDto;
+import com.udemy.star_d_link.study.Dto.Response.StudyResponseDto;
 import com.udemy.star_d_link.study.Entity.QStudy;
 import com.udemy.star_d_link.study.Entity.Study;
 import com.udemy.star_d_link.study.Exception.UnauthorizedException;
 import com.udemy.star_d_link.study.Repository.StudyRepository;
 import com.udemy.star_d_link.user.repository.UserRepository;
+import java.util.List;
 import java.util.NoSuchElementException;
+import java.util.stream.Collectors;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -55,7 +58,6 @@ public class StudyService {
             .title(requestDto.getTitle())
             .content(requestDto.getContent())
             .hashtag(requestDto.getHashtag())
-            .isRecruit(requestDto.getIsRecruit())
             .region(requestDto.getRegion())
             .isOnline(requestDto.getIsOnline())
             .headCount(requestDto.getHeadCount())
@@ -129,5 +131,10 @@ public class StudyService {
         return studyRepository.findAll(builder, pageable);
     }
 
-    // 임시로 User를 조회하는 메서드들 추후 변경
+    public List<StudyResponseDto> getStudiesByAdmin(String username) {
+        List<Study> studies = studyRepository.findByUsername(username);
+        return studies.stream()
+            .map(StudyResponseDto::fromEntity)
+            .collect(Collectors.toList());
+    }
 }
