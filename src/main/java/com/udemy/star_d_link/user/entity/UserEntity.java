@@ -74,5 +74,9 @@ public class UserEntity {
         this.email = email;
     }
 
+    public void changePassword(String password) {
+        this.password = password;
+    }
+
 
 }

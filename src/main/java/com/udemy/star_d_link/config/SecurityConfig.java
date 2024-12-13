@@ -55,7 +55,7 @@ public class SecurityConfig {
                 .successHandler(customSuccessHandler)
             )
             .authorizeHttpRequests(auth -> auth
-                .requestMatchers("/login", "/", "/signup", "/h2-console/**"
+                .requestMatchers("/login", "/", "/users/**", "/h2-console/**"
                 , "/oauth2/**", "/login/oauth2/**").permitAll()
                 .requestMatchers("/admin").hasRole("ADMIN")
                 .anyRequest().authenticated()
