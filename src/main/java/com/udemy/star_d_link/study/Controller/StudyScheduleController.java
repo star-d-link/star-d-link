@@ -39,7 +39,7 @@ public class StudyScheduleController {
         this.studyMembersService = studyMembersService;
     }
 
-    @GetMapping("/")
+    @GetMapping
     public ResponseEntity<ApiResponse<List<StudyScheduleResponseDto>>> getScheduleList (
         @PathVariable("study_id") Long studyId,
         @AuthenticationPrincipal UserDetails currentUser) {
@@ -48,7 +48,7 @@ public class StudyScheduleController {
             throw new UnauthorizedException("로그인이 필요합니다.");
         }
 
-        boolean hasPermission = studyMembersService.isMemberOfStudy(studyId, currentUser.getUsername());
+        boolean hasPermission = studyMembersService.hasPermission(studyId, currentUser.getUsername());
         if (!hasPermission) {
             throw new UnauthorizedException("스터디 일정 조회 권한이 없습니다.");
         }
@@ -93,7 +93,7 @@ public class StudyScheduleController {
             throw new UnauthorizedException("스터디 일정 관리 권한이 없습니다.");
         }
 
-        StudySchedule savedSchedule = studyScheduleService.addSchedule(studyId, requestDto);
+        StudySchedule savedSchedule = studyScheduleService.addSchedule(studyId, requestDto, currentUser.getUsername());
 
         StudyScheduleResponseDto responseDto = StudyScheduleResponseDto.fromEntity(savedSchedule);
 
