@@ -5,8 +5,11 @@ import com.udemy.star_d_link.study.Dto.Request.StudyCreateRequestDto;
 import com.udemy.star_d_link.study.Dto.Request.StudyUpdateRequestDto;
 import com.udemy.star_d_link.study.Dto.Response.StudyResponseDto;
 import com.udemy.star_d_link.study.Entity.QStudy;
+import com.udemy.star_d_link.study.Entity.Role;
 import com.udemy.star_d_link.study.Entity.Study;
+import com.udemy.star_d_link.study.Entity.StudyMembers;
 import com.udemy.star_d_link.study.Exception.UnauthorizedException;
+import com.udemy.star_d_link.study.Repository.StudyMemberRepository;
 import com.udemy.star_d_link.study.Repository.StudyRepository;
 import com.udemy.star_d_link.user.repository.UserRepository;
 import java.util.List;
@@ -20,17 +23,29 @@ import org.springframework.transaction.annotation.Transactional;
 @Service
 public class StudyService {
     private final StudyRepository studyRepository;
-    private final UserRepository userRepository;
-    public StudyService(StudyRepository studyRepository, UserRepository userRepository) {
+    private final StudyMemberRepository studyMemberRepository;
+    public StudyService(StudyRepository studyRepository, StudyMemberRepository studyMemberRepository) {
         this.studyRepository = studyRepository;
-        this.userRepository = userRepository;
+        this.studyMemberRepository = studyMemberRepository;
 
     }
     @Transactional
     public Study createStudy(StudyCreateRequestDto requestDto, String username) {
-
+        // 1. Study 엔티티 생성 및 저장
         Study study = requestDto.toEntity(username);
-        return studyRepository.save(study);
+        Study savedStudy = studyRepository.save(study);
+
+        // 2. StudyMembers 엔티티 생성 및 저장
+        StudyMembers studyMember = StudyMembers.builder()
+            .study(savedStudy) // 연관된 스터디
+            .username(username) // 스터디 생성자
+            .role(Role.LEADER) // 관리자 역할
+            .status("참여중") // 기본 상태
+            .build();
+
+        studyMemberRepository.save(studyMember);
+
+        return savedStudy;
     }
 
     public Study getStudyForEdit(Long studyId, String username) {
