@@ -6,13 +6,13 @@ import com.udemy.star_d_link.study.Entity.StudyMembers;
 import com.udemy.star_d_link.study.Exception.UnauthorizedException;
 import com.udemy.star_d_link.study.Repository.StudyMemberRepository;
 import com.udemy.star_d_link.study.Repository.StudyRepository;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.Optional;
+import java.util.stream.Collectors;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -42,15 +42,32 @@ public class StudyMembersService {
     }
 
     @Transactional(readOnly = true)
-    public Page<StudyMembers> getMemberList(int page, int size) {
-        Pageable pageable = PageRequest.of(page, size, Sort.by("createDate").descending());
-        return studyMemberRepository.findAll(pageable);
+    public Map<String, List<StudyMembers>> getMemberList(Long studyId) {
+        // 특정 스터디 ID로 멤버 전체 조회
+        List<StudyMembers> allMembers = studyMemberRepository.findByStudy_StudyId(studyId);
+
+        // 역할(Role)을 기준으로 관리하는 멤버와 일반 멤버 구분
+        List<StudyMembers> adminMembers = allMembers.stream()
+            .filter(member -> List.of(Role.LEADER, Role.SUB_LEADER).contains(member.getRole()))
+            .collect(Collectors.toList());
+
+        List<StudyMembers> joinedMembers = allMembers.stream()
+            .filter(member -> !List.of(Role.LEADER, Role.SUB_LEADER).contains(member.getRole()))
+            .collect(Collectors.toList());
+
+        // Map으로 반환
+        Map<String, List<StudyMembers>> result = new HashMap<>();
+        result.put("admin", adminMembers);
+        result.put("joined", joinedMembers);
+
+        return result;
     }
 
+
     @Transactional
-    public StudyMembers acceptMember(Long studyId, String proposer) {
-        StudyMembers member = studyMemberRepository.findByUsername(proposer)
-            .orElseThrow(() -> new NoSuchElementException("해당 멤버를 찾을 수 없습니다: "));
+    public StudyMembers acceptMember(Long studyId, Long memberId) {
+        StudyMembers member = studyMemberRepository.findById(memberId)
+            .orElseThrow(() -> new NoSuchElementException("해당 멤버를 찾을 수 없습니다"));
 
         if (!member.getStudy().getStudyId().equals(studyId)) {
             throw new IllegalArgumentException("해당 스터디에 속하지 않는 멤버입니다.");
@@ -63,14 +80,14 @@ public class StudyMembersService {
         return studyMemberRepository.save(member);
     }
 
-    public void rejectMember(Long studyId, String username) {
-        StudyMembers member = studyMemberRepository.findByUsername(username)
-            .orElseThrow(() -> new NoSuchElementException("해당 멤버를 찾을 수 없습니다: "));
+    @Transactional
+    public void rejectMember(Long studyId, Long memberId) {
+        StudyMembers member = studyMemberRepository.findById(memberId)
+            .orElseThrow(() -> new NoSuchElementException("해당 멤버를 찾을 수 없습니다: " + memberId));
 
-        if(!member.getStudy().getStudyId().equals(studyId)) {
+        if (!member.getStudy().getStudyId().equals(studyId)) {
             throw new IllegalArgumentException("해당 스터디에 속하지 않는 멤버입니다.");
         }
-
         studyMemberRepository.delete(member);
     }
 

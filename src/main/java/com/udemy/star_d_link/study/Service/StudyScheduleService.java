@@ -49,10 +49,12 @@ public class StudyScheduleService {
             .collect(Collectors.toList());
     }
 
-    public StudySchedule addSchedule(Long studyId, StudyScheduleCreateRequestDto requestDto) {
+    public StudySchedule addSchedule(Long studyId, StudyScheduleCreateRequestDto requestDto, String username) {
+        // 스터디 조회
         Study study = studyRepository.findById(studyId)
-            .orElseThrow(() -> new NoSuchElementException("해당 스터디를 찾을 수 없습니다"));
+            .orElseThrow(() -> new NoSuchElementException("해당 스터디를 찾을 수 없습니다."));
 
+        // 스터디 멤버 조회
         List<StudyMembers> studyMembers = studyMemberRepository.findByStudy(study);
         if (studyMembers == null || studyMembers.isEmpty()) {
             throw new IllegalStateException("스터디에 멤버가 존재하지 않습니다.");
@@ -62,7 +64,7 @@ public class StudyScheduleService {
 
         if (Boolean.TRUE.equals(requestDto.getIsRecurring())) {
             // 첫 번째 스케줄 생성
-            StudySchedule initialSchedule = createInitialSchedule(study, requestDto, null);
+            StudySchedule initialSchedule = createInitialSchedule(study, requestDto, null, username);
 
             // 첫 번째 스케줄 저장 후 recurrenceGroup 설정
             StudySchedule savedInitialSchedule = studyScheduleRepository.save(initialSchedule);
@@ -79,16 +81,17 @@ public class StudyScheduleService {
             int count = 0;
             while (requestDto.getRecurrenceCount() == null || count < requestDto.getRecurrenceCount() - 1) {
                 currentScheduleDate = calculateNextScheduleDate(currentScheduleDate, requestDto.getRecurrenceType());
-                StudySchedule newSchedule = createRecurringSchedule(study, requestDto, currentScheduleDate, recurrenceGroup);
+                StudySchedule newSchedule = createRecurringSchedule(study, requestDto, currentScheduleDate, recurrenceGroup, username);
                 schedulesToSave.add(newSchedule);
                 count++;
             }
         } else {
             // 단일 일정 생성
-            StudySchedule studySchedule = createInitialSchedule(study, requestDto, null);
+            StudySchedule studySchedule = createInitialSchedule(study, requestDto, null, username);
             schedulesToSave.add(studySchedule);
         }
 
+        // 스케줄 저장
         List<StudySchedule> savedSchedules = studyScheduleRepository.saveAll(schedulesToSave);
 
         // 참여 정보 생성 및 저장
@@ -107,8 +110,8 @@ public class StudyScheduleService {
 
         // 첫 번째 스케줄 반환
         return savedSchedules.get(0);
-
     }
+
     @Transactional
     public void updateAllSchedule(Long recurrenceGroupId, StudyScheduleAllUpdateRequestDto requestDto) {
         // recurrenceGroupId를 이용해 반복 그룹 전체 조회
@@ -119,18 +122,16 @@ public class StudyScheduleService {
         }
 
         // 반복 그룹의 모든 스케줄을 업데이트
-        List<StudySchedule> updatedSchedules = new ArrayList<>();
-        for (StudySchedule schedule : schedules) {
-            StudySchedule updatedSchedule = schedule.toBuilder()
+        List<StudySchedule> updatedSchedules = schedules.stream()
+            .map(schedule -> schedule.toBuilder()
                 .scheduleTitle(requestDto.getScheduleTitle())
                 .scheduleContent(requestDto.getScheduleContent())
                 .location(requestDto.getLocation())
-                .build();
+                .build())
+            .collect(Collectors.toList());
 
-            updatedSchedules.add(updatedSchedule);
-        }
-
-        studyScheduleRepository.saveAll(schedules);
+        // saveAll로 새 리스트를 저장
+        studyScheduleRepository.saveAll(updatedSchedules);
     }
 
     @Transactional
@@ -145,28 +146,37 @@ public class StudyScheduleService {
             .scheduleDate(requestDto.getScheduleDate())
             .location(requestDto.getLocation())
             .build();
-        studyScheduleRepository.save(schedule);
+        studyScheduleRepository.save(updatedSchedule);
     }
 
+    @Transactional
     public void deleteSchedule(Long scheduleId) {
-
+        // 해당 스케줄 조회
         StudySchedule studySchedule = studyScheduleRepository.findByScheduleId(scheduleId)
-            .orElseThrow(() -> new RuntimeException("해당 스케쥴을 찾을 수 없습니다."));
+            .orElseThrow(() -> new NoSuchElementException("해당 스케쥴을 찾을 수 없습니다."));
 
         if (studySchedule.getRecurrenceGroup() != null) {
-            // 반복 그룹의 모든 스케줄 삭제
-            List<StudySchedule> recurringSchedules = studyScheduleRepository.findByRecurrenceGroup(studySchedule.getRecurrenceGroup());
+            // 반복 그룹이 설정된 경우: 전체 반복 그룹 삭제
+            Long recurrenceGroupId = studySchedule.getRecurrenceGroup();
+            List<StudySchedule> recurringSchedules = studyScheduleRepository.findByRecurrenceGroup(recurrenceGroupId);
+
+            if (recurringSchedules.isEmpty()) {
+                throw new IllegalStateException("반복 그룹에 속한 스케쥴이 없습니다.");
+            }
+
+            // 반복 그룹 내 스케줄 삭제
             studyScheduleRepository.deleteAll(recurringSchedules);
-        }
-        else {
+        } else {
             // 단일 일정 삭제
             studyScheduleRepository.delete(studySchedule);
         }
     }
 
-    private StudySchedule createInitialSchedule(Study study, StudyScheduleCreateRequestDto requestDto, Long recurrenceGroup) {
+
+    public StudySchedule createInitialSchedule(Study study, StudyScheduleCreateRequestDto requestDto, Long recurrenceGroup, String username) {
         return StudySchedule.builder()
             .study(study)
+            .username(username)
             .scheduleTitle(requestDto.getScheduleTitle())
             .scheduleContent(requestDto.getScheduleContent())
             .scheduleDate(requestDto.getScheduleDate())
@@ -175,9 +185,10 @@ public class StudyScheduleService {
             .build();
     }
 
-    private StudySchedule createRecurringSchedule(Study study, StudyScheduleCreateRequestDto requestDto, LocalDateTime scheduleDate, Long recurrenceGroup) {
+    public StudySchedule createRecurringSchedule(Study study, StudyScheduleCreateRequestDto requestDto, LocalDateTime scheduleDate, Long recurrenceGroup, String username) {
         return StudySchedule.builder()
             .study(study)
+            .username(username)
             .scheduleTitle(requestDto.getScheduleTitle())
             .scheduleContent(requestDto.getScheduleContent())
             .scheduleDate(scheduleDate)
@@ -185,7 +196,6 @@ public class StudyScheduleService {
             .recurrenceGroup(recurrenceGroup)
             .build();
     }
-
 
     private LocalDateTime calculateNextScheduleDate(LocalDateTime currentDate, RecurrenceType recurrenceType) {
         switch (recurrenceType) {

@@ -73,5 +73,16 @@ public class UserController {
         return ResponseEntity.ok("비밀번호 변경이 완료 되었습니다.");
     }
 
+    @GetMapping("/user/me")
+    public ResponseEntity<?> getCurrentUser(@AuthenticationPrincipal CustomUserDetails userDetails) {
+        if (userDetails == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Unauthorized");
+        }
 
+        // 사용자 정보 반환
+        return ResponseEntity.ok(Map.of(
+            "username", userDetails.getUsername(),
+            "role", userDetails.getAuthorities()
+        ));
+    }
 }

@@ -3,12 +3,20 @@ package com.udemy.star_d_link.study.Service;
 import com.querydsl.core.BooleanBuilder;
 import com.udemy.star_d_link.study.Dto.Request.StudyCreateRequestDto;
 import com.udemy.star_d_link.study.Dto.Request.StudyUpdateRequestDto;
+import com.udemy.star_d_link.study.Dto.Response.StudyResponseDto;
 import com.udemy.star_d_link.study.Entity.QStudy;
+import com.udemy.star_d_link.study.Entity.Role;
 import com.udemy.star_d_link.study.Entity.Study;
+import com.udemy.star_d_link.study.Entity.StudyMembers;
 import com.udemy.star_d_link.study.Exception.UnauthorizedException;
+import com.udemy.star_d_link.study.Repository.StudyMemberRepository;
 import com.udemy.star_d_link.study.Repository.StudyRepository;
 import com.udemy.star_d_link.user.repository.UserRepository;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.NoSuchElementException;
+import java.util.stream.Collectors;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -17,17 +25,29 @@ import org.springframework.transaction.annotation.Transactional;
 @Service
 public class StudyService {
     private final StudyRepository studyRepository;
-    private final UserRepository userRepository;
-    public StudyService(StudyRepository studyRepository, UserRepository userRepository) {
+    private final StudyMemberRepository studyMemberRepository;
+    public StudyService(StudyRepository studyRepository, StudyMemberRepository studyMemberRepository) {
         this.studyRepository = studyRepository;
-        this.userRepository = userRepository;
+        this.studyMemberRepository = studyMemberRepository;
 
     }
     @Transactional
     public Study createStudy(StudyCreateRequestDto requestDto, String username) {
-
+        // 1. Study 엔티티 생성 및 저장
         Study study = requestDto.toEntity(username);
-        return studyRepository.save(study);
+        Study savedStudy = studyRepository.save(study);
+
+        // 2. StudyMembers 엔티티 생성 및 저장
+        StudyMembers studyMember = StudyMembers.builder()
+            .study(savedStudy) // 연관된 스터디
+            .username(username) // 스터디 생성자
+            .role(Role.LEADER) // 관리자 역할
+            .status("참여중") // 기본 상태
+            .build();
+
+        studyMemberRepository.save(studyMember);
+
+        return savedStudy;
     }
 
     public Study getStudyForEdit(Long studyId, String username) {
@@ -55,7 +75,6 @@ public class StudyService {
             .title(requestDto.getTitle())
             .content(requestDto.getContent())
             .hashtag(requestDto.getHashtag())
-            .isRecruit(requestDto.getIsRecruit())
             .region(requestDto.getRegion())
             .isOnline(requestDto.getIsOnline())
             .headCount(requestDto.getHeadCount())
@@ -128,6 +147,28 @@ public class StudyService {
 
         return studyRepository.findAll(builder, pageable);
     }
+    public Map<String, List<StudyResponseDto>> getStudiesByUserAndRole(String username) {
+        // StudyMembers를 통해 역할별 스터디 목록 조회
+        List<StudyMembers> allStudyMembers = studyMemberRepository.findByUsername(username);
 
-    // 임시로 User를 조회하는 메서드들 추후 변경
+        // 관리 중인 스터디: Role.LEADER 또는 Role.SUB_LEADER
+        List<StudyResponseDto> adminStudies = allStudyMembers.stream()
+            .filter(member -> member.getRole() == Role.LEADER || member.getRole() == Role.SUB_LEADER)
+            .map(member -> StudyResponseDto.fromEntity(member.getStudy()))
+            .collect(Collectors.toList());
+
+        // 가입한 스터디: Role.MEMBER
+        List<StudyResponseDto> joinedStudies = allStudyMembers.stream()
+            .filter(member -> member.getRole() == Role.MEMBER)
+            .map(member -> StudyResponseDto.fromEntity(member.getStudy()))
+            .collect(Collectors.toList());
+
+        // 결과를 Map으로 반환
+        Map<String, List<StudyResponseDto>> result = new HashMap<>();
+        result.put("admin", adminStudies);
+        result.put("joined", joinedStudies);
+
+        return result;
+    }
+
 }

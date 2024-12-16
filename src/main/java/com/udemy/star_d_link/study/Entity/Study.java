@@ -1,5 +1,6 @@
 package com.udemy.star_d_link.study.Entity;
 
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import com.udemy.star_d_link.user.entity.UserEntity;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
@@ -95,6 +96,6 @@ public class Study {
     }
 
     @OneToMany(mappedBy = "study", cascade = CascadeType.ALL, orphanRemoval = true)
-    @Builder.Default
+    @JsonManagedReference // 순환 참조 방지
     private List<StudySchedule> schedules = new ArrayList<>();
 }

@@ -18,7 +18,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping("/study/{study_id}/like")
+@RequestMapping("/study/{study_id}")
 public class StudyLikesController {
     private final StudyLikesService studyLikesService;
     @Autowired
@@ -26,7 +26,7 @@ public class StudyLikesController {
         this.studyLikesService = studyLikesService;
     }
 
-    @PostMapping("/")
+    @PostMapping("/like")
     public ResponseEntity<ApiResponse<StudyLikesResponseDto>> addLikes(
         @PathVariable("study_id") Long studyId,
         @AuthenticationPrincipal UserDetails currentUser) {
@@ -43,7 +43,7 @@ public class StudyLikesController {
         return new ResponseEntity<>(headers, HttpStatus.SEE_OTHER);
     }
 
-    @DeleteMapping("/")
+    @DeleteMapping("/like")
     public ResponseEntity<ApiResponse<Void>> deleteLikes(
         @PathVariable("study_id") Long studyId,
         @AuthenticationPrincipal UserDetails currentUser) {

@@ -1,6 +1,9 @@
 package com.udemy.star_d_link.study.Entity;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.udemy.star_d_link.study.Dto.Request.StudyScheduleCreateRequestDto;
 import com.udemy.star_d_link.study.Dto.Response.StudyScheduleResponseDto;
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -10,8 +13,12 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
+import jakarta.validation.constraints.NotNull;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -40,6 +47,7 @@ public class StudySchedule {
 
     @ManyToOne
     @JoinColumn(name = "study_id", nullable = false)
+    @JsonBackReference // 순환 참조 방지
     private Study study;
 
     @Column(nullable = false)
@@ -48,6 +56,7 @@ public class StudySchedule {
     @Column(nullable = false)
     private String scheduleContent;
 
+    @NotNull
     @Column(nullable = false)
     private LocalDateTime scheduleDate;
 
@@ -57,15 +66,21 @@ public class StudySchedule {
     // 반복 일정 관련 필드
     private Long recurrenceGroup; // 반복 그룹
 
+
     public StudyScheduleResponseDto toResponseDto(String username) {
         return new StudyScheduleResponseDto(
             scheduleId,
             username,
-            study,
             scheduleTitle,
             scheduleContent,
-            scheduleDate,
-            location
+            scheduleDate.toString(),
+            location,
+            recurrenceGroup
         );
     }
+
+    @OneToMany(mappedBy = "studySchedule", cascade = CascadeType.REMOVE, orphanRemoval = true)
+    private List<StudyScheduleParticipation> participations = new ArrayList<>();
+
+
 }
