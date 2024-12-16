@@ -12,7 +12,7 @@ public class StudyMemberResponseDto {
     private Long studyManageId;
     private String username;
     private Long StudyId;
-    private String  role;
+    private String role;
     private String status;
 
     public static StudyMemberResponseDto fromEntity(StudyMembers studyMember) {
