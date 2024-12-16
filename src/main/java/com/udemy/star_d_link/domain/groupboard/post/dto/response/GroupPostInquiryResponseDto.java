@@ -21,13 +21,13 @@ public class GroupPostInquiryResponseDto {
     public static GroupPostInquiryResponseDto from(GroupPostEntity groupPost){
         return GroupPostInquiryResponseDto.builder()
             .id(groupPost.getId())
-            .author(groupPost.getUser().getNickname())
+            //.author(groupPost.getUser().get)
             .title(groupPost.getTitle())
             .content(groupPost.getContent())
-            .numberOfComments(groupPost.getNumberOfComments())
+           // .numberOfComments(groupPost.getNumberOfComments())
             .createdAt(groupPost.getCreatedAt())
             .updatedAt(groupPost.getUpdatedAt())
-            .groupPostFileUrls(groupPost.getGroupPostFile())
+            //.groupPostFileUrls(groupPost.getGroupPostFile())
             .build();
     }
 }

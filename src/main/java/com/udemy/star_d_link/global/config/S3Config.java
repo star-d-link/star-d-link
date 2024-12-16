@@ -1,3 +1,4 @@
+/*
 package com.udemy.star_d_link.global.config;
 
 import com.amazonaws.auth.AWSStaticCredentialsProvider;
@@ -29,3 +30,4 @@ public class S3Config {
             .build();
     }
 }
+*/

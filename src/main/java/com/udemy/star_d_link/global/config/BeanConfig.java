@@ -1,3 +1,4 @@
+/*
 package com.udemy.star_d_link.global.config;
 
 import com.querydsl.jpa.impl.JPAQueryFactory;
@@ -12,3 +13,4 @@ public class BeanConfig {
         return new JPAQueryFactory(em);
     }
 }
+*/

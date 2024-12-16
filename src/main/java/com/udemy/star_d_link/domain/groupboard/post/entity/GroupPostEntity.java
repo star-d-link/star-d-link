@@ -2,6 +2,9 @@ package com.udemy.star_d_link.domain.groupboard.post.entity;
 
 import com.udemy.star_d_link.domain.groupboard.post.dto.request.GroupPostCreateRequestDto;
 import com.udemy.star_d_link.domain.groupboard.post.dto.request.GroupPostUpdateRequestDto;
+import com.udemy.star_d_link.study.Entity.Study;
+import com.udemy.star_d_link.study.Entity.StudyMembers;
+import com.udemy.star_d_link.user.entity.UserEntity;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
@@ -40,9 +43,6 @@ public class GroupPostEntity {
     @Column(nullable = false, length = 20)
     private String content;
 
-    @Column(nullable = false)
-    private int numberOfComments;
-
     @CreationTimestamp
     @Column(nullable = false, updatable = false)
     private LocalDate createdAt;
@@ -51,22 +51,20 @@ public class GroupPostEntity {
     @Column(insertable = false)
     private LocalDate updatedAt;
 
-    @OneToMany(mappedBy = "groupPost")
-    private List<GroupPostFileEntity> groupPostFile;
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     private UserEntity user;
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
-    private StudyEntity study;
+    private Study study;
 
-    public static GroupPostEntity of(GroupPostCreateRequestDto createRequestDto, StudyMembers studyMembers) {
+    public static GroupPostEntity of(GroupPostCreateRequestDto createRequestDto, Study study,
+        UserEntity userEntity) {
         return GroupPostEntity.builder()
             .title(createRequestDto.getTitle())
             .content(createRequestDto.getContent())
-            .user(studyMembers.getUser())
-            .study(studyMembers.getStudy())
-            .groupPostFile(new ArrayList<>())
+            .user(userEntity)
+            .study(study)
             .build();
     }
 
@@ -75,7 +73,4 @@ public class GroupPostEntity {
         this.content = updateRequestDto.getContent();
     }
 
-    public void addFile(GroupPostFileEntity groupPostFile) {
-        this.groupPostFile.add(groupPostFile);
-    }
 }

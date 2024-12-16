@@ -1,3 +1,4 @@
+/*
 package com.udemy.star_d_link.domain.groupboard.post.repository;
 
 
@@ -18,10 +19,13 @@ public class CustomGroupPostRepositoryImpl implements CustomGroupPostRepository 
     public List<GroupPostEntity> findSomeByGroupIdAndLastPostId(Long groupId, Long lastPostId) {
         return jpaQueryFactory
             .selectFrom(groupPostEntity)
-            .where(groupPostEntity.id.lt(lastPostId)/*, groupPostEntity.study.id.eq(groupId)*/)
+            .where(groupPostEntity.id.lt(lastPostId)*/
+/*, groupPostEntity.study.id.eq(groupId)*//*
+)
             .join(groupPostEntity.user).fetchJoin()
             .leftJoin(groupPostEntity.groupPostFile).fetchJoin()
             .distinct()
             .fetch();
     }
 }
+*/

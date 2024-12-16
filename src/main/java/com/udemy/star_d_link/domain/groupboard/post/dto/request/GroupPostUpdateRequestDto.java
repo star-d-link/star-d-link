@@ -9,6 +9,5 @@ import lombok.Setter;
 public class GroupPostUpdateRequestDto {
     private String title;
     private String content;
-    private List<String> addFileUrls;
-    private List<String> deleteFileUrls;
+
 }

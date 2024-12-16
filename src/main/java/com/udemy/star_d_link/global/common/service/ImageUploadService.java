@@ -1,3 +1,4 @@
+/*
 package com.udemy.star_d_link.global.common.service;
 
 import com.amazonaws.HttpMethod;
@@ -83,4 +84,4 @@ public class ImageUploadService {
 
         return PreSignedUrlResponseDto.of(preSignedUrl, imageSaveUrl);
     }
-}
+}*/

@@ -1,3 +1,4 @@
+/*
 package com.udemy.star_d_link.global.common.controller;
 
 import com.udemy.star_d_link.global.common.dto.PreSignedUrlResponseDto;
@@ -27,3 +28,4 @@ public class ImageUploadController {
         return ResponseEntity.ok(responseDto);
     }
 }
+*/

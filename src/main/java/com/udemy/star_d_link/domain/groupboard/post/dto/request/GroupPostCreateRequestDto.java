@@ -1,5 +1,6 @@
 package com.udemy.star_d_link.domain.groupboard.post.dto.request;
 
+import com.udemy.star_d_link.study.Entity.Study;
 import java.util.List;
 import lombok.Getter;
 import lombok.Setter;
@@ -9,5 +10,4 @@ import lombok.Setter;
 public class GroupPostCreateRequestDto {
     private String title;
     private String content;
-    private List<String> fileUrls;
 }
