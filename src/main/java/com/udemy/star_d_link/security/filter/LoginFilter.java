@@ -92,7 +92,7 @@ public class LoginFilter extends UsernamePasswordAuthenticationFilter {
 
         String role = next.getAuthority();
 
-        String token = jwtUtil.createJwt(username, role, 60 * 60 * 10L);
+        String token = jwtUtil.createJwt(username, role, 60 * 60 * 10000000L);
 
         response.addHeader("Authorization", "Bearer " + token);
     }
