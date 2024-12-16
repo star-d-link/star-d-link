@@ -12,7 +12,9 @@ import com.udemy.star_d_link.study.Exception.UnauthorizedException;
 import com.udemy.star_d_link.study.Repository.StudyMemberRepository;
 import com.udemy.star_d_link.study.Repository.StudyRepository;
 import com.udemy.star_d_link.user.repository.UserRepository;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.stream.Collectors;
 import org.springframework.data.domain.Page;
@@ -145,11 +147,28 @@ public class StudyService {
 
         return studyRepository.findAll(builder, pageable);
     }
+    public Map<String, List<StudyResponseDto>> getStudiesByUserAndRole(String username) {
+        // StudyMembers를 통해 역할별 스터디 목록 조회
+        List<StudyMembers> allStudyMembers = studyMemberRepository.findByUsername(username);
 
-    public List<StudyResponseDto> getStudiesByAdmin(String username) {
-        List<Study> studies = studyRepository.findByUsername(username);
-        return studies.stream()
-            .map(StudyResponseDto::fromEntity)
+        // 관리 중인 스터디: Role.LEADER 또는 Role.SUB_LEADER
+        List<StudyResponseDto> adminStudies = allStudyMembers.stream()
+            .filter(member -> member.getRole() == Role.LEADER || member.getRole() == Role.SUB_LEADER)
+            .map(member -> StudyResponseDto.fromEntity(member.getStudy()))
             .collect(Collectors.toList());
+
+        // 가입한 스터디: Role.MEMBER
+        List<StudyResponseDto> joinedStudies = allStudyMembers.stream()
+            .filter(member -> member.getRole() == Role.MEMBER)
+            .map(member -> StudyResponseDto.fromEntity(member.getStudy()))
+            .collect(Collectors.toList());
+
+        // 결과를 Map으로 반환
+        Map<String, List<StudyResponseDto>> result = new HashMap<>();
+        result.put("admin", adminStudies);
+        result.put("joined", joinedStudies);
+
+        return result;
     }
+
 }

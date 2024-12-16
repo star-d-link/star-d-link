@@ -6,6 +6,7 @@ import com.udemy.star_d_link.study.Dto.Response.StudyListResponseDto;
 import com.udemy.star_d_link.study.Dto.Response.StudyMemberResponseDto;
 import com.udemy.star_d_link.study.Dto.Response.StudyResponseDto;
 import com.udemy.star_d_link.study.Dto.Request.StudyUpdateRequestDto;
+import com.udemy.star_d_link.study.Entity.Role;
 import com.udemy.star_d_link.study.Entity.Study;
 import com.udemy.star_d_link.study.Entity.StudyMembers;
 import com.udemy.star_d_link.study.Exception.UnauthorizedException;
@@ -13,7 +14,9 @@ import com.udemy.star_d_link.study.Service.StudyMembersService;
 import com.udemy.star_d_link.study.Service.StudyService;
 import jakarta.validation.Valid;
 import java.net.URI;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -243,22 +246,24 @@ public class StudyController {
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 
-    @GetMapping("/admin/list")
-    public ResponseEntity<ApiResponse<List<StudyResponseDto>>> getAdminStudies(
+    @GetMapping("/manage/list")
+    public ResponseEntity<ApiResponse<Map<String, List<StudyResponseDto>>>> getManageAndJoinedStudies(
         @AuthenticationPrincipal UserDetails currentUser) {
 
         if (currentUser == null) {
             throw new UnauthorizedException("로그인이 필요합니다.");
         }
 
-        List<StudyResponseDto> studies = studyService.getStudiesByAdmin(currentUser.getUsername());
+        // 관리 중인 스터디와 가입한 스터디를 각각 조회
+        Map<String, List<StudyResponseDto>> studies = studyService.getStudiesByUserAndRole(currentUser.getUsername());
 
-        ApiResponse<List<StudyResponseDto>> response = new ApiResponse<>(
+        ApiResponse<Map<String, List<StudyResponseDto>>> response = new ApiResponse<>(
             "success",
-            "관리자 스터디 목록 조회 성공",
+            "스터디 목록 조회 성공",
             studies
         );
 
         return ResponseEntity.ok(response);
     }
+
 }
