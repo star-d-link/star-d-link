@@ -18,6 +18,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
@@ -28,16 +29,6 @@ public class UserController {
 
     private final UserService userService;
     private final VerificationService verificationService;
-
-    @GetMapping
-    public ResponseEntity<?> list() {
-
-        log.info("list.................");
-
-        String[] arr = {"aaa", "bbb", "ccc"};
-
-        return ResponseEntity.ok(arr);
-    }
 
     @PostMapping("/register")
     public ResponseEntity<UserRegisterResponseDto> signup(
@@ -81,4 +72,6 @@ public class UserController {
         userService.resetPassword(resetPasswordDto.getEmail(), resetPasswordDto.getNewPassword());
         return ResponseEntity.ok("비밀번호 변경이 완료 되었습니다.");
     }
+
+
 }

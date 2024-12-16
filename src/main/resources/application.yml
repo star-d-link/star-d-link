@@ -1,4 +1,7 @@
 spring:
+#  web:
+#    resources:
+#      static-locations: classpath:/static/,file:src/main/resources/static/
   mail:
     host: smtp.gmail.com  # Gmail의 SMTP 서버 호스트
     port: 587 # Gmail SMTP 서버는 587번 포트를 사용
@@ -97,3 +100,5 @@ logging:
       springframework:
         security: DEBUG
 
+file:
+  upload-dir: ${user.home}/uploads

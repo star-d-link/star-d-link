@@ -1,6 +1,7 @@
 package com.udemy.star_d_link.user.dto;
 
 import com.udemy.star_d_link.user.entity.UserEntity;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.Map;
 import lombok.AllArgsConstructor;
@@ -23,7 +24,7 @@ public class UserDTO {
     private String email;
     private String profileUrl;
     private String phoneNumber;
-    private LocalDateTime birthDate;
+    private LocalDate birthDate;
     private String region;
     private String role;
     private String createdAt;

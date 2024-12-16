@@ -1,5 +1,8 @@
 package com.udemy.star_d_link.user.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.udemy.star_d_link.user.constants.UserRoles;
+import com.udemy.star_d_link.user.dto.ProfileRequestDto;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EntityListeners;
@@ -7,6 +10,7 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -34,6 +38,7 @@ public class UserEntity {
     @Column(nullable = false, unique = true, length = 50)
     private String username;
 
+    @JsonIgnore
     @Column(nullable = false, length = 250)
     private String password;
 
@@ -53,7 +58,7 @@ public class UserEntity {
     private String phoneNumber;
 
     @Column(length = 20)
-    private LocalDateTime birthDate;
+    private LocalDate birthDate;
 
     @Column(length = 100)
     private String region;
@@ -76,6 +81,25 @@ public class UserEntity {
 
     public void changePassword(String password) {
         this.password = password;
+    }
+
+    public void changeProfileUrl(String profileUrl) {
+        this.profileUrl = profileUrl;
+    }
+
+    public void updateProfile(ProfileRequestDto requestDto) {
+        this.nickname = requestDto.getNickname();
+        this.phoneNumber = requestDto.getPhoneNumber();
+        this.region = requestDto.getRegion();
+        this.birthDate = requestDto.getBirthDate();
+    }
+
+    public void deactivateUser() {
+        this.role = UserRoles.ROLE_DEACTIVATED.name();
+    }
+
+    public void activateUser() {
+        this.role = UserRoles.ROLE_USER.name();
     }
 
 
