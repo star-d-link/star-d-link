@@ -17,6 +17,7 @@ import java.net.URI;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -40,6 +41,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequestMapping(value = "/study")
+@Slf4j
 public class StudyController {
     private final StudyService studyService;
     private final StudyMembersService studyMembersService;
@@ -84,10 +86,9 @@ public class StudyController {
 
     @GetMapping("/{study_id}")
     public ResponseEntity<ApiResponse<StudyResponseDto>> getStudy(
-        @PathVariable Long study_id) {
+        @PathVariable("study_id") Long study_id) {
         // 서비스 계층에서 Study 엔티티 조회
         Study study = studyService.findByStudyId(study_id);
-
         // Study 엔티티를 StudyResponseDto로 변환
         StudyResponseDto responseDto = StudyResponseDto.fromEntity(study);
 
@@ -123,7 +124,7 @@ public class StudyController {
 
     @PutMapping("/{study_id}")
     public ResponseEntity<ApiResponse<StudyResponseDto>> putStudyEditForm(
-        @PathVariable Long study_id,
+        @PathVariable("study_id") Long study_id,
         @RequestBody StudyUpdateRequestDto requestDto,
         @AuthenticationPrincipal UserDetails currentUser) {
 
@@ -145,7 +146,7 @@ public class StudyController {
 
     @DeleteMapping("/{study_id}")
     public ResponseEntity<ApiResponse<Void>> deleteStudy(
-        @PathVariable Long study_id,
+        @PathVariable("study_id") Long study_id,
         @AuthenticationPrincipal UserDetails currentUser) {
 
         if (currentUser == null) {

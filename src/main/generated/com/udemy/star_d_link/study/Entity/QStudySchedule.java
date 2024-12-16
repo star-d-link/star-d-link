@@ -24,6 +24,8 @@ public class QStudySchedule extends EntityPathBase<StudySchedule> {
 
     public final StringPath location = createString("location");
 
+    public final ListPath<StudyScheduleParticipation, QStudyScheduleParticipation> participations = this.<StudyScheduleParticipation, QStudyScheduleParticipation>createList("participations", StudyScheduleParticipation.class, QStudyScheduleParticipation.class, PathInits.DIRECT2);
+
     public final NumberPath<Long> recurrenceGroup = createNumber("recurrenceGroup", Long.class);
 
     public final StringPath scheduleContent = createString("scheduleContent");

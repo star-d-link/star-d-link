@@ -24,7 +24,7 @@ import org.hibernate.annotations.CreationTimestamp;
 
 @Entity
 @Builder(toBuilder = true)
-@ToString
+@ToString(exclude = "likes")
 @NoArgsConstructor
 @AllArgsConstructor
 @Getter
