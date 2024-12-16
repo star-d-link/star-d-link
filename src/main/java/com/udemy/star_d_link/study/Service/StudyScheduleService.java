@@ -122,18 +122,16 @@ public class StudyScheduleService {
         }
 
         // 반복 그룹의 모든 스케줄을 업데이트
-        List<StudySchedule> updatedSchedules = new ArrayList<>();
-        for (StudySchedule schedule : schedules) {
-            StudySchedule updatedSchedule = schedule.toBuilder()
+        List<StudySchedule> updatedSchedules = schedules.stream()
+            .map(schedule -> schedule.toBuilder()
                 .scheduleTitle(requestDto.getScheduleTitle())
                 .scheduleContent(requestDto.getScheduleContent())
                 .location(requestDto.getLocation())
-                .build();
+                .build())
+            .collect(Collectors.toList());
 
-            updatedSchedules.add(updatedSchedule);
-        }
-
-        studyScheduleRepository.saveAll(schedules);
+        // saveAll로 새 리스트를 저장
+        studyScheduleRepository.saveAll(updatedSchedules);
     }
 
     @Transactional
@@ -148,24 +146,32 @@ public class StudyScheduleService {
             .scheduleDate(requestDto.getScheduleDate())
             .location(requestDto.getLocation())
             .build();
-        studyScheduleRepository.save(schedule);
+        studyScheduleRepository.save(updatedSchedule);
     }
 
+    @Transactional
     public void deleteSchedule(Long scheduleId) {
-
+        // 해당 스케줄 조회
         StudySchedule studySchedule = studyScheduleRepository.findByScheduleId(scheduleId)
-            .orElseThrow(() -> new RuntimeException("해당 스케쥴을 찾을 수 없습니다."));
+            .orElseThrow(() -> new NoSuchElementException("해당 스케쥴을 찾을 수 없습니다."));
 
         if (studySchedule.getRecurrenceGroup() != null) {
-            // 반복 그룹의 모든 스케줄 삭제
-            List<StudySchedule> recurringSchedules = studyScheduleRepository.findByRecurrenceGroup(studySchedule.getRecurrenceGroup());
+            // 반복 그룹이 설정된 경우: 전체 반복 그룹 삭제
+            Long recurrenceGroupId = studySchedule.getRecurrenceGroup();
+            List<StudySchedule> recurringSchedules = studyScheduleRepository.findByRecurrenceGroup(recurrenceGroupId);
+
+            if (recurringSchedules.isEmpty()) {
+                throw new IllegalStateException("반복 그룹에 속한 스케쥴이 없습니다.");
+            }
+
+            // 반복 그룹 내 스케줄 삭제
             studyScheduleRepository.deleteAll(recurringSchedules);
-        }
-        else {
+        } else {
             // 단일 일정 삭제
             studyScheduleRepository.delete(studySchedule);
         }
     }
+
 
     public StudySchedule createInitialSchedule(Study study, StudyScheduleCreateRequestDto requestDto, Long recurrenceGroup, String username) {
         return StudySchedule.builder()

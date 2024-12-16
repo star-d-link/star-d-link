@@ -108,7 +108,7 @@ public class StudyScheduleController {
 
     // 반복 일정 전부 수정
     @PutMapping("/update-entire/{recurrence_group_id}")
-    public ResponseEntity<ApiResponse<Void>> updateEntireSchedule(
+    public ResponseEntity<ApiResponse<StudyScheduleAllUpdateRequestDto>> updateEntireSchedule(
         @PathVariable("study_id") Long studyId,
         @PathVariable("recurrence_group_id") Long recurrenceGroupId,
         @Valid @RequestBody StudyScheduleAllUpdateRequestDto requestDto,
@@ -123,17 +123,18 @@ public class StudyScheduleController {
         }
 
         studyScheduleService.updateAllSchedule(recurrenceGroupId, requestDto);
-        String redirectUrl = "/study/" + studyId + "/schedule";
+        ApiResponse<StudyScheduleAllUpdateRequestDto> response = new ApiResponse<>(
+            "success",
+            "반복 일정 전체 수정 완료",
+            requestDto
+        );
 
-        HttpHeaders headers = new HttpHeaders();
-        headers.setLocation(URI.create(redirectUrl));
-
-        return ResponseEntity.status(HttpStatus.SEE_OTHER).headers(headers).build();
+        return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 
     // 특정 일정만 수정
     @PutMapping("/update-single/{schedule_id}")
-    public ResponseEntity<ApiResponse<Void>> updateSingleSchedule(
+    public ResponseEntity<ApiResponse<StudyScheduleSingleUpdateRequestDto>> updateSingleSchedule(
         @PathVariable("study_id") Long studyId,
         @PathVariable("schedule_id") Long scheduleId,
         @Valid @RequestBody StudyScheduleSingleUpdateRequestDto requestDto,
@@ -148,12 +149,13 @@ public class StudyScheduleController {
         }
 
         studyScheduleService.updateSingleSchedule(scheduleId, requestDto);
-        String redirectUrl = "/study/" + studyId + "/schedule";
+        ApiResponse<StudyScheduleSingleUpdateRequestDto> response = new ApiResponse<>(
+            "success",
+            "단일 일정 수정 완료",
+            requestDto
+        );
 
-        HttpHeaders headers = new HttpHeaders();
-        headers.setLocation(URI.create(redirectUrl));
-
-        return ResponseEntity.status(HttpStatus.SEE_OTHER).headers(headers).build();
+        return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 
 

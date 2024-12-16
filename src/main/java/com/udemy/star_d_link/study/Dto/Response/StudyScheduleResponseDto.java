@@ -18,6 +18,7 @@ public class StudyScheduleResponseDto {
     private String content;
     private String scheduleDate;
     private String location;
+    private Long recurrenceGroup;
 
     public static StudyScheduleResponseDto fromEntity(StudySchedule studySchedule) {
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm");
@@ -27,7 +28,8 @@ public class StudyScheduleResponseDto {
             studySchedule.getScheduleTitle(),
             studySchedule.getScheduleContent(),
             studySchedule.getScheduleDate().format(formatter),
-            studySchedule.getLocation()
+            studySchedule.getLocation(),
+            studySchedule.getRecurrenceGroup()
         );
     }
 }
