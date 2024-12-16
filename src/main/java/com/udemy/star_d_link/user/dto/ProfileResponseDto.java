@@ -23,5 +23,6 @@ public class ProfileResponseDto {
     private String profileUrl;
     private String phoneNumber;
     private String region;
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
     private LocalDate birthDate;
 }

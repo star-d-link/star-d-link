@@ -1,5 +1,6 @@
 package com.udemy.star_d_link.user.controller;
 
+import com.udemy.star_d_link.user.dto.CustomUserDetails;
 import com.udemy.star_d_link.user.dto.EmailRequestDto;
 import com.udemy.star_d_link.user.dto.EmailVerifyRequestDto;
 import com.udemy.star_d_link.user.dto.EmailVerifyResponseDto;
@@ -9,10 +10,12 @@ import com.udemy.star_d_link.user.dto.UserRegisterResponseDto;
 import com.udemy.star_d_link.user.entity.UserEntity;
 import com.udemy.star_d_link.user.service.UserService;
 import com.udemy.star_d_link.user.service.VerificationService;
+import java.util.Map;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -75,6 +78,7 @@ public class UserController {
 
     @GetMapping("/user/me")
     public ResponseEntity<?> getCurrentUser(@AuthenticationPrincipal CustomUserDetails userDetails) {
+        log.info("hihihi");
         if (userDetails == null) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Unauthorized");
         }
