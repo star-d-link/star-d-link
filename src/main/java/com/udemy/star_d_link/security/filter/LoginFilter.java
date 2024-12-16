@@ -9,6 +9,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 import lombok.RequiredArgsConstructor;
@@ -92,9 +93,18 @@ public class LoginFilter extends UsernamePasswordAuthenticationFilter {
 
         String role = next.getAuthority();
 
-        String token = jwtUtil.createJwt(username, role, 60 * 60 * 10L);
+        String token = jwtUtil.createJwt(username, role, 60 * 60 * 10000000L);
 
         response.addHeader("Authorization", "Bearer " + token);
+
+        // 응답 본문에 토큰 추가 (JSON 형태로 반환)
+        response.setContentType("application/json");
+        response.setCharacterEncoding("UTF-8");
+        Map<String, String> responseBody = new HashMap<>();
+        responseBody.put("token", token);
+        new ObjectMapper().writeValue(response.getWriter(), responseBody);
+
+        log.info("JWT Token: {}", token);
     }
 
     /**

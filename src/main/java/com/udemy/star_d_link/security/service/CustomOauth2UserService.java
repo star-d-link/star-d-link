@@ -1,6 +1,8 @@
 package com.udemy.star_d_link.security.service;
 
+import com.udemy.star_d_link.security.dto.GithubResponse;
 import com.udemy.star_d_link.security.dto.GoogleResponse;
+import com.udemy.star_d_link.security.dto.KakaoResponse;
 import com.udemy.star_d_link.security.dto.NaverResponse;
 import com.udemy.star_d_link.security.dto.Oauth2Response;
 import com.udemy.star_d_link.user.constants.UserRoles;
@@ -12,6 +14,7 @@ import com.udemy.star_d_link.user.util.RandomNickname;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.oauth2.client.userinfo.DefaultOAuth2UserService;
 import org.springframework.security.oauth2.client.userinfo.OAuth2UserRequest;
 import org.springframework.security.oauth2.core.OAuth2AuthenticationException;
@@ -34,7 +37,7 @@ public class CustomOauth2UserService extends DefaultOAuth2UserService {
     @Override
     public OAuth2User loadUser(OAuth2UserRequest userRequest) throws OAuth2AuthenticationException {
         OAuth2User oAuth2User = super.loadUser(userRequest);
-        log.info(oAuth2User);
+        log.info(oAuth2User.getAttributes());
 
         String registrationId = userRequest.getClientRegistration().getRegistrationId();
         Oauth2Response oauth2Response = null;
@@ -42,6 +45,10 @@ public class CustomOauth2UserService extends DefaultOAuth2UserService {
             oauth2Response = new NaverResponse(oAuth2User.getAttributes());
         } else if (registrationId.equals("google")) {
             oauth2Response = new GoogleResponse(oAuth2User.getAttributes());
+        } else if (registrationId.equals("kakao")) {
+            oauth2Response = new KakaoResponse(oAuth2User.getAttributes());
+        } else if (registrationId.equals("github")) {
+            oauth2Response = new GithubResponse(oAuth2User.getAttributes());
         } else {
             throw new OAuth2AuthenticationException("Unsupported provider: " + registrationId);
         }

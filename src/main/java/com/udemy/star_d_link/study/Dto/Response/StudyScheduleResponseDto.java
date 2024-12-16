@@ -3,6 +3,7 @@ package com.udemy.star_d_link.study.Dto.Response;
 import com.udemy.star_d_link.study.Entity.Study;
 import com.udemy.star_d_link.study.Entity.StudySchedule;
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -13,21 +14,22 @@ import lombok.NoArgsConstructor;
 public class StudyScheduleResponseDto {
     private Long scheduleId;
     private String username;
-    private Study study;
     private String title;
     private String content;
-    private LocalDateTime scheduleDate;
+    private String scheduleDate;
     private String location;
+    private Long recurrenceGroup;
 
     public static StudyScheduleResponseDto fromEntity(StudySchedule studySchedule) {
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm");
         return new StudyScheduleResponseDto(
             studySchedule.getScheduleId(),
             studySchedule.getUsername(),
-            studySchedule.getStudy(),
             studySchedule.getScheduleTitle(),
             studySchedule.getScheduleContent(),
-            studySchedule.getScheduleDate(),
-            studySchedule.getLocation()
+            studySchedule.getScheduleDate().format(formatter),
+            studySchedule.getLocation(),
+            studySchedule.getRecurrenceGroup()
         );
     }
 }
