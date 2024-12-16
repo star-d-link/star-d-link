@@ -7,7 +7,7 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 
 @SpringBootApplication
 @EnableJpaAuditing
-@EnableWebSecurity(debug = true)
+//@EnableWebSecurity(debug = true)
 public class StarDLinkApplication {
 
 	public static void main(String[] args) {

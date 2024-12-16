@@ -1,6 +1,7 @@
 package com.udemy.star_d_link.dummy;
 
 import com.udemy.star_d_link.user.entity.UserEntity;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.IntStream;
@@ -22,7 +23,7 @@ public class DummyUserDataList {
                 .nickname("nickname" + i)
                 .email("email" + i)
                 .phoneNumber("phoneNumber" + i)
-                .birthDate(LocalDateTime.now())
+                .birthDate(LocalDate.now())
                 .region("region" + i)
                 .role(i < 2 ? "ROLE_ADMIN" : "ROLE_USER")
                 .build()
