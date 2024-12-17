@@ -12,6 +12,7 @@ import com.udemy.star_d_link.domain.groupboard.post.repository.GroupPostFileRepo
 import com.udemy.star_d_link.domain.groupboard.post.repository.GroupPostRepository;
 import com.udemy.star_d_link.study.Entity.Study;
 import com.udemy.star_d_link.study.Entity.StudyMembers;
+import com.udemy.star_d_link.study.Exception.UnauthorizedException;
 import com.udemy.star_d_link.study.Repository.StudyMemberRepository;
 import com.udemy.star_d_link.study.Repository.StudyRepository;
 import com.udemy.star_d_link.study.Service.StudyMembersService;
@@ -63,22 +64,29 @@ public class GroupPostService {
 
     @Transactional
     public GroupPostUpdateResponseDto update(Long groupId,
-        String userid,
+        String username,
         GroupPostUpdateRequestDto updateRequestDto,
         Long postId) {
-
         GroupPostEntity groupPost = groupPostRepository.findById(postId)
             .orElseThrow(RuntimeException::new);
+        UserEntity userEntity = userRepository.findByUsername(username)
+            .orElseThrow(RuntimeException::new);;
+        if(userEntity != groupPost.getUser())
+            throw new UnauthorizedException("수정 권한이 없습니다.");
         groupPost.modify(updateRequestDto);
         groupPostRepository.save(groupPost);
         return GroupPostUpdateResponseDto.from(groupPost);
     }
 
     @Transactional
-    public void delete(Long groupId, Long postId) {
+    public void delete(Long groupId, Long postId, String username) {
         GroupPostEntity groupPost = groupPostRepository.findById(postId)
             .orElseThrow(RuntimeException::new);
         //유저 검증
+        UserEntity userEntity = userRepository.findByUsername(username)
+            .orElseThrow(RuntimeException::new);;
+        if(userEntity != groupPost.getUser())
+            throw new UnauthorizedException("수정 권한이 없습니다.");
         groupPostRepository.delete(groupPost);
     }
 
