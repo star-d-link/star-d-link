@@ -1,5 +1,6 @@
 package com.udemy.star_d_link.study.Entity;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -35,6 +36,7 @@ public class StudyLikes {
 
     @ManyToOne
     @JoinColumn(name = "study_id", nullable = false)
+    @JsonBackReference
     private Study study;
 
 }

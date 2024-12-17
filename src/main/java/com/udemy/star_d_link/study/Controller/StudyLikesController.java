@@ -12,6 +12,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -65,5 +66,25 @@ public class StudyLikesController {
         HttpHeaders headers = new HttpHeaders();
         headers.setLocation(URI.create(redirectUrl));
         return new ResponseEntity<>(headers, HttpStatus.SEE_OTHER);
+    }
+
+    @GetMapping("/like/status")
+    public ResponseEntity<ApiResponse<Boolean>> checkLikeStatus(
+        @PathVariable("study_id") Long studyId,
+        @AuthenticationPrincipal UserDetails currentUser) {
+
+        if (currentUser == null) {
+            throw new UnauthorizedException("권한이 없습니다.");
+        }
+
+        boolean isLiked = studyLikesService.isLiked(studyId, currentUser.getUsername());
+
+        ApiResponse<Boolean> response = new ApiResponse<>(
+            "success",
+            "좋아요 상태 조회 성공",
+            isLiked
+        );
+
+        return ResponseEntity.ok(response);
     }
 }
