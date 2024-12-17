@@ -102,3 +102,6 @@ logging:
 
 file:
   upload-dir: ${user.home}/uploads
+
+server:
+  port: 8080
