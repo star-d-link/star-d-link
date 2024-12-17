@@ -9,6 +9,7 @@ import com.udemy.star_d_link.domain.groupboard.post.service.GroupPostService;
 import com.udemy.star_d_link.global.common.dto.ResponseDto;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -16,7 +17,8 @@ import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/study")
+@RequestMapping("/study/group")
+@Slf4j
 public class GroupPostController {
 
     private final GroupPostService groupPostService;
@@ -30,12 +32,8 @@ public class GroupPostController {
         // 게시글 리스트 조회
         var inquiryResponseDtoList = groupPostService.getList(studyId, page, size);
 
-        ResponseDto<?> responseDto = ResponseDto.onSuccess(
-            "스터디 그룹 게시글 목록을 성공적으로 조회하였습니다.",
-            inquiryResponseDtoList
-        );
 
-        return ResponseEntity.ok(responseDto);
+        return ResponseEntity.ok(inquiryResponseDtoList);
     }
 
     @GetMapping("/{studyId}/post/{postId}")
@@ -46,13 +44,14 @@ public class GroupPostController {
         // 단일 게시글 조회
         GroupPostInquiryResponseDto postDetail = groupPostService.getPostDetail(studyId, postId);
 
+        log.info("'dsafas");
         // 성공 응답 생성
         ResponseDto<?> responseDto = ResponseDto.onSuccess(
             "스터디 그룹 게시글을 성공적으로 조회하였습니다.",
             postDetail
         );
 
-        return ResponseEntity.ok(responseDto);
+        return ResponseEntity.ok(postDetail);
     }
 
     @PostMapping("/{studyId}/board")
@@ -60,30 +59,25 @@ public class GroupPostController {
         @PathVariable("studyId") Long studyId,
         @RequestBody GroupPostCreateRequestDto createRequestDto,
         @AuthenticationPrincipal UserDetails currentUser) {
-        System.out.println("Received Study ID: " + studyId);
-        System.out.println("User: " + currentUser.getUsername());
-        System.out.println("Request DTO: " + createRequestDto);
+
         GroupPostCreateResponseDto createResponseDto = groupPostService.save(studyId, currentUser.getUsername(),
             createRequestDto);
-        ResponseDto<?> responseDto = ResponseDto.onSuccess(
-            "스터디 그룹 게시글을 성공적으로 생성하였습니다.",
-            createResponseDto);
 
-        return ResponseEntity.ok(responseDto);
+        log.info(createResponseDto.toString());
+        return ResponseEntity.ok(createResponseDto);
     }
 
-/*    @PutMapping("/{studyId}/post/{postId}")
+    @PutMapping("/{studyId}/post/{postId}")
     public ResponseEntity<?> updatePost(
         @PathVariable("studyId") Long studyId,
         @PathVariable("postId") Long postId,
-        @RequestBody GroupPostUpdateRequestDto updateRequestDto) {
-        GroupPostUpdateResponseDto updateResponseDto = groupPostService.update(studyId, updateRequestDto, postId);
-        ResponseDto<?> responseDto = ResponseDto.onSuccess(
-            "스터디 그룹 게시글을 성공적으로 수정하였습니다.",
-            updateResponseDto);
+        @RequestBody GroupPostUpdateRequestDto updateRequestDto,
+        @AuthenticationPrincipal UserDetails currentUser) {
+        GroupPostUpdateResponseDto updateResponseDto = groupPostService.update(studyId, currentUser.getUsername(),
+            updateRequestDto, postId);
 
-        return ResponseEntity.ok(responseDto);
-    }*/
+        return ResponseEntity.ok(updateResponseDto);
+    }
 
     @DeleteMapping("/{studyId}/post/{postId}")
     public ResponseEntity<?> deletePost(
@@ -92,10 +86,6 @@ public class GroupPostController {
 
         System.out.println("Received studyId: ");
         groupPostService.delete(studyId, postId);
-        ResponseDto<?> responseDto = ResponseDto.onSuccess(
-            "스터디 그룹 게시글을 성공적으로 삭제하였습니다.",
-            null);
-
-        return ResponseEntity.ok(responseDto);
+        return ResponseEntity.ok("삭제되었습니다.");
     }
 }

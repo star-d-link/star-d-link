@@ -20,12 +20,14 @@ import com.udemy.star_d_link.user.repository.UserRepository;
 import jakarta.transaction.Transactional;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class GroupPostService {
@@ -38,9 +40,9 @@ public class GroupPostService {
         Study study = studyRepository.findByStudyId(groupId)
             .orElseThrow(() -> new RuntimeException("스터디를 찾을 수 없습니다."));
 
-        Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "createdAt"));
+        Pageable pageable = PageRequest.of(page-1, size, Sort.by(Sort.Direction.DESC, "createdAt"));
         Page<GroupPostEntity> groupPostEntities = groupPostRepository.findByStudy(study, pageable);
-
+        log.info(groupPostEntities.toString());
         return groupPostEntities.map(GroupPostInquiryResponseDto::from);
     }
 
@@ -53,28 +55,24 @@ public class GroupPostService {
            .orElseThrow(RuntimeException::new);
        UserEntity userEntity = userRepository.findByUsername(username)
            .orElseThrow(() -> new RuntimeException("유저를 찾을 수 없습니다."));
-
+        System.out.println(createRequestDto.getTitle());
         GroupPostEntity groupPost = GroupPostEntity.of(createRequestDto, study, userEntity);
         groupPostRepository.save(groupPost);
         return GroupPostCreateResponseDto.from(groupPost);
     }
 
-/*    @Transactional
+    @Transactional
     public GroupPostUpdateResponseDto update(Long groupId,
-        Long userid,
-        GroupPostUpdateRequestDto updateRequestDto, Long postId) {
+        String userid,
+        GroupPostUpdateRequestDto updateRequestDto,
+        Long postId) {
 
         GroupPostEntity groupPost = groupPostRepository.findById(postId)
             .orElseThrow(RuntimeException::new);
-        //유저 검증
         groupPost.modify(updateRequestDto);
-        List<GroupPostFileEntity> groupPostFiles = updateRequestDto.getAddFileUrls().stream()
-            .map(fileUrl -> GroupPostFileEntity.of(fileUrl, groupPost)).toList();
-        groupPostFileRepository.saveAll(groupPostFiles);
-        imageUploadService.deleteFiles(updateRequestDto.getDeleteFileUrls());
         groupPostRepository.save(groupPost);
         return GroupPostUpdateResponseDto.from(groupPost);
-    }*/
+    }
 
     @Transactional
     public void delete(Long groupId, Long postId) {

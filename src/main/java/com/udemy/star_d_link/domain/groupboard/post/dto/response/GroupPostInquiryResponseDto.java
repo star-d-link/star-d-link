@@ -13,21 +13,18 @@ public class GroupPostInquiryResponseDto {
     private String author;
     private String title;
     private String content;
-    private List<String> groupPostFileUrls;
     private LocalDate createdAt;
     private LocalDate updatedAt;
-    private int numberOfComments;
+
 
     public static GroupPostInquiryResponseDto from(GroupPostEntity groupPost){
         return GroupPostInquiryResponseDto.builder()
             .id(groupPost.getId())
-            //.author(groupPost.getUser().get)
+            .author(groupPost.getUser().getUsername())
             .title(groupPost.getTitle())
             .content(groupPost.getContent())
-           // .numberOfComments(groupPost.getNumberOfComments())
             .createdAt(groupPost.getCreatedAt())
             .updatedAt(groupPost.getUpdatedAt())
-            //.groupPostFileUrls(groupPost.getGroupPostFile())
             .build();
     }
 }
