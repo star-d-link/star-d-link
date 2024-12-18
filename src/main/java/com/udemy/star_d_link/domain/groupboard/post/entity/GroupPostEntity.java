@@ -15,6 +15,7 @@ import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import lombok.AccessLevel;
@@ -45,11 +46,11 @@ public class GroupPostEntity {
 
     @CreationTimestamp
     @Column(nullable = false, updatable = false)
-    private LocalDate createdAt;
+    private LocalDateTime createdAt;
 
     @UpdateTimestamp
     @Column(insertable = false)
-    private LocalDate updatedAt;
+    private LocalDateTime updatedAt;
 
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
