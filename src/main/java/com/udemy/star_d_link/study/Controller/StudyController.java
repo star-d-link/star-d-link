@@ -144,6 +144,29 @@ public class StudyController {
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 
+    @PutMapping("/{study_id}/complete")
+    public ResponseEntity<ApiResponse<StudyResponseDto>> completeStudy(
+        @PathVariable("study_id") Long studyId,
+        @AuthenticationPrincipal UserDetails currentUser) {
+
+        if (currentUser == null) {
+            throw new UnauthorizedException("모집 완료 권한이 없습니다.");
+        }
+
+        // 현재 사용자명과 해당 스터디 ID를 바탕으로 isRecruit를 false로 변경하는 서비스 로직 수행
+        Study completedStudy = studyService.completeStudy(studyId, currentUser.getUsername());
+
+        StudyResponseDto studyResponseDto = StudyResponseDto.fromEntity(completedStudy);
+
+        ApiResponse<StudyResponseDto> response = new ApiResponse<>(
+            "success",
+            "스터디 모집이 성공적으로 완료되었습니다.",
+            studyResponseDto
+        );
+
+        return ResponseEntity.status(HttpStatus.OK).body(response);
+    }
+
     @DeleteMapping("/{study_id}")
     public ResponseEntity<ApiResponse<Void>> deleteStudy(
         @PathVariable("study_id") Long study_id,

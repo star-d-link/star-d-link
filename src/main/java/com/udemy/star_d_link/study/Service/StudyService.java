@@ -78,6 +78,8 @@ public class StudyService {
             .region(requestDto.getRegion())
             .isOnline(requestDto.getIsOnline())
             .headCount(requestDto.getHeadCount())
+            .latitude(requestDto.getLatitude())
+            .longitude(requestDto.getLongitude())
             .build();
 
         return studyRepository.save(study);
