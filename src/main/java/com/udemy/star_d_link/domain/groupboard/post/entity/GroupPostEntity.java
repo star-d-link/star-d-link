@@ -3,8 +3,8 @@ package com.udemy.star_d_link.domain.groupboard.post.entity;
 import com.udemy.star_d_link.domain.groupboard.post.dto.request.GroupPostCreateRequestDto;
 import com.udemy.star_d_link.domain.groupboard.post.dto.request.GroupPostUpdateRequestDto;
 import com.udemy.star_d_link.study.Entity.Study;
-import com.udemy.star_d_link.study.Entity.StudyMembers;
 import com.udemy.star_d_link.user.entity.UserEntity;
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
@@ -14,9 +14,7 @@ import jakarta.persistence.Id;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
-import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.List;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
@@ -58,6 +56,9 @@ public class GroupPostEntity {
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     private Study study;
+
+    @OneToMany(mappedBy = "groupPostEntity", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<GroupPostComment> comments;
 
     public static GroupPostEntity of(GroupPostCreateRequestDto createRequestDto, Study study,
         UserEntity userEntity) {

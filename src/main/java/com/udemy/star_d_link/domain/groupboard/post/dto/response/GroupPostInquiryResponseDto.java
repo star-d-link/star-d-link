@@ -1,10 +1,7 @@
 package com.udemy.star_d_link.domain.groupboard.post.dto.response;
 
 import com.udemy.star_d_link.domain.groupboard.post.entity.GroupPostEntity;
-import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.List;
 import lombok.Builder;
 import lombok.Getter;
 
@@ -17,13 +14,14 @@ public class GroupPostInquiryResponseDto {
     private String content;
     private String createdAt;
     private String updatedAt;
-
+    private String nickname;
 
     public static GroupPostInquiryResponseDto from(GroupPostEntity groupPost){
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm");
         return GroupPostInquiryResponseDto.builder()
             .id(groupPost.getId())
             .author(groupPost.getUser().getUsername())
+            .nickname(groupPost.getUser().getNickname())
             .title(groupPost.getTitle())
             .content(groupPost.getContent())
             .createdAt(groupPost.getCreatedAt().format(formatter))

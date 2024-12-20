@@ -7,7 +7,6 @@ import com.udemy.star_d_link.domain.groupboard.post.dto.response.GroupPostInquir
 import com.udemy.star_d_link.domain.groupboard.post.dto.response.GroupPostUpdateResponseDto;
 import com.udemy.star_d_link.domain.groupboard.post.service.GroupPostService;
 import com.udemy.star_d_link.global.common.dto.ResponseDto;
-import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;

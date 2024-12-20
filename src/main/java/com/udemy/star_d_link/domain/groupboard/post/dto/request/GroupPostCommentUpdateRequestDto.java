@@ -5,8 +5,6 @@ import lombok.Setter;
 
 @Getter
 @Setter
-public class GroupPostUpdateRequestDto {
-    private String title;
+public class GroupPostCommentUpdateRequestDto {
     private String content;
-
 }
