@@ -1,6 +1,5 @@
 package com.udemy.star_d_link.domain.groupboard.post.repository;
 
-import com.udemy.star_d_link.coursereview.Entity.CourseReview;
 import com.udemy.star_d_link.domain.groupboard.post.entity.GroupPostEntity;
 import com.udemy.star_d_link.study.Entity.Study;
 import java.util.Optional;

@@ -7,7 +7,6 @@ import com.udemy.star_d_link.domain.groupboard.post.dto.response.GroupPostInquir
 import com.udemy.star_d_link.domain.groupboard.post.dto.response.GroupPostUpdateResponseDto;
 import com.udemy.star_d_link.domain.groupboard.post.service.GroupPostService;
 import com.udemy.star_d_link.global.common.dto.ResponseDto;
-import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
@@ -44,7 +43,7 @@ public class GroupPostController {
         // 단일 게시글 조회
         GroupPostInquiryResponseDto postDetail = groupPostService.getPostDetail(studyId, postId);
 
-        log.info("'dsafas");
+
         // 성공 응답 생성
         ResponseDto<?> responseDto = ResponseDto.onSuccess(
             "스터디 그룹 게시글을 성공적으로 조회하였습니다.",
@@ -63,7 +62,6 @@ public class GroupPostController {
         GroupPostCreateResponseDto createResponseDto = groupPostService.save(studyId, currentUser.getUsername(),
             createRequestDto);
 
-        log.info(createResponseDto.toString());
         return ResponseEntity.ok(createResponseDto);
     }
 
@@ -82,10 +80,10 @@ public class GroupPostController {
     @DeleteMapping("/{studyId}/post/{postId}")
     public ResponseEntity<?> deletePost(
         @PathVariable("studyId") Long studyId,
-        @PathVariable("postId") Long postId) {
+        @PathVariable("postId") Long postId,
+        @AuthenticationPrincipal UserDetails currentUser) {
 
-        System.out.println("Received studyId: ");
-        groupPostService.delete(studyId, postId);
+        groupPostService.delete(studyId, postId, currentUser.getUsername());
         return ResponseEntity.ok("삭제되었습니다.");
     }
 }

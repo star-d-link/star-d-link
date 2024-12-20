@@ -1,24 +1,18 @@
 package com.udemy.star_d_link.domain.groupboard.post.service;
 
-import com.udemy.star_d_link.coursereview.Entity.CourseReview;
 import com.udemy.star_d_link.domain.groupboard.post.dto.request.GroupPostCreateRequestDto;
 import com.udemy.star_d_link.domain.groupboard.post.dto.request.GroupPostUpdateRequestDto;
 import com.udemy.star_d_link.domain.groupboard.post.dto.response.GroupPostCreateResponseDto;
 import com.udemy.star_d_link.domain.groupboard.post.dto.response.GroupPostInquiryResponseDto;
 import com.udemy.star_d_link.domain.groupboard.post.dto.response.GroupPostUpdateResponseDto;
 import com.udemy.star_d_link.domain.groupboard.post.entity.GroupPostEntity;
-import com.udemy.star_d_link.domain.groupboard.post.entity.GroupPostFileEntity;
-import com.udemy.star_d_link.domain.groupboard.post.repository.GroupPostFileRepository;
 import com.udemy.star_d_link.domain.groupboard.post.repository.GroupPostRepository;
 import com.udemy.star_d_link.study.Entity.Study;
-import com.udemy.star_d_link.study.Entity.StudyMembers;
-import com.udemy.star_d_link.study.Repository.StudyMemberRepository;
+import com.udemy.star_d_link.study.Exception.UnauthorizedException;
 import com.udemy.star_d_link.study.Repository.StudyRepository;
-import com.udemy.star_d_link.study.Service.StudyMembersService;
 import com.udemy.star_d_link.user.entity.UserEntity;
 import com.udemy.star_d_link.user.repository.UserRepository;
 import jakarta.transaction.Transactional;
-import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
@@ -42,7 +36,6 @@ public class GroupPostService {
 
         Pageable pageable = PageRequest.of(page-1, size, Sort.by(Sort.Direction.DESC, "createdAt"));
         Page<GroupPostEntity> groupPostEntities = groupPostRepository.findByStudy(study, pageable);
-        log.info(groupPostEntities.toString());
         return groupPostEntities.map(GroupPostInquiryResponseDto::from);
     }
 
@@ -55,7 +48,6 @@ public class GroupPostService {
            .orElseThrow(RuntimeException::new);
        UserEntity userEntity = userRepository.findByUsername(username)
            .orElseThrow(() -> new RuntimeException("유저를 찾을 수 없습니다."));
-        System.out.println(createRequestDto.getTitle());
         GroupPostEntity groupPost = GroupPostEntity.of(createRequestDto, study, userEntity);
         groupPostRepository.save(groupPost);
         return GroupPostCreateResponseDto.from(groupPost);
@@ -63,22 +55,29 @@ public class GroupPostService {
 
     @Transactional
     public GroupPostUpdateResponseDto update(Long groupId,
-        String userid,
+        String username,
         GroupPostUpdateRequestDto updateRequestDto,
         Long postId) {
-
         GroupPostEntity groupPost = groupPostRepository.findById(postId)
             .orElseThrow(RuntimeException::new);
+        UserEntity userEntity = userRepository.findByUsername(username)
+            .orElseThrow(RuntimeException::new);;
+        if(userEntity != groupPost.getUser())
+            throw new UnauthorizedException("수정 권한이 없습니다.");
         groupPost.modify(updateRequestDto);
         groupPostRepository.save(groupPost);
         return GroupPostUpdateResponseDto.from(groupPost);
     }
 
     @Transactional
-    public void delete(Long groupId, Long postId) {
+    public void delete(Long groupId, Long postId, String username) {
         GroupPostEntity groupPost = groupPostRepository.findById(postId)
             .orElseThrow(RuntimeException::new);
         //유저 검증
+        UserEntity userEntity = userRepository.findByUsername(username)
+            .orElseThrow(RuntimeException::new);;
+        if(userEntity != groupPost.getUser())
+            throw new UnauthorizedException("삭제 권한이 없습니다.");
         groupPostRepository.delete(groupPost);
     }
 
