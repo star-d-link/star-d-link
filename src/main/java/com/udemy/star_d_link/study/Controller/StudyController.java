@@ -153,7 +153,6 @@ public class StudyController {
             throw new UnauthorizedException("모집 완료 권한이 없습니다.");
         }
 
-        // 현재 사용자명과 해당 스터디 ID를 바탕으로 isRecruit를 false로 변경하는 서비스 로직 수행
         Study completedStudy = studyService.completeStudy(studyId, currentUser.getUsername());
 
         StudyResponseDto studyResponseDto = StudyResponseDto.fromEntity(completedStudy);

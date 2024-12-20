@@ -98,6 +98,22 @@ public class StudyService {
         studyRepository.delete(study);
     }
 
+    @Transactional
+    public Study completeStudy(Long studyId, String username) {
+        Study study = studyRepository.findById(studyId)
+            .orElseThrow(() -> new RuntimeException("해당 글을 찾을 수 없습니다."));
+
+        if (!study.getUsername().equals(username)) {
+            throw new UnauthorizedException("수정 권한이 없습니다.");
+        }
+
+        study = study.toBuilder()
+            .isRecruit(false)
+            .build();
+
+        return studyRepository.save(study);
+    }
+
     public Study findByStudyId(Long studyId) {
         return studyRepository.findByStudyId(studyId)
             .orElseThrow(() -> new NoSuchElementException("스터디 모집글 내용을 찾을 수 없습니다: " + studyId));
