@@ -58,4 +58,12 @@ public class StudyLikesService {
         study.decrementLikes();
         studyRepository.save(study);
     }
+
+    @Transactional
+    public boolean isLiked(Long studyId, String username) {
+        Study study = studyRepository.findById(studyId)
+            .orElseThrow(() -> new NoSuchElementException("해당 스터디를 찾을 수 없습니다: "));
+
+        return studyLikeRepository.findByUsernameAndStudy(username, study).isPresent();
+    }
 }

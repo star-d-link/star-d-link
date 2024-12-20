@@ -4,9 +4,11 @@ import com.udemy.star_d_link.study.Entity.StudySchedule;
 import com.udemy.star_d_link.study.Entity.StudyScheduleParticipation;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 @Builder
+@Getter
 @NoArgsConstructor
 @AllArgsConstructor
 public class StudyScheduleParticipationResponseDto {

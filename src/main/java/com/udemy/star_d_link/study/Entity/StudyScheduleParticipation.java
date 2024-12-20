@@ -20,7 +20,7 @@ import lombok.ToString;
 @NoArgsConstructor
 @AllArgsConstructor
 @Getter
-@Builder
+@Builder(toBuilder = true)
 public class StudyScheduleParticipation {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
