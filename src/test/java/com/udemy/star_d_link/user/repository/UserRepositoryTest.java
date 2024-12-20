@@ -3,6 +3,7 @@ package com.udemy.star_d_link.user.repository;
 import com.udemy.star_d_link.user.entity.UserEntity;
 import com.udemy.star_d_link.user.exception.UserExceptions;
 import com.udemy.star_d_link.user.exception.UserTaskException;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
@@ -48,12 +49,12 @@ class UserRepositoryTest {
 
     private UserEntity createUserEntity(int num) {
         return UserEntity.builder()
-            .username("user" + num)
+            .username("user" + num + 20)
             .password(passwordEncoder.encode("1234"))
-            .nickname("nickname" + num)
-            .email("email" + num)
-            .phoneNumber("phoneNumber" + num)
-            .birthDate(LocalDateTime.now())
+            .nickname("nickname" + num + 20)
+            .email("email" + (num + 20) )
+            .phoneNumber("phoneNumber" + num + 20)
+            .birthDate(LocalDate.now())
             .region("region" + num)
             .role(num <= 8 ? "USER" : "ADMIN")
             .build();
